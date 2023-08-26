@@ -1,0 +1,80 @@
+/* Updated styles with provided CSS */
+
+.table-container {
+  padding: 50px 0px 0px;
+  width: 65%;
+  margin: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+}
+
+th,
+td {
+  padding: 6px;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+  color: #ccc;
+}
+
+th {
+  background-color: #202020;
+  color: #ccc;
+}
+
+.delete-cell {
+  cursor: pointer;
+  width: 10%;
+}
+
+.delete-cell:hover {
+  background-color: rgb(185, 46, 46);
+  transition: background-color 0.3s ease;
+}
+
+.firstcolumnorrow {
+  cursor: pointer;
+}
+
+.firstcolumnorrow:hover {
+  background-color: rgb(117, 115, 115);
+  transition: background-color 0.3s ease;
+}
+
+.hover-red:hover {
+  background-color: rgb(165, 0, 0);
+}
+
+.hover-green:hover {
+  background-color: #005f40;
+}
+
+/* Pagination styles */
+
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: left;
+}
+
+.pagination button {
+  padding: 8px 12px;
+  margin: 2px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.pagination button.active {
+  background-color: #333;
+  color: #fff;
+}
+
+.pagination button:hover:not(.active) {
+  background-color: #f2f2f2;
+}

@@ -1,0 +1,68 @@
+.side-menu {
+  width: 100%;
+  background-color: #333;
+  color: rgb(226, 224, 224);
+  padding: 50px;
+}
+
+.menu-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: 18px;
+  text-align: left;
+
+  width: 250px;
+}
+
+.menu-item:hover {
+  background-color: #444;
+  width: 250px;
+}
+
+.icon {
+  margin-right: 5px;
+}
+.text {
+  margin-bottom: 5px;
+}
+
+.menu-item.has-submenu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rebeccapurple;
+}
+
+.sub-items-container {
+  position: absolute;
+  top: 100%;
+  left: 250px; /* Pomeramo podstavke horizontalno, tako da budu ispod menu-itema */
+  background-color: #444;
+  min-width: 150px;
+  padding: 10px;
+  z-index: 1;
+  display: none;
+  border: 1px solid rebeccapurple;
+}
+
+/* Prikaži podstavke kada je meni otvoren (kada ima klasu "open") */
+.menu-item.open .sub-items-container {
+  display: block;
+}
+
+.submenu-item {
+  padding: 5px;
+  cursor: pointer;
+
+  width: 200px;
+}
+.submenu-item:hover {
+  background-color: #555;
+  color: #fff;
+}

@@ -1,0 +1,27 @@
+/* Center the content both vertically and horizontally */
+.delete-client-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: left;
+  margin-left: 280px;
+  height: 50vh;
+}
+
+/* Style the content within the container */
+.delete-client-content {
+  padding: 10px;
+  max-width: 400px;
+  border: 1px solid #ccc;
+  margin-left: 20px;
+}
+
+.button-delete {
+  display: flex;
+  justify-content: center;
+}
+
+.text-delete {
+  color: #ccc;
+  font-size: medium;
+}

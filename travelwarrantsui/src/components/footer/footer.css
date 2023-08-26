@@ -1,0 +1,13 @@
+.footer {
+  position: fixed;
+  text-align: start;
+  width: 10%;
+  padding: 15px;
+  margin-bottom: 5px;
+  bottom: 0;
+  color: white;
+}
+
+.footer span:hover {
+  background-color: #686767;
+}

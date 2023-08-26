@@ -1,0 +1,88 @@
+import React, { useContext, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { addService } from "../../api/interfaces";
+import Button from "../../ui/Button";
+import { getServicesById } from "../../api/api";
+import { ServicesContext } from "../../context/ServicesContext";
+const initialValues = {
+  name: "",
+  vat: 0,
+};
+const EditService = () => {
+  const { id } = useParams();
+  const { editService } = useContext(ServicesContext);
+  const navigate = useNavigate();
+  const [addService, setService] = useState<addService>(initialValues);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const { name, value, type, checked } = e.target;
+    const newValue = type === "checkbox" ? checked : value;
+    setService((prevValues) => ({ ...prevValues, [name]: newValue }));
+  };
+  useEffect(() => {
+    const getSingleService = async () => {
+      try {
+        const serviceData = await getServicesById(Number(id));
+        setService(serviceData);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getSingleService();
+  }, [id]);
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    e.preventDefault();
+    try {
+      await editService(Number(id), addService);
+
+      navigate("/services");
+    } catch (error) {
+      console.error("Error adding client:", error);
+    }
+  };
+  return (
+    <div>
+      <div>
+        <div>
+          <Button
+            buttonStyle={{
+              backgroundColor: "rgb(100,100,100)",
+              marginTop: "10px",
+              marginLeft: "10px",
+            }}
+            onClick={() => navigate("/services")}
+          >
+            Nazad
+          </Button>
+          <h1>Izmijeni uslugu</h1>
+        </div>
+        <form onSubmit={handleSubmit} className="form-container-basic">
+          <div>
+            <label>Naziv</label>
+            <input
+              type="text"
+              name="name"
+              value={addService.name}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label>PDV</label>
+            <input
+              type="text"
+              name="vat"
+              value={addService.vat}
+              onChange={handleChange}
+            />
+          </div>
+
+          <button type="submit">Sačuvaj izmjene</button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default EditService;

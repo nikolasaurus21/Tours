@@ -1,0 +1,90 @@
+.form-container {
+  width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 10px;
+  grid-column-gap: 20px;
+  position: relative;
+
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-container::before {
+  content: "";
+  position: absolute;
+
+  background-color: #ccc;
+  transform: translateX(-50%);
+}
+
+.form-container div {
+  margin-bottom: 0px;
+}
+
+.form-container label {
+  display: block;
+  font-size: 14px;
+  color: #f5f0f0;
+  margin-bottom: 5px;
+  font-weight: 300;
+}
+
+.form-container input[type="text"],
+.form-container input[type="email"],
+.form-container input[type="number"],
+.form-container input[type="datetime-local"],
+.form-container textarea {
+  width: 90%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.form-container select {
+  width: 93%;
+  padding: 5px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  outline: none;
+  border-radius: 3px;
+}
+
+.form-container input:focus,
+.form-container select:focus {
+  border-color: #007bff;
+}
+.form-container button[type="submit"] {
+  display: flex;
+  justify-content: center;
+  margin-left: 95px;
+  width: 40%;
+  margin-top: 10px;
+  padding: 8px;
+  background-color: rgb(0, 128, 64);
+  color: #ebe9e9;
+  border: none;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background-color 0.3s;
+  letter-spacing: 1.5px;
+}
+.form-container button[type="submit"]:hover {
+  background-color: #005f40;
+}
+.left-side-tw {
+  grid-column: 1 / 2;
+}
+
+.right-side-tw {
+  grid-column: 2 / 3;
+}
+.error {
+  color: rgb(141, 6, 6);
+  font-size: 15px;
+  margin-top: 2px;
+}
