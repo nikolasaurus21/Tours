@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.DTOs;
+using TravelWarrants.Interfaces;
 
 namespace TravelWarrants.Controllers
 {
@@ -8,28 +9,35 @@ namespace TravelWarrants.Controllers
     [ApiController]
     public class StatusesController : ControllerBase
     {
-        private readonly TravelWarrantsContext _context;
-        public StatusesController(TravelWarrantsContext context)
+        private readonly IStatusesService _statuesesService;
+        public StatusesController(IStatusesService statuesesService)
         {
-            _context = context;
+            _statuesesService = statuesesService;
         }
 
         [HttpGet]
 
-        public async Task<ActionResult<IEnumerable<StatusDTO>>> GetStatuses()
+        public async Task<ActionResult> GetStatuses()
         {
-            var statuses = await _context.Statuses.Include(c => c.Client).Select(x => new StatusDTO
+            var result = await _statuesesService.GetStatuses();
+            if (result.IsSucced)
             {
-                Id= x.Id,
-                Client = x.Client.Name,
-                Search = x.AmountOfAccount,
-                Deposit = x.AmountOfDeposit,
-                Balance = x.Balance,
-                ClientId= x.ClientId,
-                
-            }).ToListAsync();
+                return Ok(result.Message);
+            }
+            return NotFound();
 
-            return Ok(statuses);
+            //var statuses = await _context.Statuses.Include(c => c.Client).Select(x => new StatusDTO
+            //{
+            //    Id= x.Id,
+            //    Client = x.Client.Name,
+            //    Search = x.AmountOfAccount,
+            //    Deposit = x.AmountOfDeposit,
+            //    Balance = x.Balance,
+            //    ClientId= x.ClientId,
+                
+            //}).ToListAsync();
+
+            //return Ok(statuses);
         }
     }
 }

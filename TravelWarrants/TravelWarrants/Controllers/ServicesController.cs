@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.DTOs;
+using TravelWarrants.Interfaces;
+using TravelWarrants.Models;
 
 namespace TravelWarrants.Controllers
 {
@@ -8,71 +10,110 @@ namespace TravelWarrants.Controllers
     [ApiController]
     public class ServicesController : ControllerBase
     {
-        private readonly TravelWarrantsContext _context;
-        public ServicesController(TravelWarrantsContext context)
+        private readonly IServicesService _servicesService;
+        public ServicesController(IServicesService servicesService )
         {
-            _context = context;
+            _servicesService = servicesService;
         }
 
         [HttpGet]
 
-        public async Task<ActionResult<IEnumerable<ServiceDTO>>> GetServices()
+        public async Task<ActionResult> GetServices()
         {
-            var services = await _context.Services.Select(x => new ServiceDTO
+
+            var result = await _servicesService.GetServices();
+            
+            if (result.IsSucced)
             {
-                Name= x.Name,
-                VATRate= x.VATRate,
-                Id= x.Id,
+                return Ok(result.Message);
+            }
+            return NotFound();
 
-            }).ToListAsync(); 
+            //var services = await _context.Services.Select(x => new ServiceDTO
+            //{
+            //    Name= x.Name,
+            //    VATRate= x.VATRate,
+            //    Id= x.Id,
 
-            return Ok(services);
+            //}).ToListAsync(); 
+
+            //return Ok(services);
         }
 
 
         [HttpGet("{id}")]
 
-        public async Task<ActionResult<ServiceDTO>> GetService(int id)
+        public async Task<ActionResult> GetService(int id)
         {
-            var service = await _context.Services.Where(x => x.Id == id).Select(x => new ServiceDTO
+            var result = await _servicesService.GetService(id);
+            if (result.IsSucced)
             {
-                Id = x.Id,
-                Name = x.Name,
-                VATRate = x.VATRate
-            }).SingleOrDefaultAsync();
+                return Ok(result.Message);
+            }
+            return NotFound();
 
-            return Ok(service);
+            //var service = await _context.Services.Where(x => x.Id == id).Select(x => new ServiceDTO
+            //{
+            //    Id = x.Id,
+            //    Name = x.Name,
+            //    VATRate = x.VATRate
+            //}).FirstOrDefaultAsync();
+
+            //return Ok(service);
         }
 
         [HttpPost]
         public async Task<ActionResult> NewService (ServiceDTOSave serviceDTO)
         {
-            var service = new Service
+            var result = await _servicesService.NewService(serviceDTO);
+            if (result.IsSucced)
             {
-                Name = serviceDTO.Name,
-                VATRate= serviceDTO.VATRate,
-                
-            };
+                return Ok(result.Message);
+            }
+            
+            return NotFound();
 
-            _context.Services.Add(service);
-            await _context.SaveChangesAsync();
-            return Ok();
+            //var service = new Service
+            //{
+            //    Name = serviceDTO.Name,
+            //    VATRate= serviceDTO.VATRate,
+                
+            //};
+
+            //_context.Services.Add(service);
+            //await _context.SaveChangesAsync();
+
+            //var newService = new ServiceDTO
+            //{
+            //    Name = service.Name,
+            //    Id = service.Id,
+            //    VATRate = service.VATRate,
+            //};
+
+            //return Ok(newService);
         }
 
         [HttpDelete("{id}")]
 
         public async Task<ActionResult> DeleteService(int id)
         {
-            var service = await _context.Services.FirstOrDefaultAsync(x => x.Id == id);
-
-            if (service == null)
+            var result = await _servicesService.DeleteService(id);
+            if (result.IsSucced)
             {
-                return NotFound();
+                return Ok(result.Message);
             }
+            return NotFound();
 
-            _context.Services.Remove(service);
-            await _context.SaveChangesAsync();
-            return Ok();
+            //var service = await _context.Services.FirstOrDefaultAsync(x => x.Id == id);
+
+            //if (service == null)
+            //{
+            //    return NotFound();
+            //}
+
+            //_context.Services.Remove(service);
+            //await _context.SaveChangesAsync();
+            //return Ok();
 
         }
 
@@ -80,22 +121,34 @@ namespace TravelWarrants.Controllers
 
         public async Task<ActionResult> EditService(int id , ServiceDTOSave serviceDTO)
         {
-            
-
-            var serviceDb = await _context.Services.FirstOrDefaultAsync(x=> x.Id == id);
-            if (serviceDb == null) 
+            var result = await _servicesService.EditService(id, serviceDTO);
+            if(result.IsSucced)
             {
-                return NotFound();
+                return Ok(result.Message);
             }
+            return NotFound();
 
-            serviceDb.VATRate = serviceDTO.VATRate;
-            serviceDb.Name= serviceDTO.Name;
+            //var serviceDb = await _context.Services.FirstOrDefaultAsync(x=> x.Id == id);
+            //if (serviceDb == null) 
+            //{
+            //    return NotFound();
+            //}
 
-            _context.Services.Update(serviceDb);
-            await _context.SaveChangesAsync();
+            //serviceDb.VATRate = serviceDTO.VATRate;
+            //serviceDb.Name= serviceDTO.Name;
 
+            //_context.Services.Update(serviceDb);
+            //await _context.SaveChangesAsync();
 
-            return Ok();
+            //var updatedService = new ServiceDTO
+            //{
+            //    Name = serviceDb.Name,
+            //    Id = serviceDb.Id,
+            //    VATRate = serviceDb.VATRate,
+            //};
+
+            //return Ok(updatedService);
+            
         }
     }
 }

@@ -2,6 +2,8 @@ global using Microsoft.EntityFrameworkCore;
 global using TravelWarrants.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using TravelWarrants.Interfaces;
+using TravelWarrants.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,16 +16,28 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<TravelWarrantsContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("ConnectionDB")));
 
-var provider = builder.Services.BuildServiceProvider();
-var configuration = provider.GetService<IConfiguration>();
+builder.Services.AddScoped<IClientsService,ClientsService>();
+builder.Services.AddScoped<IVehiclesService,VehiclesService>();
+builder.Services.AddScoped<IDriversService,DriversService>();
+builder.Services.AddScoped<ICompanyService,CompanyService>();
+builder.Services.AddScoped<IAccountService,AccountService>();
+builder.Services.AddScoped<IServicesService,ServicesService>();
+builder.Services.AddScoped<IToursService,ToursService>();
+builder.Services.AddScoped<IPaymentsService,PaymentsService>();
+builder.Services.AddScoped<ISearchesService,SearchesService>();
+builder.Services.AddScoped<IStatusesService,StatusesService>();
+builder.Services.AddScoped<IReportsService,ReportsService>();
 
-
+var configuration = builder.Configuration;
 builder.Services.AddCors(options =>
 {
-    var FrontendUrl = configuration.GetValue<string>("FrontendUrl");
-    options.AddDefaultPolicy(builder =>
+    var frontendUrl = configuration.GetValue<string>("FrontendUrl");
+    options.AddDefaultPolicy(policy =>
     {
-        builder.WithOrigins(FrontendUrl).AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin();
+        policy.WithOrigins(frontendUrl)
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+        
     });
 }
 );
