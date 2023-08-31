@@ -29,15 +29,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var services = await _context.Services.Select(x => new ServiceDTO
-            //{
-            //    Name= x.Name,
-            //    VATRate= x.VATRate,
-            //    Id= x.Id,
-
-            //}).ToListAsync(); 
-
-            //return Ok(services);
+            
         }
 
 
@@ -52,14 +44,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var service = await _context.Services.Where(x => x.Id == id).Select(x => new ServiceDTO
-            //{
-            //    Id = x.Id,
-            //    Name = x.Name,
-            //    VATRate = x.VATRate
-            //}).FirstOrDefaultAsync();
-
-            //return Ok(service);
+           
         }
 
         [HttpPost]
@@ -73,24 +58,7 @@ namespace TravelWarrants.Controllers
             
             return NotFound();
 
-            //var service = new Service
-            //{
-            //    Name = serviceDTO.Name,
-            //    VATRate= serviceDTO.VATRate,
-                
-            //};
-
-            //_context.Services.Add(service);
-            //await _context.SaveChangesAsync();
-
-            //var newService = new ServiceDTO
-            //{
-            //    Name = service.Name,
-            //    Id = service.Id,
-            //    VATRate = service.VATRate,
-            //};
-
-            //return Ok(newService);
+            
         }
 
         [HttpDelete("{id}")]
@@ -104,16 +72,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var service = await _context.Services.FirstOrDefaultAsync(x => x.Id == id);
-
-            //if (service == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //_context.Services.Remove(service);
-            //await _context.SaveChangesAsync();
-            //return Ok();
+            
 
         }
 
@@ -128,26 +87,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var serviceDb = await _context.Services.FirstOrDefaultAsync(x=> x.Id == id);
-            //if (serviceDb == null) 
-            //{
-            //    return NotFound();
-            //}
-
-            //serviceDb.VATRate = serviceDTO.VATRate;
-            //serviceDb.Name= serviceDTO.Name;
-
-            //_context.Services.Update(serviceDb);
-            //await _context.SaveChangesAsync();
-
-            //var updatedService = new ServiceDTO
-            //{
-            //    Name = serviceDb.Name,
-            //    Id = serviceDb.Id,
-            //    VATRate = serviceDb.VATRate,
-            //};
-
-            //return Ok(updatedService);
+            
             
         }
     }

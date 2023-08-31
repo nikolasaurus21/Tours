@@ -29,15 +29,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var acc = await _context.CompaniesGiroAccounts.Select(x => new GiroAccountDTOGet
-            //{
-            //    Id = x.Id,
-            //    Bank = x.Bank,
-            //    AccountNumber = x.AccountNumber,
-                
-            //}).ToListAsync();
-
-            //return Ok(acc);
+           
         }
 
         [HttpGet("{id}")]
@@ -52,16 +44,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var acc = await _context.CompaniesGiroAccounts.Where(x => x.Id == id).Select(x => new GiroAccountDTOGet
-            //{
-            //    Id = x.Id,
-            //    Bank = x.Bank,
-            //    AccountNumber = x.AccountNumber
-                
-                
-            //}).FirstOrDefaultAsync();
-
-            //return Ok(acc);
+            ;
         }
 
         [HttpPost]
@@ -76,24 +59,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var acc = new CompanyGiroAccount
-            //{
-                
-            //    Bank = giroAccountDTO.Bank,
-            //    AccountNumber= giroAccountDTO.AccountNumber,
-            //    CompanyId= 17,
-            //};
-
-            //_context.CompaniesGiroAccounts.Add(acc);
-            //await _context.SaveChangesAsync();
-
-            //var newAcc = new GiroAccountDTOGet 
-            //{
-            //    Id= acc.Id,
-            //    Bank = acc.Bank,
-            //    AccountNumber= acc.AccountNumber,
-            //};
-            //return Ok(newAcc);
+            
         }
 
 
@@ -108,16 +74,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var accDelete = await _context.CompaniesGiroAccounts.FirstOrDefaultAsync(x => x.Id == id);
-            //if (accDelete == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //_context.CompaniesGiroAccounts.Remove(accDelete);
-            //await _context.SaveChangesAsync();
-
-            //return Ok();
+            
         }
 
         [HttpPut("{id}")]
@@ -131,27 +88,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var accDb = await _context.CompaniesGiroAccounts.FirstOrDefaultAsync(x => x.Id == id);
-
-            //if(accDb == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //accDb.Bank = giroAccountDTO.Bank;
-            //accDb.AccountNumber = giroAccountDTO.AccountNumber;
             
-
-            //_context.CompaniesGiroAccounts.Update(accDb);
-            //await _context.SaveChangesAsync();
-
-            //var updateAcc = new GiroAccountDTOGet
-            //{
-            //    Id = accDb.Id,
-            //    Bank = accDb.Bank,
-            //    AccountNumber = accDb.AccountNumber,
-            //};
-            //return Ok(updateAcc);
         }
     }
 }

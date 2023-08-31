@@ -28,15 +28,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var drivers = await _context.Drivers.Select(x => new DriverDTO
-            //{
-            //    Name = x.Name,
-            //    Id= x.Id,
-               
-
-            //}).ToListAsync();
-
-            //return Ok(drivers);
+           
         }
 
 
@@ -51,16 +43,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var acc = await _context.Drivers.Where(x => x.Id == id).Select(x => new DriverDTO
-            //{
-            //    Id = x.Id,
-            //    Name = x.Name,
-            //    NumberOfPhone = x.NUmberOfPhone
-
-
-            //}).FirstOrDefaultAsync();
-
-            //return Ok(acc);
+            
         }
 
         [HttpPost]
@@ -74,19 +57,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var driver = new Driver
-            //{
-                
-            //    Name = driverDto.Name,
-            //    NUmberOfPhone = driverDto.NumberOfPhone
-            //};
-
-            //_context.Drivers.Add(driver);
-            //await _context.SaveChangesAsync();
-
-            //var newDriver = new DriverDTO { Id = driver.Id, Name = driver.Name };
-
-            //return Ok(newDriver);
+            ;
         }
 
         [HttpDelete("{id}")]
@@ -101,18 +72,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var deleteDriver = await _context.Drivers.FirstOrDefaultAsync(x => x.Id == id);
-
-            //if (deleteDriver == null)
-            //{
-            //    return NotFound();
-
-            //}
-
-            //_context.Drivers.Remove(deleteDriver);
-            //await _context.SaveChangesAsync();
-
-            //return Ok();
+            
         }
 
         [HttpPut("{id}")]
@@ -126,21 +86,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
             
-            //var driverDb = await _context.Drivers.FirstOrDefaultAsync(x => x.Id == id);
-            //if (driverDb == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //driverDb.Name = driverDTO.Name;
-            //driverDb.NUmberOfPhone = driverDTO.NumberOfPhone;
             
-
-            //_context.Drivers.Update(driverDb);
-            //await _context.SaveChangesAsync();
-
-            //var updatedDriver = new DriverDTO { Id = driverDb.Id, Name = driverDb.Name };
-            //return Ok(updatedDriver);
         }
     }
 }

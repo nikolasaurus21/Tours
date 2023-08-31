@@ -36,20 +36,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var warrants = await _context.Tours.Include(c => c.Client).Where(x => x.ClientId == id).Select(x => new TravelWarrantsReportsDTO
-            //{
-               
-            //    Id = x.Id, 
-            //    Mileage=x.Mileage,
-            //    Departure=x.Departure,
-            //    Destination=x.Destination,
-            //    IntermediateDestinations=x.IntermediateDestinations,
-            //    ClientName =  x.Client.Name,
-            //    DateAndTime=x.TimeOfTour
-
-            //}).ToListAsync();
-
-            //return Ok(warrants);
+            
         }
 
         [HttpGet]
@@ -61,24 +48,7 @@ namespace TravelWarrants.Controllers
                 return Ok(result.Message);
             }
             return NotFound();
-            //destination = destination.ToLower();
-
-            //var warrants = await _context.Tours
-            //    .Where(x => _excursion || x.Client.Excursion != true)
-            //    .Where(x =>  x.Destination.ToLower().Equals(destination))
-            //    .Select( x => new TravelWarrantsReportsDTO
-            //    {
-            //        Id= x.Id,
-            //        Departure=x.Departure,
-            //        Destination=x.Destination,
-            //        IntermediateDestinations = x.IntermediateDestinations,
-            //        Mileage=x.Mileage,
-            //        DateAndTime = x.TimeOfTour,
-            //        ClientName = _context.Clients.Where(c => c.Id == x.ClientId).Select(c => c.Name).FirstOrDefault()
-
-            //    }).ToArrayAsync();
-
-            //return Ok(warrants);
+            
         }
 
         [HttpGet]
@@ -91,25 +61,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //departure = departure.ToLower();
-            //destination = destination.ToLower();
-
-            //var warrants = await _context.Tours
-            //    .Where(x => _excursion || x.Client.Excursion != true)
-            //    .Where(x => x.Departure.ToLower().Equals(departure) && x.Destination.ToLower().Equals(destination))
-            //    .Select(x => new TravelWarrantsReportsDTO
-            //    {
-            //        Id = x.Id,
-            //        Departure = x.Departure,
-            //        Destination = x.Destination,
-            //        IntermediateDestinations = x.IntermediateDestinations,
-            //        Mileage = x.Mileage,    
-            //        ClientName = _context.Clients.Where(c => c.Id == x.ClientId).Select(c => c.Name).FirstOrDefault(),
-            //        DateAndTime = x.TimeOfTour
-
-            //    }).ToArrayAsync();
-
-            //return Ok(warrants);
+            
         }
 
         [HttpGet("{id}")]
@@ -121,22 +73,7 @@ namespace TravelWarrants.Controllers
                 return Ok(result.Message);
             }
             return NotFound();
-            //var warrants = await _context.Tours.Include(c => c.Client)
-            //    .Where(x => _excursion || x.Client.Excursion != true)
-            //    .Where(x => x.VehicleId == id)
-            //    .Select(x => new TravelWarrantsReportsDTO
-            //    {
-            //        Id = x.Id,
-            //        Departure = x.Departure,
-            //        Destination = x.Destination,
-            //        IntermediateDestinations = x.IntermediateDestinations,
-            //        Mileage = x.Mileage,
-            //        ClientName = x.Client.Name,
-            //        DateAndTime= x.TimeOfTour
-
-            //    }).ToArrayAsync();
-
-            //return Ok(warrants);
+            
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<TravelWarrantsReportsDTO>>> GetForDrivers(int id )
@@ -147,22 +84,7 @@ namespace TravelWarrants.Controllers
                 return Ok(result.Message);
             }
             return NotFound();
-            //var warrants = await _context.Tours.Include(c => c.Client)
-            //    .Where(x => _excursion || x.Client.Excursion != true)
-            //    .Where(x => x.DriverId == id)
-            //    .Select(x => new TravelWarrantsReportsDTO
-            //    {
-            //        Id = x.Id,
-            //        Departure = x.Departure,
-            //        Destination = x.Destination,
-            //        IntermediateDestinations = x.IntermediateDestinations,
-            //        Mileage = x.Mileage,    
-            //        ClientName = x.Client.Name,
-            //        DateAndTime= x.TimeOfTour
-
-            //    }).ToArrayAsync();
-
-            //return Ok(warrants);
+            
         }
 
         //[HttpGet]
@@ -199,31 +121,7 @@ namespace TravelWarrants.Controllers
                 return Ok(result.Message);
             }
             return NotFound();
-            //IQueryable<Tour> warrants = _context.Tours.Include(c => c.Client)
-            //    .Where(x => x.TimeOfTour >= from && x.TimeOfTour <= to);
-
-            //IQueryable<Tour> excursionWarrants = warrants.Where(c => c.Client.Excursion != true);
-
-            //if (_excursion != true)
-            //{
-            //    warrants = warrants.Except(excursionWarrants);
-            //}
-
-
-
-            //var result = await warrants.Select(x => new TravelWarrantReportsPeriod
-            //{
-            //    Id = x.Id,
-            //    Departure = x.Departure,
-            //    Destination = x.Destination,
-            //    IntermediateDestinations = x.IntermediateDestinations,
-            //    Mileage = x.Mileage,
-            //    ClientName = x.Client.Name,
-            //    DateAndTime = x.TimeOfTour
-
-            //}).ToListAsync();
-
-            //return Ok(result);
+            
         }
 
     }

@@ -26,18 +26,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var statuses = await _context.Statuses.Include(c => c.Client).Select(x => new StatusDTO
-            //{
-            //    Id= x.Id,
-            //    Client = x.Client.Name,
-            //    Search = x.AmountOfAccount,
-            //    Deposit = x.AmountOfDeposit,
-            //    Balance = x.Balance,
-            //    ClientId= x.ClientId,
-                
-            //}).ToListAsync();
-
-            //return Ok(statuses);
+            
         }
     }
 }

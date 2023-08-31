@@ -30,20 +30,7 @@ namespace TravelWarrants.Controllers
 
             return NotFound();
 
-            //var fleet = await _context.Vehicles.Select(x => new FleetDTOGet
-            //{
-            //    Id= x.Id,
-            //    Registration = x.Registration,
-            //    Name = x.Name,
-            //    Note = x.Note,
-            //    NumberOfSeats = x.NumberOfSeats,
-            //    FuelConsumption = x.FuelConsumption,
-            //    Mileage= x.Mileage,
-
-
-            //}).ToListAsync();
-
-            //return Ok(fleet);
+            
         }
 
         [HttpGet("{id}")]
@@ -59,20 +46,7 @@ namespace TravelWarrants.Controllers
             return NotFound();
 
 
-            //var vehicle = await _context.Vehicles.Where(x => x.Id == id).Select(x => new FleetDTOGet
-            //{
-            //    Id = x.Id,
-            //    Name = x.Name,
-            //    Registration = x.Registration,
-            //    Note = x.Note,
-            //    NumberOfSeats= x.NumberOfSeats,
-            //    FuelConsumption= x.FuelConsumption,
-            //    Mileage = x.Mileage
-
-
-            //}).FirstOrDefaultAsync();
-
-            //return Ok(vehicle);
+            
         }
 
         [HttpPost]
@@ -88,32 +62,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var vehicle = new Vehicle
-            //{
-                
-            //    Name = fleetDTO.Name,
-            //    Registration = fleetDTO.Registration,
-            //    Note = fleetDTO.Note,
-            //    NumberOfSeats = fleetDTO.NumberOfSeats,
-            //    FuelConsumption = fleetDTO.FuelConsumption,
-            //    Mileage = fleetDTO.Mileage,
-            //};
-
-            //_context.Vehicles.Add(vehicle);
-            //await _context.SaveChangesAsync();
-
-            //var newVehicle = new FleetDTOGet
-            //{
-            //    Id = vehicle.Id,
-            //    Registration = vehicle.Registration,
-            //    Name = vehicle.Name,
-            //    Note = vehicle.Note,
-            //    NumberOfSeats = vehicle.NumberOfSeats,
-            //    FuelConsumption = vehicle.FuelConsumption,
-            //    Mileage = vehicle.Mileage,
-            //};
-
-            //return Ok(newVehicle);
+            
         }
 
         [HttpDelete("{id}")]
@@ -128,17 +77,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var vehicle = await _context.Vehicles.FirstOrDefaultAsync(x=> x.Id == id);
-
-            //if (vehicle == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //_context.Vehicles.Remove(vehicle);
-            //await _context.SaveChangesAsync();
-
-            //return Ok(); 
+            
         }
 
         [HttpPut("{id}")]
@@ -152,35 +91,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            //var vehicleDb = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == id);
-            //if (vehicleDb == null)
-            //{
-            //    return NotFound();
-            //}
-
             
-            //vehicleDb.Name = fleetDTO.Name;
-            //vehicleDb.Registration = fleetDTO.Registration;
-            //vehicleDb.Note = fleetDTO.Note;
-            //vehicleDb.NumberOfSeats = fleetDTO.NumberOfSeats;
-            //vehicleDb.FuelConsumption = fleetDTO.FuelConsumption;
-            //vehicleDb.Mileage = fleetDTO.Mileage;
-
-            //_context.Vehicles.Update(vehicleDb);
-            //await _context.SaveChangesAsync();
-
-            //var updatedVehicle = new FleetDTOGet
-            //{
-            //    Id = vehicleDb.Id,
-            //    Registration = vehicleDb.Registration,
-            //    Name = vehicleDb.Name,
-            //    Note = vehicleDb.Note,
-            //    NumberOfSeats = vehicleDb.NumberOfSeats,
-            //    FuelConsumption = vehicleDb.FuelConsumption,
-            //    Mileage = vehicleDb.Mileage,
-            //};
-
-            //return Ok(updatedVehicle);
             
         }
     
