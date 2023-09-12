@@ -164,3 +164,12 @@ export interface deleteTour{
   driver:string
   mileage:number
 }
+
+export interface Inovices{
+  id:number,
+  number:number,
+  year:number,
+  amount:number,
+  clientName:number
+  date:string
+}

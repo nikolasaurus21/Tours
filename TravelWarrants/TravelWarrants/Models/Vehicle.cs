@@ -2,12 +2,7 @@
 {
     public class Vehicle
     {
-        public Vehicle()
-        {
-
-            this.Tour = new HashSet<Tour>();
-        }
-
+      
         public int Id { get; set; }
         public string Name { get; set; }
         public string Registration { get; set; }

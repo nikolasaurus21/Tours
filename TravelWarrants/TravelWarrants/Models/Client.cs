@@ -4,15 +4,7 @@ namespace TravelWarrants.Models
 {
     public class Client
     {
-        public Client()
-        {
-
-            this.Account = new HashSet<Account>();
-            this.Inovice = new HashSet<Inovice>();
-            this.Tour = new HashSet<Tour>();
-            this.Payment = new HashSet<Payment>();
-            this.Status = new HashSet<Status>();
-        }
+        
         public int Id { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }

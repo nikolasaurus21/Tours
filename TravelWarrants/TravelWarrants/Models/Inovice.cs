@@ -2,11 +2,7 @@
 {
     public class Inovice
     {
-        public Inovice()
-        {
-            this.InoviceService = new HashSet<InoviceService>();
-            this.Account = new HashSet<Account>();
-        }
+       
         public int Id { get; set; }
         public int Number { get; set; }
         public int Year { get; set; }

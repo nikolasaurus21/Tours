@@ -27,6 +27,7 @@ builder.Services.AddScoped<IPaymentsService,PaymentsService>();
 builder.Services.AddScoped<ISearchesService,SearchesService>();
 builder.Services.AddScoped<IStatusesService,StatusesService>();
 builder.Services.AddScoped<IReportsService,ReportsService>();
+builder.Services.AddScoped<IInovicesService,InovicesService>();
 
 var configuration = builder.Configuration;
 builder.Services.AddCors(options =>

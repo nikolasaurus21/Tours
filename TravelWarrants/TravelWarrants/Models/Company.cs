@@ -2,10 +2,7 @@
 {
     public class Company
     {
-        public Company()
-        {
-            this.CompanyGiroAccount = new HashSet<CompanyGiroAccount>();
-        }
+       
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }

@@ -2,16 +2,7 @@
 {
     public class Service
     {
-        public Service()
-        {
-            this.InoviceService = new HashSet<InoviceService>();
-            this.Inovice = new HashSet<Inovice>();
-            this.Inovice1 = new HashSet<Inovice>();
-            this.Inovice2 = new HashSet<Inovice>();
-            this.Inovice3 = new HashSet<Inovice>();
-            this.Inovice4 = new HashSet<Inovice>();
-
-        }
+        
 
         public int Id { get; set; }
         public string Name { get; set; }

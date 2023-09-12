@@ -15,6 +15,7 @@ import { PaymentsProvider } from "./context/PaymentsContext";
 import { SearchesProvider } from "./context/SearchesContext";
 import { StatusesProvider } from "./context/StatusesContext";
 import { PaginationProvider } from "./context/PaginationContext";
+import { InovicesProvider } from "./context/InovicesContext";
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
@@ -30,11 +31,13 @@ root.render(
                   <PaymentsProvider>
                     <SearchesProvider>
                       <StatusesProvider>
-                        <PaginationProvider>
-                          <BrowserRouter>
-                            <App />
-                          </BrowserRouter>
-                        </PaginationProvider>
+                        <InovicesProvider>
+                          <PaginationProvider>
+                            <BrowserRouter>
+                              <App />
+                            </BrowserRouter>
+                          </PaginationProvider>
+                        </InovicesProvider>
                       </StatusesProvider>
                     </SearchesProvider>
                   </PaymentsProvider>

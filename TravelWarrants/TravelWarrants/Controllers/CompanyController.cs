@@ -25,7 +25,7 @@ namespace TravelWarrants.Controllers
             var result = await _companyService.Get();
             if (result.IsSucced)
             {
-                return Ok(result);
+                return Ok(result.Message);
             }
             return NotFound();
 

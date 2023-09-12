@@ -38,6 +38,7 @@ import DeleteDriver from "./pages/drivers/DeleteDriver";
 import DeleteGiroAccount from "./pages/ziro-racun/DeleteGiroAccount";
 import DeleteService from "./pages/services/DeleteService";
 import DeleteTour from "./pages/travelwarrants/DeleteTour";
+import Inovices from "./pages/inovice/Inovices";
 
 const AppRoutes = () => {
   return (
@@ -118,6 +119,8 @@ const AppRoutes = () => {
         />
 
         <Route path="/status" element={<Status />} />
+
+        <Route path="/inovices" element={<Inovices />} />
       </Routes>
     </div>
   );

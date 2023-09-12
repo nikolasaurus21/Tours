@@ -1,4 +1,4 @@
-import {  addClient, addVehicle,allClients, allVehicles,allDrivers,addDriver,ICompany, allGiroAccounts, addGiroAccounts, allServices, addService, allTravelWarrants, addTravelWarrant, allPayments, addPayment, IReports, Statuses, deleteTour} from "./interfaces";
+import {  addClient, addVehicle,allClients, allVehicles,allDrivers,addDriver,ICompany, allGiroAccounts, addGiroAccounts, allServices, addService, allTravelWarrants, addTravelWarrant, allPayments, addPayment, IReports, Statuses, deleteTour, Inovices} from "./interfaces";
 import axios from "axios";
 import { format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
@@ -257,7 +257,7 @@ export const getClientById = async (id: number): Promise<addClient> => {
   export const getCompany =async ():Promise<ICompany[]> => {
     const response =await axios.get("https://localhost:7206/api/Company/Get")
    
-    const jsonResponse = await response.data.map((x:any)=> ({
+    const jsonResponse =  response.data.map((x:any)=> ({
       name: x.name,
       description: x.description,
       address: x.address,
@@ -836,7 +836,7 @@ export const  getReportsForDestination = async (dest:string):Promise<IReports[]>
 
 export const excursion = async (onOff: boolean): Promise<void> => {
   try {
-    console.log(onOff);
+    
     await axios.post(`https://localhost:7206/api/TravelWarrantsReports/Excursion?excursionOnOff=${onOff}`,
     {
       headers: {
@@ -844,7 +844,7 @@ export const excursion = async (onOff: boolean): Promise<void> => {
         Accept: "application/json"
       }
     });
-    console.log("Uspješno poslat zahtev.");
+    
   } catch (error) {
     console.error("Došlo je do greške prilikom slanja zahteva:", error);
   }
@@ -887,4 +887,26 @@ export const getStatuses =async ():Promise<Statuses[]> => {
   }))
   
   return jsonResponse
+}
+
+//Inovice
+
+export const getInovices =async (page?: number | null):Promise<Inovices[]> => {
+   const response = await axios.get("https://localhost:7206/api/Inovices",{
+    params:{
+      pageNumber:page
+    }
+   })
+
+   const jsonResponse = response.data.map((x:any)=>({
+      year: x.year,
+      number:x.number,
+      amount:x.amount,
+      clientName:x.clientName,
+      id:x.id,
+      date: format(new Date(x.date), "dd/MM/yyyy"),
+
+   }))
+
+   return jsonResponse
 }

@@ -10,8 +10,6 @@ namespace TravelWarrants.Controllers
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class ClientsController : ControllerBase
-
-
     {   
         private readonly IClientsService _clientsService;
         public ClientsController(IClientsService clientsService) 

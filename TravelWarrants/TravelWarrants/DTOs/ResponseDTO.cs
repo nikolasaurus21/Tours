@@ -7,6 +7,7 @@ namespace TravelWarrants.DTOs
         
         public bool IsSucced { get; set; }
         public T Message { get; set; }
-        
+        public int? TotalPages { get; set; }
+
     }
 }

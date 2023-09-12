@@ -103,7 +103,9 @@ const SideMenu = () => {
       </div>
       {isInvoiceMenuOpen && (
         <div className="submenu">
-          <div className="submenu-item">Fakture</div>
+          <div className="submenu-item" onClick={() => navigate("/inovices")}>
+            Fakture
+          </div>
           <div className="submenu-item">Profakture</div>
         </div>
       )}
