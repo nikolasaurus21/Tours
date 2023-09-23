@@ -5,24 +5,25 @@
 namespace TravelWarrants.Migrations
 {
     /// <inheritdoc />
-    public partial class VATDecimal : Migration
+    public partial class FixInovice : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<decimal>(
-            name: "VAT",
-            table: "Clients",
-            type: "decimal",
-            nullable: false
-            );
-
+            migrationBuilder.DropColumn(
+                name: "NumberOfDays",
+                table: "Inovices");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-           
+            migrationBuilder.AddColumn<string>(
+                name: "NumberOfDays",
+                table: "Inovices",
+                type: "text",
+                nullable: false,
+                defaultValue: "");
         }
     }
 }

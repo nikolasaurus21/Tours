@@ -12,8 +12,8 @@ using TravelWarrants.Models;
 namespace TravelWarrants.Migrations
 {
     [DbContext(typeof(TravelWarrantsContext))]
-    [Migration("20230710153024_Fixing")]
-    partial class Fixing
+    [Migration("20230921201222_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -102,9 +102,8 @@ namespace TravelWarrants.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("VAT")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<decimal>("VAT")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 

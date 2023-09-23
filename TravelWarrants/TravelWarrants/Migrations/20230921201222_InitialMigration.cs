@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace TravelWarrants.Migrations
 {
     /// <inheritdoc />
-    public partial class DatabaseCreation : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,11 +22,11 @@ namespace TravelWarrants.Migrations
                     Address = table.Column<string>(type: "text", nullable: false),
                     PlaceName = table.Column<string>(type: "text", nullable: false),
                     RegistrationNUmber = table.Column<string>(type: "text", nullable: false),
-                    VAT = table.Column<string>(type: "text", nullable: false),
+                    VAT = table.Column<decimal>(type: "numeric", nullable: false),
                     Telephone = table.Column<string>(type: "text", nullable: false),
                     Fax = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
-                    Note = table.Column<string>(type: "text", nullable: false),
+                    Note = table.Column<string>(type: "text", nullable: true),
                     Excursion = table.Column<bool>(type: "boolean", nullable: true)
                 },
                 constraints: table =>
@@ -111,6 +111,7 @@ namespace TravelWarrants.Migrations
                     Note = table.Column<string>(type: "text", nullable: false),
                     NumberOfSeats = table.Column<string>(type: "text", nullable: false),
                     FuelConsumption = table.Column<string>(type: "text", nullable: false),
+                    Mileage = table.Column<decimal>(type: "numeric", nullable: false),
                     Change = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>

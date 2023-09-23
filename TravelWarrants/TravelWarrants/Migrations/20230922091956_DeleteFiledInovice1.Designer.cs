@@ -12,8 +12,8 @@ using TravelWarrants.Models;
 namespace TravelWarrants.Migrations
 {
     [DbContext(typeof(TravelWarrantsContext))]
-    [Migration("20230620132125_DatabaseCreation")]
-    partial class DatabaseCreation
+    [Migration("20230922091956_DeleteFiledInovice1")]
+    partial class DeleteFiledInovice1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -88,7 +88,6 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Note")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PlaceName")
@@ -103,9 +102,8 @@ namespace TravelWarrants.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("VAT")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<decimal>("VAT")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
@@ -243,9 +241,6 @@ namespace TravelWarrants.Migrations
 
                     b.Property<DateTime>("DocumentDate")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("Inovice1")
-                        .HasColumnType("boolean");
 
                     b.Property<decimal>("NoVAT")
                         .HasColumnType("numeric");
@@ -608,6 +603,9 @@ namespace TravelWarrants.Migrations
                     b.Property<string>("FuelConsumption")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<decimal>("Mileage")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("Name")
                         .IsRequired()

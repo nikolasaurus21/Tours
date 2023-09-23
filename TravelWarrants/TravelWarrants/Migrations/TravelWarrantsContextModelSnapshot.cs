@@ -41,6 +41,7 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("InoviceId")
+                        .IsRequired()
                         .HasColumnType("integer");
 
                     b.Property<string>("Note")
@@ -220,26 +221,8 @@ namespace TravelWarrants.Migrations
                     b.Property<DateTime>("CurrencyDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Description1")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Description2")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Description3")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Description4")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Description5")
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("DocumentDate")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("Inovice1")
-                        .HasColumnType("boolean");
 
                     b.Property<decimal>("NoVAT")
                         .HasColumnType("numeric");
@@ -251,27 +234,8 @@ namespace TravelWarrants.Migrations
                     b.Property<int>("Number")
                         .HasColumnType("integer");
 
-                    b.Property<string>("NumberOfDays")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("OfferAccepted")
+                    b.Property<bool?>("OfferAccepted")
                         .HasColumnType("boolean");
-
-                    b.Property<decimal>("Price1")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("Price2")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("Price3")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("Price4")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("Price5")
-                        .HasColumnType("numeric");
 
                     b.Property<bool?>("PriceWithoutVAT")
                         .HasColumnType("boolean");
@@ -282,55 +246,10 @@ namespace TravelWarrants.Migrations
                     b.Property<string>("Route")
                         .HasColumnType("text");
 
-                    b.Property<int>("Service1")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("Service2")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("Service3")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("Service4")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("Service5")
-                        .HasColumnType("integer");
-
                     b.Property<decimal>("Total")
                         .HasColumnType("numeric");
 
                     b.Property<decimal>("VAT")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("VAT1")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("VAT2")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("VAT3")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("VAT4")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("VAT5")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("Value1")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("Value2")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("Value3")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("Value4")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal?>("Value5")
                         .HasColumnType("numeric");
 
                     b.Property<int>("Year")
@@ -339,16 +258,6 @@ namespace TravelWarrants.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId");
-
-                    b.HasIndex("Service1");
-
-                    b.HasIndex("Service2");
-
-                    b.HasIndex("Service3");
-
-                    b.HasIndex("Service4");
-
-                    b.HasIndex("Service5");
 
                     b.ToTable("Inovices", (string)null);
                 });
@@ -665,39 +574,7 @@ namespace TravelWarrants.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TravelWarrants.Models.Service", "Service")
-                        .WithMany("Inovice")
-                        .HasForeignKey("Service1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TravelWarrants.Models.Service", "Service6")
-                        .WithMany("Inovice1")
-                        .HasForeignKey("Service2");
-
-                    b.HasOne("TravelWarrants.Models.Service", "Service7")
-                        .WithMany("Inovice2")
-                        .HasForeignKey("Service3");
-
-                    b.HasOne("TravelWarrants.Models.Service", "Service8")
-                        .WithMany("Inovice3")
-                        .HasForeignKey("Service4");
-
-                    b.HasOne("TravelWarrants.Models.Service", "Service9")
-                        .WithMany("Inovice4")
-                        .HasForeignKey("Service5");
-
                     b.Navigation("Client");
-
-                    b.Navigation("Service");
-
-                    b.Navigation("Service6");
-
-                    b.Navigation("Service7");
-
-                    b.Navigation("Service8");
-
-                    b.Navigation("Service9");
                 });
 
             modelBuilder.Entity("TravelWarrants.Models.InoviceService", b =>
@@ -800,16 +677,6 @@ namespace TravelWarrants.Migrations
 
             modelBuilder.Entity("TravelWarrants.Models.Service", b =>
                 {
-                    b.Navigation("Inovice");
-
-                    b.Navigation("Inovice1");
-
-                    b.Navigation("Inovice2");
-
-                    b.Navigation("Inovice3");
-
-                    b.Navigation("Inovice4");
-
                     b.Navigation("InoviceService");
                 });
 

@@ -39,9 +39,9 @@ namespace TravelWarrants.Models
 
 
 
-            modelBuilder.Entity<Account>()
-                .Property(x => x.InoviceId)
-                .IsRequired(false);
+            //modelBuilder.Entity<Account>()
+            //    .Property(x => x.InoviceId)
+            //    .IsRequired(false);
 
             // One-to-Many relationship between Inovice and Acount +
             modelBuilder.Entity<Inovice>()
@@ -112,31 +112,7 @@ namespace TravelWarrants.Models
                     .WithOne(t => t.Driver)
                     .HasForeignKey(t => t.DriverId);
 
-            //One-to-Many relathionship between Service and Inovice +
-            modelBuilder.Entity<Service>()
-                    .HasMany(u => u.Inovice)
-                    .WithOne(f => f.Service)
-                    .HasForeignKey(f => f.Service1);
-
-            modelBuilder.Entity<Service>()
-                    .HasMany(u => u.Inovice1)
-                    .WithOne(f => f.Service6)
-                    .HasForeignKey(f => f.Service2);
-
-            modelBuilder.Entity<Service>()
-                    .HasMany(u => u.Inovice2)
-                    .WithOne(f => f.Service7)
-                    .HasForeignKey(f => f.Service3);
-
-            modelBuilder.Entity<Service>()
-                    .HasMany(u => u.Inovice3)
-                    .WithOne(f => f.Service8)
-                    .HasForeignKey(f => f.Service4);
-
-            modelBuilder.Entity<Service>()
-                    .HasMany(u => u.Inovice4)
-                    .WithOne(f => f.Service9)
-                    .HasForeignKey(f => f.Service5);
+           
         }
 
 
