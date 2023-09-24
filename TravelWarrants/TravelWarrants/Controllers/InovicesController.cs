@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.Inovices;
 using TravelWarrants.Interfaces;
 
 namespace TravelWarrants.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class InovicesController : ControllerBase
     {
@@ -29,9 +29,33 @@ namespace TravelWarrants.Controllers
 
         [HttpPost]
 
-        public async Task<ActionResult> NewInovice(InoviceSaveDTO inoviceSaveDTO)
+        public async Task<ActionResult> NewInovice(InoviceNewDTO inoviceSaveDTO)
         {
             var result = await _inovicesService.NewInovice(inoviceSaveDTO);
+            if (result.IsSucced)
+            {
+                return Ok(result.Message);
+            }
+            return NotFound();
+        }
+
+        [HttpPut]
+
+        public async Task<ActionResult>EditInovice(int inoviceId, InoviceEditDTO inoviceEditDTO)
+        {
+            var result = await _inovicesService.EditInvoice(inoviceId, inoviceEditDTO);
+            if (result.IsSucced)
+            {
+                return Ok(result.Message);
+            }
+            return NotFound();
+        }
+
+        [HttpDelete("{inoviceId}")]
+
+        public async Task<ActionResult> DeleteInovice (int inoviceId)
+        {
+            var result = await _inovicesService.DeleteInovice(inoviceId);
             if (result.IsSucced)
             {
                 return Ok(result.Message);

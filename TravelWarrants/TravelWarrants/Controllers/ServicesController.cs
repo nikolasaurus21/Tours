@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.Services;
 using TravelWarrants.Interfaces;
 using TravelWarrants.Models;
 

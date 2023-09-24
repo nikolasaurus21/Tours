@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.Tours;
 
 namespace TravelWarrants.Interfaces
 {

@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.Models;
-using TravelWarrants.DTOs;
 using TravelWarrants.Services;
 using TravelWarrants.Interfaces;
+using TravelWarrants.DTOs.Clients;
 
 namespace TravelWarrants.Controllers
 {

@@ -1,4 +1,5 @@
 ﻿using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.Clients;
 using TravelWarrants.Interfaces;
 using TravelWarrants.Models;
 

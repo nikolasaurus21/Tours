@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.Drivers;
 using TravelWarrants.Interfaces;
 
 namespace TravelWarrants.Services

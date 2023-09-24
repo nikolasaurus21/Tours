@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.Payments;
 using TravelWarrants.Interfaces;
 using TravelWarrants.Models;
 

@@ -1,4 +1,5 @@
 ﻿using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.Status;
 using TravelWarrants.Interfaces;
 
 namespace TravelWarrants.Services

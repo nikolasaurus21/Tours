@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.Tours;
 using TravelWarrants.Interfaces;
 using TravelWarrants.Models;
 

@@ -1,4 +1,5 @@
 ﻿using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.Fleet;
 
 namespace TravelWarrants.Interfaces
 {

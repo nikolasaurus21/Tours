@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Xml.Linq;
-using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.Company;
 using TravelWarrants.Interfaces;
 
 namespace TravelWarrants.Controllers

@@ -1,4 +1,5 @@
 ﻿using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.Drivers;
 
 namespace TravelWarrants.Interfaces
 {

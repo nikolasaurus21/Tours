@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.Reports;
 using TravelWarrants.Interfaces;
 
 namespace TravelWarrants.Services
