@@ -1,7 +1,8 @@
 import React, { createContext, useState, useEffect } from "react";
 import { addVehicle, allVehicles } from "../api/interfaces";
 import { addVehicles, editVehicles, getVehicles } from "../api/api";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+import PopUp from "../ui/PopUp";
 
 export type VehiclesContextData = {
   vehicles: allVehicles[];
@@ -23,6 +24,7 @@ export const VehiclesProvider = ({
   children: React.ReactNode;
 }) => {
   const [vehicles, setVehicles] = useState<allVehicles[]>([]);
+  const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -53,7 +55,10 @@ export const VehiclesProvider = ({
       const newVehicle = await addVehicles(data);
       setVehicles((prevVehicles) => [newVehicle, ...prevVehicles]);
     } catch (error) {
-      console.log(error);
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 400) {
+        setPopupOpen(true);
+      }
     }
   };
 
@@ -72,6 +77,9 @@ export const VehiclesProvider = ({
     <VehiclesContext.Provider
       value={{ vehicles, removeVehicle, addVehicle, editVehicle }}
     >
+      {isPopupOpen && (
+        <PopUp isOpen={isPopupOpen} onClose={() => setPopupOpen(false)} />
+      )}
       {children}
     </VehiclesContext.Provider>
   );

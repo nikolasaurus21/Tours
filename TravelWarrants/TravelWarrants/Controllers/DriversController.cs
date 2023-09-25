@@ -48,16 +48,16 @@ namespace TravelWarrants.Controllers
 
         [HttpPost]
 
-        public  async Task<ActionResult > NewDriver (DriverDTOSave driverDto)
+        public  async Task<ActionResult> NewDriver (DriverDTOSave driverDto)
         {
             var result = await _driversService.NewDriver(driverDto);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
-            return NotFound();
+            return BadRequest(result.ErrorMessage);
 
-            ;
+            
         }
 
         [HttpDelete("{id}")]

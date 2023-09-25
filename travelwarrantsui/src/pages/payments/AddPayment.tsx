@@ -5,8 +5,6 @@ import Button from "../../ui/Button";
 import "../../ui/form.css";
 import { ClientsContext } from "../../context/ClientsContext";
 import { PaymentsContext } from "../../context/PaymentsContext";
-import { CompanyContext } from "../../context/CompanyContext";
-import PopUp from "../../ui/PopUp";
 
 const currentDate = new Date();
 const formattedDate = `${currentDate.getFullYear()}-${String(
@@ -25,8 +23,6 @@ const AddPayment = () => {
   const navigate = useNavigate();
   const { clients } = useContext(ClientsContext);
   const { addNewPayment } = useContext(PaymentsContext);
-  const { isCompanyAdded, isPopUpOpen, setIsPopUpOpen } =
-    useContext(CompanyContext);
 
   const [clientData, setClientData] = useState<ListItem[]>([]);
   const [addPayment, setAddPayment] = useState<addPayment>(defaultValues);
@@ -59,12 +55,8 @@ const AddPayment = () => {
   ): Promise<void> => {
     e.preventDefault();
     try {
-      if (!isCompanyAdded) {
-        setIsPopUpOpen(true);
-      } else {
-        await addNewPayment(addPayment);
-        navigate("/payments");
-      }
+      await addNewPayment(addPayment);
+      navigate("/payments");
     } catch (error) {
       console.error("Error adding client:", error);
     }
@@ -131,7 +123,6 @@ const AddPayment = () => {
           <button type="submit">Dodaj uplatu</button>
         </div>
       </form>
-      <PopUp isOpen={isPopUpOpen} onClose={() => setIsPopUpOpen(false)} />
     </div>
   );
 };

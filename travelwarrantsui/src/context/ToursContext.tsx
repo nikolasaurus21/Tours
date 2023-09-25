@@ -1,7 +1,8 @@
 import { createContext, useEffect, useState } from "react";
 import { addTravelWarrant, allTravelWarrants } from "../api/interfaces";
 import { addWarrant, editWarrant, getTravelWarrants } from "../api/api";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+import PopUp from "../ui/PopUp";
 
 export type TravelWarrantsContextData = {
   travelwarrants: allTravelWarrants[];
@@ -23,6 +24,8 @@ export const TravelWarrantsProvider = ({
   children: React.ReactNode;
 }) => {
   const [travelwarrants, setTravelwarrants] = useState<allTravelWarrants[]>([]);
+  const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
+
   useEffect(() => {
     const fetchWarrants = async () => {
       try {
@@ -51,7 +54,10 @@ export const TravelWarrantsProvider = ({
       const newTour = await addWarrant(data);
       setTravelwarrants((x) => [newTour, ...x]);
     } catch (error) {
-      console.log(error);
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 400) {
+        setPopupOpen(true);
+      }
     }
   };
 
@@ -77,6 +83,9 @@ export const TravelWarrantsProvider = ({
         editTour,
       }}
     >
+      {isPopupOpen && (
+        <PopUp isOpen={isPopupOpen} onClose={() => setPopupOpen(false)} />
+      )}
       {children}
     </TravelWarrantsContext.Provider>
   );

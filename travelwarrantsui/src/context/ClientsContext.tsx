@@ -5,8 +5,10 @@ import {
   editClients,
   getClientById,
 } from "../api/api"; // Uvoz novih funkcija
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { addClient, allClients } from "../api/interfaces";
+
+import PopUp from "../ui/PopUp";
 
 export type ClientsContextData = {
   clients: allClients[];
@@ -33,6 +35,7 @@ export const ClientsProvider = ({
   children: React.ReactNode;
 }) => {
   const [clients, setClients] = useState<allClients[]>([]);
+  const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -64,6 +67,10 @@ export const ClientsProvider = ({
       setClients((prevClients) => [newClient, ...prevClients]);
     } catch (error) {
       console.log(error);
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 400) {
+        setPopupOpen(true);
+      }
     }
   };
 
@@ -89,6 +96,9 @@ export const ClientsProvider = ({
         getClientById,
       }}
     >
+      {isPopupOpen && (
+        <PopUp isOpen={isPopupOpen} onClose={() => setPopupOpen(false)} />
+      )}
       {children}
     </ClientsContext.Provider>
   );

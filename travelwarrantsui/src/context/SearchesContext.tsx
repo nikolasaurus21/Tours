@@ -1,6 +1,8 @@
 import React, { createContext, useEffect, useState } from "react";
 import { addPayment, allPayments } from "../api/interfaces";
 import { addSearches, editSearches, getSearches } from "../api/api";
+import { AxiosError } from "axios";
+import PopUp from "../ui/PopUp";
 
 export type SearchesContextData = {
   searches: allPayments[];
@@ -25,6 +27,7 @@ export const SearchesProvider = ({
 }) => {
   const [searches, setSearches] = useState<allPayments[]>([]);
   const [searchesChanged, setSearchesChanged] = useState<boolean>(false);
+  const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchSearches = async () => {
@@ -47,7 +50,10 @@ export const SearchesProvider = ({
       setSearches((x) => [newSearch, ...x]);
       setSearchesChanged(true);
     } catch (error) {
-      console.log(error);
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 400) {
+        setPopupOpen(true);
+      }
     }
   };
 
@@ -71,6 +77,9 @@ export const SearchesProvider = ({
         setSearchesChanged,
       }}
     >
+      {isPopupOpen && (
+        <PopUp isOpen={isPopupOpen} onClose={() => setPopupOpen(false)} />
+      )}
       {children}
     </SearchesContext.Provider>
   );

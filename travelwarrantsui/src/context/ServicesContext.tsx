@@ -1,7 +1,8 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { createContext, useState, useEffect } from "react";
 import { addServices, editServices, getServices } from "../api/api";
 import { addService, allServices } from "../api/interfaces";
+import PopUp from "../ui/PopUp";
 
 export type ServicesContextData = {
   services: allServices[];
@@ -22,7 +23,7 @@ export const ServicesProvider = ({
   children: React.ReactNode;
 }) => {
   const [services, setServices] = useState<allServices[]>([]);
-
+  const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -51,7 +52,10 @@ export const ServicesProvider = ({
       const newService = await addServices(data);
       setServices((x) => [newService, ...x]);
     } catch (error) {
-      console.log(error);
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 400) {
+        setPopupOpen(true);
+      }
     }
   };
 
@@ -75,6 +79,9 @@ export const ServicesProvider = ({
         editService,
       }}
     >
+      {isPopupOpen && (
+        <PopUp isOpen={isPopupOpen} onClose={() => setPopupOpen(false)} />
+      )}
       {children}
     </ServicesContext.Provider>
   );

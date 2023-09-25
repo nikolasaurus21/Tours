@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.GiroAcc;
 using TravelWarrants.DTOs.Searches;
 using TravelWarrants.Interfaces;
 
@@ -104,24 +105,31 @@ namespace TravelWarrants.Services
             var searches = await _context.Accounts.Include(c => c.Client).Select(x => new SearchDTOGet
             {
                 Id = x.Id,
-                ClientId = (int)x.ClientId,
-                ClientName = x.Client.Name,
-                Amount = (decimal)x.Amount,
-                Date = (DateTime)x.Date,
+                ClientId = x.ClientId.HasValue ? (int)x.ClientId : 0, // check if ClientId has value
+                ClientName = x.Client != null ? x.Client.Name : null, // check if Client is null
+                Amount = x.Amount.HasValue ? (decimal)x.Amount : 0, // check if Amount has value
+                Date = x.Date.HasValue ? (DateTime)x.Date : DateTime.MinValue, // check if Date has value
                 Note = x.Note,
-
             }).ToListAsync();
-            return new ResponseDTO<IEnumerable<SearchDTOGet>> { IsSucced=true , Message=searches};
+            return new ResponseDTO<IEnumerable<SearchDTOGet>> { IsSucced = true, Message = searches };
         }
+
 
         public async Task<ResponseDTO<SearchDTOGet>> NewSearch(SearchesDTOSave searchesDTO)
         {
+            //var companyExists = await _context.Companies.AnyAsync();
+            //if (!companyExists)
+            //{
+            //    return new ResponseDTO<SearchDTOGet>() { IsSucced = false, ErrorMessage = "Add a company first" };
+            //}
+
             var search = new Account
             {
                 Date = searchesDTO.Date,
                 Amount = searchesDTO.Amount,
                 ClientId = searchesDTO.ClientId,
                 Note = searchesDTO.Note,
+               
 
             };
 
@@ -157,6 +165,7 @@ namespace TravelWarrants.Services
                 Date = (DateTime)search.Date,
                 Amount = (decimal)search.Amount,
                 ClientName = (await _context.Clients.FirstOrDefaultAsync(c => c.Id == searchesDTO.ClientId))?.Name,
+
                 Note = search.Note,
 
             };

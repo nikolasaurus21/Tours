@@ -4,8 +4,6 @@ import "../../ui/form.css";
 import Button from "../../ui/Button";
 import { useNavigate } from "react-router-dom";
 import { ClientsContext } from "../../context/ClientsContext";
-import { CompanyContext } from "../../context/CompanyContext";
-import PopUp from "../../ui/PopUp";
 
 export const initialValues: addClient = {
   name: "",
@@ -20,8 +18,6 @@ export const initialValues: addClient = {
 };
 const AddClient = () => {
   const { addClient } = useContext(ClientsContext);
-  const { isCompanyAdded, isPopUpOpen, setIsPopUpOpen } =
-    useContext(CompanyContext);
 
   const navigate = useNavigate();
   const [addNewClient, setAddNewClient] = useState<addClient>(initialValues);
@@ -37,12 +33,8 @@ const AddClient = () => {
   ): Promise<void> => {
     e.preventDefault();
     try {
-      if (!isCompanyAdded) {
-        setIsPopUpOpen(true);
-      } else {
-        await addClient(addNewClient);
-        navigate("/clients");
-      }
+      await addClient(addNewClient);
+      navigate("/clients");
     } catch (error) {
       console.error("Error adding client:", error);
     }
@@ -152,8 +144,6 @@ const AddClient = () => {
           />
         </div>
         <button type="submit">Dodaj klijenta</button>
-
-        <PopUp isOpen={isPopUpOpen} onClose={() => setIsPopUpOpen(false)} />
       </form>
     </div>
   );

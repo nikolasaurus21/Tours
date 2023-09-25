@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.GiroAcc;
 using TravelWarrants.DTOs.Tours;
 using TravelWarrants.Interfaces;
 
@@ -14,6 +15,11 @@ namespace TravelWarrants.Services
         }
         public async Task<ResponseDTO<TourDTOGet>> CreateTour(TourDTOSave tourDTO)
         {
+            var companyExists = await _context.Companies.AnyAsync();
+            if (!companyExists)
+            {
+                return new ResponseDTO<TourDTOGet>() { IsSucced = false, ErrorMessage = "Add a company first" };
+            }
             var tour = new Tour
             {
 

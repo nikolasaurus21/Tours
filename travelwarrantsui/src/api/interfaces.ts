@@ -1,5 +1,3 @@
-
-
 export interface allClients{
     name: string,
     address:string,
@@ -172,4 +170,21 @@ export interface Inovices{
   amount:number,
   clientName:number
   date:string
+}
+
+export interface IAddItem{
+  description?:string
+  serviceId:number
+  quantity:number
+  price:number
+  numberOfDays:string
+
+}
+export interface IAddInovice{
+  clientId: number
+  paymentDeadline:number
+  note:string
+  date:string
+  priceWithoutVat:boolean
+  itemsOnInovice:IAddItem[]
 }

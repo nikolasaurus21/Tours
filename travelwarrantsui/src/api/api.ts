@@ -1,4 +1,4 @@
-import {  addClient, addVehicle,allClients, allVehicles,allDrivers,addDriver,ICompany, allGiroAccounts, addGiroAccounts, allServices, addService, allTravelWarrants, addTravelWarrant, allPayments, addPayment, IReports, Statuses, deleteTour, Inovices} from "./interfaces";
+import {  addClient, addVehicle,allClients, allVehicles,allDrivers,addDriver,ICompany, allGiroAccounts, addGiroAccounts, allServices, addService, allTravelWarrants, addTravelWarrant, allPayments, addPayment, IReports, Statuses, deleteTour, Inovices, IAddInovice} from "./interfaces";
 import axios from "axios";
 import { format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
@@ -892,7 +892,7 @@ export const getStatuses =async ():Promise<Statuses[]> => {
 //Inovice
 
 export const getInovices =async (page?: number | null):Promise<Inovices[]> => {
-   const response = await axios.get("https://localhost:7206/api/Inovices",{
+   const response = await axios.get("https://localhost:7206/api/Inovices/Get",{
     params:{
       pageNumber:page
     }
@@ -909,4 +909,26 @@ export const getInovices =async (page?: number | null):Promise<Inovices[]> => {
    }))
 
    return jsonResponse
+}
+
+export const newInovice =async (data:IAddInovice):Promise<Inovices> => {
+  const utcDate = utcToZonedTime(data.date, "UTC");
+  const response = await axios.post("https://localhost:7206/api/Inovices/NewInovice",
+  {
+    clientId:data.clientId,
+    documentDate:format(utcDate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
+    paymentDeadline:data.paymentDeadline,
+    priceWithoutVAT:data.priceWithoutVat,
+    note:data.note,
+    itemsOnInovice:data.itemsOnInovice
+  },
+  {
+    headers:{
+      "Content-Type":"application/json",
+      Accept:"application/json"
+    }
+  })
+console.log(response.data)
+ return response.data
+ 
 }

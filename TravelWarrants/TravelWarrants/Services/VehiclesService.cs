@@ -1,4 +1,5 @@
 ﻿using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.Clients;
 using TravelWarrants.DTOs.Fleet;
 using TravelWarrants.Interfaces;
 
@@ -98,6 +99,12 @@ namespace TravelWarrants.Services
 
         public async Task<ResponseDTO<FleetDTOGet>> NewVehicle(FleetDTOSave fleetDTO)
         {
+            var companyExists = await _context.Companies.AnyAsync();
+            if (!companyExists)
+            {
+                return new ResponseDTO<FleetDTOGet>() { IsSucced = false, ErrorMessage = "Add a company first" };
+            }
+
             var vehicle = new Vehicle
             {
 

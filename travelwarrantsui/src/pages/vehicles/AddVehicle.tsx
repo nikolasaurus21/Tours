@@ -3,8 +3,6 @@ import Button from "../../ui/Button";
 import { useNavigate } from "react-router-dom";
 import { addVehicle } from "../../api/interfaces";
 import { VehiclesContext } from "../../context/VehiclesContext";
-import PopUp from "../../ui/PopUp";
-import { CompanyContext } from "../../context/CompanyContext";
 
 const initialValues = {
   registration: "",
@@ -17,8 +15,7 @@ const initialValues = {
 const AddVehicle = () => {
   const navigate = useNavigate();
   const { addVehicle } = useContext(VehiclesContext);
-  const { isCompanyAdded, isPopUpOpen, setIsPopUpOpen } =
-    useContext(CompanyContext);
+
   const [addNewVehicle, setAddNewVehicle] = useState<addVehicle>(initialValues);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -32,13 +29,9 @@ const AddVehicle = () => {
   ): Promise<void> => {
     e.preventDefault();
     try {
-      if (!isCompanyAdded) {
-        setIsPopUpOpen(true);
-      } else {
-        await addVehicle(addNewVehicle);
+      await addVehicle(addNewVehicle);
 
-        navigate("/vehicles");
-      }
+      navigate("/vehicles");
     } catch (error) {
       console.error("Error adding client:", error);
     }
@@ -124,7 +117,6 @@ const AddVehicle = () => {
 
         <button type="submit">Dodaj vozilo</button>
       </form>
-      <PopUp isOpen={isPopUpOpen} onClose={() => setIsPopUpOpen(false)} />
     </div>
   );
 };

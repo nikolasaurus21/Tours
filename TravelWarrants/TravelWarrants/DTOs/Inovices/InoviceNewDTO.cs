@@ -12,7 +12,7 @@ namespace TravelWarrants.DTOs.Inovices
 
         public List<ItemsOnInovice> ItemsOnInovice { get; set; } = new List<ItemsOnInovice>();
 
-        public bool PriceWithoutVAT { get; set; }
+        public bool PriceWithoutVAT { get; set; } = false;
         // public bool? ProinoviceWithoutVAT { get; set; }
 
         // public string? Route { get; set; }

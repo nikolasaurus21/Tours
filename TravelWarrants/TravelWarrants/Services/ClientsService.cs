@@ -100,6 +100,13 @@ namespace TravelWarrants.Services
 
         public async Task<ResponseDTO<ClientDTOGet>> NewClient(ClientDTOSave clientDTO)
         {
+
+            var companyExists = await _context.Companies.AnyAsync(); 
+            if (!companyExists)
+            {
+                return new ResponseDTO<ClientDTOGet>() {IsSucced = false,  ErrorMessage="Add company before add a client"};
+            }
+
             var client = new Client
             {
                 Name = clientDTO.Name,

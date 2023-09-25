@@ -1,6 +1,8 @@
 import React, { createContext, useEffect, useState } from "react";
 import { addPayment, allPayments } from "../api/interfaces";
 import { addPayments, editPayments, getPayments } from "../api/api";
+import { AxiosError } from "axios";
+import PopUp from "../ui/PopUp";
 
 export type PaymentsContextData = {
   payments: allPayments[];
@@ -25,6 +27,7 @@ export const PaymentsProvider = ({
 }) => {
   const [payments, setPayments] = useState<allPayments[]>([]);
   const [paymentsChanged, setPaymentsChanged] = useState<boolean>(false);
+  const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchPayments = async () => {
@@ -44,7 +47,10 @@ export const PaymentsProvider = ({
       setPayments((x) => [newPayment, ...x]);
       setPaymentsChanged(true);
     } catch (error) {
-      console.log(error);
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 400) {
+        setPopupOpen(true);
+      }
     }
   };
 
@@ -70,6 +76,9 @@ export const PaymentsProvider = ({
         setPaymentsChanged,
       }}
     >
+      {isPopupOpen && (
+        <PopUp isOpen={isPopupOpen} onClose={() => setPopupOpen(false)} />
+      )}
       {children}
     </PaymentsContext.Provider>
   );

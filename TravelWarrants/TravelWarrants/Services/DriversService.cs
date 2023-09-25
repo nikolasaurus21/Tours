@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.Clients;
 using TravelWarrants.DTOs.Drivers;
 using TravelWarrants.Interfaces;
 
@@ -76,6 +77,11 @@ namespace TravelWarrants.Services
     
         public async Task<ResponseDTO<DriverDTO>> NewDriver(DriverDTOSave driverDTO)
         {
+            var companyExists = await _context.Companies.AnyAsync();
+            if (!companyExists)
+            {
+                return new ResponseDTO<DriverDTO>() { IsSucced = false, ErrorMessage = "Add a company first" };
+            }
             var driver = new Driver
             {
 

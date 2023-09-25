@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { addService } from "../../api/interfaces";
 import Button from "../../ui/Button";
 import { ServicesContext } from "../../context/ServicesContext";
-import PopUp from "../../ui/PopUp";
-import { CompanyContext } from "../../context/CompanyContext";
+
 const initialValues = {
   name: "",
   vat: 0,
@@ -12,8 +11,7 @@ const initialValues = {
 const AddService = () => {
   const navigate = useNavigate();
   const { addNewService } = useContext(ServicesContext);
-  const { isCompanyAdded, isPopUpOpen, setIsPopUpOpen } =
-    useContext(CompanyContext);
+
   const [addService, setService] = useState<addService>(initialValues);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -27,13 +25,9 @@ const AddService = () => {
   ): Promise<void> => {
     e.preventDefault();
     try {
-      if (!isCompanyAdded) {
-        setIsPopUpOpen(true);
-      } else {
-        await addNewService(addService);
+      await addNewService(addService);
 
-        navigate("/services");
-      }
+      navigate("/services");
     } catch (error) {
       console.error("Error adding client:", error);
     }
@@ -76,7 +70,6 @@ const AddService = () => {
 
           <button type="submit">Dodaj uslugu</button>
         </form>
-        <PopUp isOpen={isPopUpOpen} onClose={() => setIsPopUpOpen(false)} />
       </div>
     </div>
   );

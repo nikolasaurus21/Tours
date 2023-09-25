@@ -3,8 +3,7 @@ import { addDriver } from "../../api/interfaces";
 import Button from "../../ui/Button";
 import { useNavigate } from "react-router-dom";
 import { DriversContext } from "../../context/DriversContext";
-import { CompanyContext } from "../../context/CompanyContext";
-import PopUp from "../../ui/PopUp";
+
 const initialValues = {
   name: "",
   phone: "",
@@ -12,8 +11,7 @@ const initialValues = {
 const AddDriver = () => {
   const navigate = useNavigate();
   const { addDriver } = useContext(DriversContext);
-  const { isCompanyAdded, isPopUpOpen, setIsPopUpOpen } =
-    useContext(CompanyContext);
+
   const [addNewDriver, setAddNewDriver] = useState<addDriver>(initialValues);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -26,12 +24,8 @@ const AddDriver = () => {
   ): Promise<void> => {
     e.preventDefault();
     try {
-      if (!isCompanyAdded) {
-        setIsPopUpOpen(true);
-      } else {
-        await addDriver(addNewDriver);
-        navigate("/drivers");
-      }
+      await addDriver(addNewDriver);
+      navigate("/drivers");
     } catch (error) {
       console.error("Error adding client:", error);
     }
@@ -74,8 +68,6 @@ const AddDriver = () => {
 
           <button type="submit">Dodaj vozača</button>
         </form>
-
-        <PopUp isOpen={isPopUpOpen} onClose={() => setIsPopUpOpen(false)} />
       </div>
     </div>
   );

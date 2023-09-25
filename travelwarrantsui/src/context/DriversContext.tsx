@@ -6,7 +6,8 @@ import {
   getDrivers,
   getDriversById,
 } from "../api/api";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+import PopUp from "../ui/PopUp";
 
 export type DriversContextData = {
   drivers: allDrivers[];
@@ -32,6 +33,7 @@ export const DriversProvider = ({
   children: React.ReactNode;
 }) => {
   const [drivers, setDrivers] = useState<allDrivers[]>([]);
+  const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchDrivers = async () => {
@@ -61,7 +63,12 @@ export const DriversProvider = ({
     try {
       const newDriver = await addDrivers(data);
       setDrivers((x) => [newDriver, ...x]);
-    } catch (error) {}
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 400) {
+        setPopupOpen(true);
+      }
+    }
   };
 
   const editDriver = async (id: number, data: addDriver): Promise<void> => {
@@ -76,6 +83,9 @@ export const DriversProvider = ({
     <DriversContext.Provider
       value={{ drivers, removeDriver, addDriver, editDriver, getDriversById }}
     >
+      {isPopupOpen && (
+        <PopUp isOpen={isPopupOpen} onClose={() => setPopupOpen(false)} />
+      )}
       {children}
     </DriversContext.Provider>
   );

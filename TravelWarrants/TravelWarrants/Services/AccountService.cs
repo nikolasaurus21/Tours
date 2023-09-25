@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.Fleet;
 using TravelWarrants.DTOs.GiroAcc;
 using TravelWarrants.Interfaces;
 
@@ -80,6 +81,11 @@ namespace TravelWarrants.Services
 
         public async Task<ResponseDTO<GiroAccountDTOGet>> NewGiroAcc(GiroAccountDTOSave giroAccountDTO)
         {
+            var companyExists = await _context.Companies.AnyAsync();
+            if (!companyExists)
+            {
+                return new ResponseDTO<GiroAccountDTOGet>() { IsSucced = false, ErrorMessage = "Add a company first" };
+            }
             var acc = new CompanyGiroAccount
             {
 

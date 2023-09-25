@@ -5,8 +5,6 @@ import { ListItem, addPayment } from "../../api/interfaces";
 import Button from "../../ui/Button";
 import { ClientsContext } from "../../context/ClientsContext";
 import { SearchesContext } from "../../context/SearchesContext";
-import PopUp from "../../ui/PopUp";
-import { CompanyContext } from "../../context/CompanyContext";
 
 const currentDate = new Date();
 const formattedDate = `${currentDate.getFullYear()}-${String(
@@ -25,8 +23,6 @@ const AddSearch = () => {
   const navigate = useNavigate();
   const { clients } = useContext(ClientsContext);
   const { addNewSearch } = useContext(SearchesContext);
-  const { isCompanyAdded, isPopUpOpen, setIsPopUpOpen } =
-    useContext(CompanyContext);
 
   const [clientData, setClientData] = useState<ListItem[]>([]);
   const [addSearch, setAddSearch] = useState<addPayment>(defaultValues);
@@ -59,12 +55,8 @@ const AddSearch = () => {
   ): Promise<void> => {
     e.preventDefault();
     try {
-      if (!isCompanyAdded) {
-        setIsPopUpOpen(true);
-      } else {
-        await addNewSearch(addSearch);
-        navigate("/searches");
-      }
+      await addNewSearch(addSearch);
+      navigate("/searches");
     } catch (error) {
       console.error("Error adding client:", error);
     }
@@ -133,7 +125,6 @@ const AddSearch = () => {
           <button type="submit">Dodaj potraživanje</button>
         </div>
       </form>
-      <PopUp isOpen={isPopUpOpen} onClose={() => setIsPopUpOpen(false)} />
     </div>
   );
 };

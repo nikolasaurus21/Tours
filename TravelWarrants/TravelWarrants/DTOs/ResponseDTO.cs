@@ -9,5 +9,7 @@ namespace TravelWarrants.DTOs
         public T Message { get; set; }
         public int? TotalPages { get; set; }
 
+        public string? ErrorMessage { get; set; }
+
     }
 }

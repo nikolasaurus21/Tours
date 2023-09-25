@@ -4,8 +4,6 @@ import { addGiroAccounts } from "../../api/interfaces";
 
 import Button from "../../ui/Button";
 import { GiroAccountsContext } from "../../context/ZiroRacuniContext";
-import { CompanyContext } from "../../context/CompanyContext";
-import PopUp from "../../ui/PopUp";
 
 const initialValues = {
   bank: "",
@@ -14,8 +12,7 @@ const initialValues = {
 const AddGiroAccount = () => {
   const navigate = useNavigate();
   const { addAcc } = useContext(GiroAccountsContext);
-  const { isCompanyAdded, isPopUpOpen, setIsPopUpOpen } =
-    useContext(CompanyContext);
+
   const [addGiroAcc, setAddGiroAcc] = useState<addGiroAccounts>(initialValues);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -29,13 +26,9 @@ const AddGiroAccount = () => {
   ): Promise<void> => {
     e.preventDefault();
     try {
-      if (!isCompanyAdded) {
-        setIsPopUpOpen(true);
-      } else {
-        await addAcc(addGiroAcc);
+      await addAcc(addGiroAcc);
 
-        navigate("/giroaccounts");
-      }
+      navigate("/giroaccounts");
     } catch (error) {
       console.error("Error adding client:", error);
     }
@@ -78,7 +71,6 @@ const AddGiroAccount = () => {
 
           <button type="submit">Dodaj žiro-račun</button>
         </form>
-        <PopUp isOpen={isPopUpOpen} onClose={() => setIsPopUpOpen(false)} />
       </div>
     </div>
   );

@@ -36,7 +36,7 @@ namespace TravelWarrants.Controllers
             {
                 return Ok(result.Message);
             }
-            return NotFound();
+            return BadRequest(result.ErrorMessage);
         }
 
         [HttpPut]

@@ -1,4 +1,5 @@
 ﻿using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.GiroAcc;
 using TravelWarrants.DTOs.Services;
 using TravelWarrants.Interfaces;
 using TravelWarrants.Models;
@@ -79,6 +80,11 @@ namespace TravelWarrants.Services
 
         public async Task<ResponseDTO<ServiceDTO>> NewService(ServiceDTOSave serviceDTO)
         {
+            var companyExists = await _context.Companies.AnyAsync();
+            if (!companyExists)
+            {
+                return new ResponseDTO<ServiceDTO>() { IsSucced = false, ErrorMessage = "Add a company first" };
+            }
             var service = new Service
             {
                 Name = serviceDTO.Name,

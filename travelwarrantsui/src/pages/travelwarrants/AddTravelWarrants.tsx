@@ -12,8 +12,6 @@ import { ClientsContext } from "../../context/ClientsContext";
 import { VehiclesContext } from "../../context/VehiclesContext";
 import { DriversContext } from "../../context/DriversContext";
 import { TravelWarrantsContext } from "../../context/ToursContext";
-import { CompanyContext } from "../../context/CompanyContext";
-import PopUp from "../../ui/PopUp";
 
 const defalutValues = {
   departure: "",
@@ -42,8 +40,7 @@ const AddTravelWarrants = () => {
   const { clients } = useContext(ClientsContext);
   const { vehicles } = useContext(VehiclesContext);
   const { addTour } = useContext(TravelWarrantsContext);
-  const { isCompanyAdded, isPopUpOpen, setIsPopUpOpen } =
-    useContext(CompanyContext);
+
   const [clientData, setClientData] = useState<ListItem[]>([]);
   const [driverData, setDriverData] = useState<ListItem[]>([]);
   const [vehicleData, setVehicleData] = useState<ListItemVehicle[]>([]);
@@ -183,19 +180,16 @@ const AddTravelWarrants = () => {
     e: React.FormEvent<HTMLFormElement>
   ): Promise<void> => {
     e.preventDefault();
-    if (!isCompanyAdded) {
-      setIsPopUpOpen(true);
-    } else {
-      if (!validateForm()) {
-        return;
-      }
-      try {
-        await addTour(addTravelWarrant);
 
-        navigate("/");
-      } catch (error) {
-        console.error("Error adding client:", error);
-      }
+    if (!validateForm()) {
+      return;
+    }
+    try {
+      await addTour(addTravelWarrant);
+
+      navigate("/");
+    } catch (error) {
+      console.error("Error adding client:", error);
     }
   };
 
@@ -419,7 +413,6 @@ const AddTravelWarrants = () => {
           <button type="submit">Dodaj nalog</button>
         </div>
       </form>
-      <PopUp isOpen={isPopUpOpen} onClose={() => setIsPopUpOpen(false)} />
     </div>
   );
 };

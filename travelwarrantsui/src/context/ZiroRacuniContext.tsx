@@ -1,7 +1,8 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { createContext, useState, useEffect } from "react";
 import { addGiroAccount, editGiroAccount, getGiroAccounts } from "../api/api";
 import { addGiroAccounts, allGiroAccounts } from "../api/interfaces";
+import PopUp from "../ui/PopUp";
 
 export type GiroAccountsContextData = {
   giroAccounts: allGiroAccounts[];
@@ -23,6 +24,7 @@ export const ZiroRacuniProvider = ({
   children: React.ReactNode;
 }) => {
   const [giroAccounts, setGiroAccounts] = useState<allGiroAccounts[]>([]);
+  const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchGiroAcc = async () => {
@@ -52,7 +54,10 @@ export const ZiroRacuniProvider = ({
       const newAcc = await addGiroAccount(data);
       setGiroAccounts((x) => [newAcc, ...x]);
     } catch (error) {
-      console.log(error);
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 400) {
+        setPopupOpen(true);
+      }
     }
   };
 
@@ -78,6 +83,9 @@ export const ZiroRacuniProvider = ({
         editAcc,
       }}
     >
+      {isPopupOpen && (
+        <PopUp isOpen={isPopupOpen} onClose={() => setPopupOpen(false)} />
+      )}
       {children}
     </GiroAccountsContext.Provider>
   );

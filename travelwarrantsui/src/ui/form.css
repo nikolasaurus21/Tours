@@ -20,6 +20,7 @@
 }
 
 .form-container-basic input[type="text"],
+.form-container-basic textarea,
 .form-container-basic input[type="email"],
 .form-container-basic input[type="number"],
 .form-container-basic input[type="datetime-local"],

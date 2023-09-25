@@ -1,5 +1,6 @@
 ﻿
 using TravelWarrants.DTOs;
+using TravelWarrants.DTOs.GiroAcc;
 using TravelWarrants.DTOs.Inovices;
 using TravelWarrants.Interfaces;
 using TravelWarrants.Models;
@@ -49,6 +50,13 @@ namespace TravelWarrants.Services
 
         public async Task<ResponseDTO<InoviceGetDTO>> NewInovice(InoviceNewDTO inoviceSaveDTO)
         {
+
+            var companyExists = await _context.Companies.AnyAsync();
+            if (!companyExists)
+            {
+                return new ResponseDTO<InoviceGetDTO>() { IsSucced = false, ErrorMessage = "Add a company first" };
+            }
+
             if (inoviceSaveDTO == null || inoviceSaveDTO.ItemsOnInovice == null)
             {
                 return new ResponseDTO<InoviceGetDTO>() { IsSucced = false };

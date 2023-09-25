@@ -1,12 +1,19 @@
 import React, { useContext } from "react";
-
+import "./paginationInovice.css";
 import Button from "../../ui/Button";
-import { AiFillDelete, AiFillPrinter } from "react-icons/ai";
+import {
+  AiFillDelete,
+  AiFillPrinter,
+  AiOutlineArrowLeft,
+  AiOutlineArrowRight,
+} from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import { InovicesContext } from "../../context/InovicesContext";
 
 const Inovices = () => {
-  const { inovices, setCurrentPage } = useContext(InovicesContext);
+  const { inovices, currentPage, totalPages, setCurrentPage } =
+    useContext(InovicesContext);
+
   const navigate = useNavigate();
   return (
     <div>
@@ -16,7 +23,7 @@ const Inovices = () => {
           backgroundColor: "#005f40",
           marginLeft: "30px",
         }}
-        onClick={() => navigate("/inovice/add")}
+        onClick={() => navigate("/inovices/add")}
       >
         Nova faktura
       </Button>
@@ -41,7 +48,7 @@ const Inovices = () => {
                 <td>{inovice.date}</td>
                 <td>{inovice.clientName}</td>
                 <td>{inovice.amount}</td>
-                <td className="delete-cell">
+                <td className="print-cell">
                   <AiFillPrinter style={{ color: "whitesmoke" }} />
                 </td>
                 <td
@@ -55,12 +62,27 @@ const Inovices = () => {
           </tbody>
         </table>
       </div>
-      <div>
-        <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}>
-          Prethodna
+      <div className="paginationInoivice">
+        <button
+          className={`page-button ${currentPage === 1 ? "disabled" : ""}`}
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          <AiOutlineArrowLeft />
         </button>
-        <button onClick={() => setCurrentPage((prev) => prev + 1)}>
-          Sledeća
+        <span className="page-info">
+          {currentPage} / {totalPages}
+        </span>
+        <button
+          className={`page-button ${
+            currentPage === totalPages ? "disabled" : ""
+          }`}
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
+          disabled={currentPage === totalPages}
+        >
+          <AiOutlineArrowRight />
         </button>
       </div>
     </div>
