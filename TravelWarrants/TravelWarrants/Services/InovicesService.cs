@@ -1,22 +1,46 @@
 ﻿
+using PdfSharpCore.Pdf;
+using PdfSharpCore;
+using TheArtOfDev.HtmlRenderer.PdfSharp;
 using TravelWarrants.DTOs;
-using TravelWarrants.DTOs.GiroAcc;
 using TravelWarrants.DTOs.Inovices;
 using TravelWarrants.Interfaces;
-using TravelWarrants.Models;
+using System.Text;
 
 namespace TravelWarrants.Services
 {
 
 
-    public class InovicesService :IInovicesService
+    public class InovicesService : IInovicesService
     {
         private readonly TravelWarrantsContext _context;
-        public InovicesService(TravelWarrantsContext context)
+        private readonly ICompanyService _companyService;
+        public InovicesService(TravelWarrantsContext context, ICompanyService companyService)
         {
             _context = context;
+            _companyService = companyService;
         }
 
+
+        public async Task<ResponseDTO<InoviceGetByIdDeleteDTO>> GetForDelete(int inoviceId)
+        {
+            var inoviceToDelete = await _context.Inovices.Include(c => c.Client)
+                .Where(x => x.Id == inoviceId)
+                .Select(x => new InoviceGetByIdDeleteDTO
+                {
+                    Number = x.Number + "/" + x.Year,
+                    Date = x.DocumentDate.ToShortDateString(),
+                    ClientName = x.Client.Name,
+                    Amount = x.Total
+                }).FirstOrDefaultAsync();
+
+            if (inoviceToDelete == null)
+            {
+                return new ResponseDTO<InoviceGetByIdDeleteDTO> { IsSucced = false };
+            }
+            return new ResponseDTO<InoviceGetByIdDeleteDTO> { IsSucced = true, Message = inoviceToDelete };
+
+        }
         public async Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetInovices(int? page)
         {
             int pageSize = 10;
@@ -29,13 +53,14 @@ namespace TravelWarrants.Services
                 .Take(pageSize)
                 .Select(x => new InoviceGetDTO
                 {
-                     Id = x.Id,
-                     Number = x.Number,
+                    Id = x.Id,
+                    Number = x.Number,
                     Year = x.Year,
                     Amount = x.Total,
                     ClientName = x.Client.Name,
                     Date = x.DocumentDate
                 })
+                .OrderByDescending(x => x.Id)
                 .ToListAsync();
 
             int totalRecords = await _context.Inovices.CountAsync();
@@ -45,8 +70,41 @@ namespace TravelWarrants.Services
             return response;
         }
 
+        public async Task<ResponseDTO<InoviceGetByIdDTO>> GetById(int inoviceId)
+        {
+            var inovice = await _context.Inovices
+                .Include(i => i.InoviceService)
+                .Include(c => c.Client)
+                .Where(x => x.Id == inoviceId)
+                .FirstOrDefaultAsync();
 
-        
+            if (inovice == null)
+            {
+                return new ResponseDTO<InoviceGetByIdDTO> { IsSucced = false };
+            }
+
+            var response = new InoviceGetByIdDTO
+            {
+                ClientId = inovice.ClientId,
+                ClientName = inovice.Client.Name,
+                DocumentDate = inovice.DocumentDate,
+                PaymentDeadline = (inovice.CurrencyDate - inovice.DocumentDate).Days,
+                PriceWithoutVAT = inovice.PriceWithoutVAT ?? default(bool),
+                Note = inovice.Note,
+                ItemsOnInovice = inovice.InoviceService.Select(i => new ItemsOnInoviceEdit
+                {
+                    Id = i.Id,
+                    Description = i.Description,
+                    ServiceId = i.ServiceId,
+                    Quantity = i.Quantity,
+                    Price = i.Price,
+                    NumberOfDays = i.NumberOfDays
+                }).ToList()
+            };
+
+            return new ResponseDTO<InoviceGetByIdDTO> { IsSucced = true, Message = response };
+        }
+
 
         public async Task<ResponseDTO<InoviceGetDTO>> NewInovice(InoviceNewDTO inoviceSaveDTO)
         {
@@ -64,7 +122,7 @@ namespace TravelWarrants.Services
 
             decimal amount = 0, vat = 0;
 
-           
+
 
             var newInovice = new Inovice
             {
@@ -75,7 +133,7 @@ namespace TravelWarrants.Services
                 Note = inoviceSaveDTO.Note,
                 Year = inoviceSaveDTO.DocumentDate.Year,
                 InoviceService = new List<InoviceService>()
-                
+
 
             };
 
@@ -92,10 +150,10 @@ namespace TravelWarrants.Services
                     Price = item.Price,
                     Value = item.Quantity * item.Price,
                     NumberOfDays = item.NumberOfDays
-                    
-                    
+
+
                 };
-                
+
                 var inovice = item;
 
                 var service = await _context.Services.FirstOrDefaultAsync(x => x.Id == inovice.ServiceId);
@@ -123,22 +181,22 @@ namespace TravelWarrants.Services
             newInovice.Total = inoviceSaveDTO.PriceWithoutVAT ? amount + vat : amount;
             try
             {
-                newInovice.Number =  _context.Inovices.OrderByDescending(n => n.Number)
-                    .First(z => z.Year == newInovice.Year).Number +1;
+                newInovice.Number = _context.Inovices.OrderByDescending(n => n.Number)
+                    .First(z => z.Year == newInovice.Year).Number + 1;
             }
-            catch 
+            catch
             {
 
-                newInovice.Number=1;
+                newInovice.Number = 1;
             }
-            
+
             _context.Inovices.Add(newInovice);
 
             _context.Accounts.Add(
 
-                new Account 
+                new Account
                 {
-                    Amount= newInovice.Total,
+                    Amount = newInovice.Total,
                     Date = newInovice.DocumentDate,
                     Note = newInovice.Note,
                     ClientId = newInovice.ClientId,
@@ -151,14 +209,14 @@ namespace TravelWarrants.Services
             status.AmountOfAccount += newInovice.Total;
             status.Balance = status.AmountOfAccount - status.AmountOfDeposit;
 
-            if(status.Id  == 0)
+            if (status.Id == 0)
             {
                 _context.Statuses.Add(status);
             }
-          
+
             await _context.SaveChangesAsync();
 
-            
+
 
             var addedInovice = new InoviceGetDTO
             {
@@ -169,7 +227,7 @@ namespace TravelWarrants.Services
                 ClientName = await _context.Clients
                 .Where(x => x.Id == newInovice.ClientId)
                 .Select(x => x.Name).FirstOrDefaultAsync(),
-                Date=newInovice.DocumentDate
+                Date = newInovice.DocumentDate
             };
 
             return new ResponseDTO<InoviceGetDTO> { IsSucced = true, Message = addedInovice };
@@ -194,7 +252,7 @@ namespace TravelWarrants.Services
             decimal vat = 0;
             var oldClient = existingInvoice.ClientId;
             var oldAmount = existingInvoice.Total;
-            
+
 
             existingInvoice.ClientId = inoviceEditDTO.ClientId;
             existingInvoice.DocumentDate = inoviceEditDTO.DocumentDate;
@@ -231,9 +289,9 @@ namespace TravelWarrants.Services
 
                 var service = await _context.Services.FirstAsync(x => x.Id == item.ServiceId);
 
-                updateItem.VAT= inoviceEditDTO.PriceWithoutVAT 
+                updateItem.VAT = inoviceEditDTO.PriceWithoutVAT
                     ? item.Value * service.VATRate / 100
-                    : item.Value * service.VATRate *100 / (service.VATRate + 100) / 100;
+                    : item.Value * service.VATRate * 100 / (service.VATRate + 100) / 100;
 
                 updateItem.VAT = Math.Round(updateItem.VAT, 2);
 
@@ -269,13 +327,13 @@ namespace TravelWarrants.Services
                 serviceOnInovice.VAT = Math.Round(serviceOnInovice.VAT, 2);
 
                 vat += serviceOnInovice.VAT;
-                
+
 
             }
 
             var amount = inoviceEditDTO.ItemsOnInovice.Sum(x => x.Value);
 
-            existingInvoice.NoVAT = inoviceEditDTO.PriceWithoutVAT ? amount : amount -vat;
+            existingInvoice.NoVAT = inoviceEditDTO.PriceWithoutVAT ? amount : amount - vat;
             existingInvoice.VAT = vat;
             existingInvoice.Total = inoviceEditDTO.PriceWithoutVAT ? amount + vat : amount;
 
@@ -295,9 +353,9 @@ namespace TravelWarrants.Services
             }
 
             var status = await _context.Statuses.FirstOrDefaultAsync(x => x.ClientId == existingInvoice.ClientId);
-            if (status == null) 
+            if (status == null)
             {
-                status = new Status { ClientId = existingInvoice.ClientId, AmountOfAccount= existingInvoice.Total };
+                status = new Status { ClientId = existingInvoice.ClientId, AmountOfAccount = existingInvoice.Total };
             }
             else
             {
@@ -305,7 +363,7 @@ namespace TravelWarrants.Services
             }
 
             status.Balance = status.AmountOfAccount - status.AmountOfDeposit;
-            if(status.Id == 0)
+            if (status.Id == 0)
             {
                 _context.Statuses.Add(status);
             }
@@ -327,23 +385,23 @@ namespace TravelWarrants.Services
             return new ResponseDTO<InoviceGetDTO> { IsSucced = true, Message = addedInovice };
         }
 
-        public async Task<ResponseDTO<bool>> DeleteInovice (int inoviceId)
+        public async Task<ResponseDTO<bool>> DeleteInovice(int inoviceId)
         {
             var deleteInovice = await _context.Inovices.Include(i => i.InoviceService).FirstOrDefaultAsync(x => x.Id == inoviceId);
 
-            if(deleteInovice == null)
+            if (deleteInovice == null)
             {
-                return new ResponseDTO<bool> { IsSucced = false,Message=false };
+                return new ResponseDTO<bool> { IsSucced = false, Message = false };
             }
 
             try
             {
                 var acc = await _context.Accounts.FirstOrDefaultAsync(x => x.InoviceId == deleteInovice.Id);
-                if(acc != null) 
+                if (acc != null)
                 {
                     _context.Accounts.Remove(acc);
                 }
-                foreach (var item in deleteInovice.InoviceService.ToList()) 
+                foreach (var item in deleteInovice.InoviceService.ToList())
                 {
                     _context.InovicesServices.Remove(item);
                 }
@@ -351,14 +409,14 @@ namespace TravelWarrants.Services
                 _context.Inovices.Remove(deleteInovice);
 
                 var status = await _context.Statuses.FirstOrDefaultAsync(x => x.ClientId == deleteInovice.ClientId);
-                if(status != null)
+                if (status != null)
                 {
                     status.AmountOfAccount -= deleteInovice.Total;
                     status.Balance = status.AmountOfAccount - status.AmountOfDeposit;
                 }
 
                 await _context.SaveChangesAsync();
-                return new ResponseDTO<bool> { IsSucced=true,Message=true };
+                return new ResponseDTO<bool> { IsSucced = true, Message = true };
             }
             catch //(Exception ex)
             {
@@ -372,8 +430,227 @@ namespace TravelWarrants.Services
                 //    innerEx = innerEx.InnerException;
                 //}
 
-                return new ResponseDTO<bool> { IsSucced = false,Message = false };
+                return new ResponseDTO<bool> { IsSucced = false, Message = false };
             }
         }
+
+        private async Task<ResponseDTO<InviocePdf>> InoviceForPDf(int id)
+        {
+            var invoice = await _context.Inovices
+                .Include(i => i.InoviceService).ThenInclude(s => s.Service)
+                .Include(c => c.Client)
+
+                .Where(x => x.Id == id)
+                .Select(x => new InviocePdf
+                {
+                    Id = x.Id,
+
+                    ClientName = x.Client.Name,
+                    ClientAddress = x.Client.Address,
+                    ClientPlace = x.Client.PlaceName,
+                    Email = x.Client.Email,
+                    Number = x.Number + "/" + x.Year,
+                    Total = x.Total,
+                    PriceWithoutVat = x.NoVAT,
+                    Vat = x.VAT,
+                    ItemsOnInovice = x.InoviceService.Select(i => new ItemsOnInovicePdf
+                    {
+
+                        Description = i.Description,
+                        Service = i.Service.Name,
+                        Quantity = i.Quantity,
+                        Price = i.Price,
+                        NumberOfDays = i.NumberOfDays
+                    }).ToList()
+                }).FirstOrDefaultAsync();
+
+            if (invoice != null)
+            {
+                return new ResponseDTO<InviocePdf>
+                {
+                    IsSucced = true,
+                    Message = invoice
+                };
+            }
+            else
+            {
+                return new ResponseDTO<InviocePdf>
+                {
+                    IsSucced = false
+
+                };
+            }
+        }
+
+
+        public async Task<byte[]> GeneratePdf(int id)
+        {
+            var companyData = await _companyService.Get();
+            if (companyData == null || companyData.Message == null)
+            {
+                throw new InvalidOperationException("Company data is not available");
+            }
+            var company = companyData.Message.FirstOrDefault();
+
+            var inoviceData = await InoviceForPDf(id);
+            if (inoviceData == null || inoviceData.Message == null)
+            {
+                throw new InvalidOperationException("Inovice data is not available");
+            }
+            var inovice = inoviceData.Message;
+
+            if (inovice.ItemsOnInovice.Count() == 0)
+            {
+                throw new InvalidOperationException("No items on inovice");
+            }
+
+            var document = new PdfDocument();
+
+            var tableRows = new StringBuilder();
+            int i = 0;
+
+            foreach (var item in inovice.ItemsOnInovice)
+            {
+                i++;
+                tableRows.Append("<tr><td>" + i.ToString() + "</td>" +
+                                 "<td>" + item.Service + "</td>" +
+                                 "<td>" + item.Description + "</td>" +
+                                 "<td>" + item.NumberOfDays.ToString() + "</td>" +
+                                 "<td>" + item.Quantity.ToString() + "</td>" +
+                                 "<td>" + item.Price.ToString()+ "€" + "</td></tr>");
+            }
+
+            // Debugging
+            Console.WriteLine(tableRows.ToString());
+
+
+
+
+            string htmlcontent = $@"<!DOCTYPE html>
+                <html>
+                    <head>
+                        <title>Faktura</title>
+                        <style>
+                            body {{
+                                font-family: Arial, sans-serif;
+                                margin: 20px;
+                            }}
+                            header, section, footer {{
+                                margin-bottom: 20px;
+                            }}
+                            h1, h2 {{
+                                color: #333;
+                            }}
+                            table {{
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-top: 30px; /* Dodajemo marginu iznad tabele */
+                            }}
+                            th, td {{
+                                border: 1px solid #ccc;
+                                padding: 8px;
+                                text-align: left;
+                            }}
+                            th {{
+                                background-color: #f2f2f2;
+                            }}
+                            footer {{
+                                text-align: center;
+                                margin-top: 30px;
+                                border-top: 1px solid #ccc;
+                                padding-top: 10px;
+                            }}
+                            .flex-container {{
+                                display: flex;
+                                justify-content: space-between; 
+                            }}
+                            .no-border{{
+                                 border: none !important;
+                            }}
+                            .tfoot-right{{
+                                 text-align: right;
+                            }}
+                        </style>
+                    </head>
+                    <body>
+                        <header>
+                            <h1>Faktura: {inovice.Number}</h1>
+                            <p>Datum: {DateTime.Now:dd/MM/yyyy}</p>
+                        </header>
+                        <hr>
+                        <section class=\""{{flex-container}}\""> 
+                            <div>
+                                <h2>{company.Name}</h2>
+                                <address>
+                                    Adresa: {company.Address}<br>
+                                    Grad: {company.Place}, Poštanski broj: {company.PTT}<br>
+                                    Telefon: {company.Telephone}<br>
+                                    Faks: {company.Fax}<br>
+                                    PIB: {company.TIN}
+                                </address>
+                            </div>
+                            <div>
+                                <h2>Za:</h2>
+                                <address>
+                                    {inovice.ClientName}<br>
+                                    {inovice.ClientAddress}<br>
+                                    {inovice.ClientPlace}<br>
+                                    {inovice.Email}
+                                </address>
+                            </div>
+                        </section>
+                        <hr>
+                        <div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Usluga</th>
+                                        <th>Opis usluge</th>
+                                        <th>Broj dana</th>
+                                        <th>Količina</th>
+                                        <th>Cijena</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {tableRows}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td class='no-border' colspan='4'></td>
+                                        <td class='tfoot-right no-border'>Ukupno bez PDV:</td>
+                                        <td class='no-border'>{inovice.PriceWithoutVat}€</td>
+                                    </tr>
+                                    <tr>
+                                        <td class='no-border' colspan='4'></td>
+                                        <td class='tfoot-right no-border'>PDV:</td>
+                                        <td class='no-border'>{inovice.Vat}€</td>
+                                    </tr>
+                                    <tr>
+                                        <td class='no-border' colspan='4'></td>
+                                        <td class='tfoot-right no-border'>Ukupno:</td>
+                                        <td class='no-border'>{inovice.Total}€</td>
+                                    </tr>
+                                </tfoot>
+
+                            </table>
+                        </div>
+                        
+                    </body>
+                </html>";
+
+
+            PdfGenerator.AddPdfPages(document, htmlcontent, PageSize.A4);
+
+            byte[] response;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                document.Save(ms);
+                response = ms.ToArray();
+            }
+
+            return response;
+        }
+
     }
 }

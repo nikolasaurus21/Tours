@@ -1,4 +1,4 @@
-import {  addClient, addVehicle,allClients, allVehicles,allDrivers,addDriver,ICompany, allGiroAccounts, addGiroAccounts, allServices, addService, allTravelWarrants, addTravelWarrant, allPayments, addPayment, IReports, Statuses, deleteTour, Inovices, IAddInovice} from "./interfaces";
+import {  addClient, addVehicle,allClients, allVehicles,allDrivers,addDriver,ICompany, allGiroAccounts, addGiroAccounts, allServices, addService, allTravelWarrants, addTravelWarrant, allPayments, addPayment, IReports, Statuses, deleteTour, Inovices, IAddInovice, IDeleteInovice, IGetInoviceById, IItemsEdit, IEditInovice} from "./interfaces";
 import axios from "axios";
 import { format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
@@ -929,6 +929,90 @@ export const newInovice =async (data:IAddInovice):Promise<Inovices> => {
     }
   })
 console.log(response.data)
- return response.data
+ const inoviceData:Inovices ={
+  id:response.data.id,
+  year:response.data.year,
+  number:response.data.number,
+  date:format(new Date(response.data.date), "dd/MM/yyyy"),
+  amount:response.data.amount,
+  clientName:response.data.clientName
+ } 
+ 
+ return inoviceData
+}
+
+export const inoviceToDelete =async (id:number):Promise<IDeleteInovice> => {
+  const response = await axios.get(`https://localhost:7206/api/Inovices/ToDelete/${id}`)
+  const jsonResponse = response.data
+
+  const inoviceToDelete:IDeleteInovice={
+    number:jsonResponse.number,
+    clientName: jsonResponse.clientName,
+    date:jsonResponse.date,
+    amount:jsonResponse.amount
+  }
+
+  return inoviceToDelete
+}
+
+export const getInoviceById =async (id:number):Promise<IGetInoviceById> => {
+  var response = await axios.get(`https://localhost:7206/api/Inovices/GetById/${id}`)
+  const jsonResponse = response.data
+  //console.log("Sa servera:" , jsonResponse);
+  const date = new Date(jsonResponse.documentDate);
+  const formattedDate = format(date, "yyyy-MM-dd'T'HH:mm");
+  const singleInovice:IGetInoviceById={
+    
+    //clientName: jsonResponse.clientName,
+    date:formattedDate,
+    clientId:jsonResponse.clientId,
+    paymentDeadline:jsonResponse.paymentDeadline,
+    note:jsonResponse.note,
+    priceWithoutVat:jsonResponse.priceWithoutVAT,
+    itemsOnInovice: jsonResponse.itemsOnInovice.map((i:any) => {
+      return{
+        id: i.id,
+        description:i.description,
+        serviceId: i.serviceId,
+        quantity: i.quantity,
+        price: i.price,
+        numberOfDays: i.numberOfDays
+      } as IItemsEdit
+    })
+   
+  }
+  //console.log("Mapirani:" , singleInovice);
+  return singleInovice
+}
+
+export const editInovice =async (id:number,data:IEditInovice):Promise<Inovices> => {
+  const utcDate = utcToZonedTime(data.date, "UTC");
+  const response = await axios.put(`https://localhost:7206/api/Inovices/EditInovice/${id}`,
+  {
+    clientId:data.clientId,
+    documentDate:format(utcDate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
+    paymentDeadline:data.paymentDeadline,
+    priceWithoutVAT:data.priceWithoutVat,
+    note:data.note,
+    itemsOnInovice:data.itemsOnInovice,
+    itemsToDeleteId: data.itemsToDelete
+  },
+  {
+    headers:{
+      "Content-Type":"application/json",
+      Accept:"application/json"
+    }
+  })
+
+const inoviceData:Inovices ={
+  id:response.data.id,
+  year:response.data.year,
+  number:response.data.number,
+  date:format(new Date(response.data.date), "dd/MM/yyyy"),
+  amount:response.data.amount,
+  clientName:response.data.clientName
+ } 
+ 
+ return inoviceData
  
 }

@@ -173,6 +173,7 @@ export interface Inovices{
 }
 
 export interface IAddItem{
+  
   description?:string
   serviceId:number
   quantity:number
@@ -187,4 +188,40 @@ export interface IAddInovice{
   date:string
   priceWithoutVat:boolean
   itemsOnInovice:IAddItem[]
+}
+
+export interface IDeleteInovice{
+  number:string
+  date:string
+  clientName:string
+  amount:number
+}
+
+export interface IItemsEdit{
+  id?:number
+  description?:string
+  serviceId:number
+  quantity:number
+  price:number
+  numberOfDays:string
+}
+
+export interface IEditInovice{
+  clientId: number
+  paymentDeadline:number
+  note:string
+  date:string
+  priceWithoutVat:boolean
+  itemsOnInovice:IItemsEdit[]
+  itemsToDelete?: number[]
+}
+
+export interface IGetInoviceById{
+  clientId: number
+  //clientName:string
+  paymentDeadline:number
+  note:string
+  date:string
+  priceWithoutVat:boolean
+  itemsOnInovice:IItemsEdit[]
 }

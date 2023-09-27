@@ -16,6 +16,7 @@ const EditClient = () => {
     const fetchClientData = async () => {
       try {
         const clientData = await getClientById(Number(id));
+
         setAddNewClient(clientData);
       } catch (error) {
         console.error("Error fetching client data:", error);

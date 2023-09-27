@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PdfSharpCore.Pdf;
+using PdfSharpCore;
+using TheArtOfDev.HtmlRenderer.PdfSharp;
 using TravelWarrants.DTOs.Inovices;
 using TravelWarrants.Interfaces;
+
 
 namespace TravelWarrants.Controllers
 {
@@ -14,6 +18,30 @@ namespace TravelWarrants.Controllers
         public InovicesController(IInovicesService inovicesService)
         {
             _inovicesService = inovicesService;
+        }
+
+
+        [HttpGet("{inoviceId}")]
+        public async Task<ActionResult> GetById(int inoviceId)
+        {
+            var result = await _inovicesService.GetById(inoviceId);
+            if (result.IsSucced)
+            {
+                return Ok(result.Message);
+            }
+
+            return NotFound();
+        }
+
+        [HttpGet("{inoviceId}")]
+        public async Task<ActionResult> ToDelete(int inoviceId)
+        {
+            var result = await _inovicesService.GetForDelete(inoviceId);
+            if (result.IsSucced)
+            {
+                return Ok(result.Message);
+            }
+            return NotFound();
         }
 
         [HttpGet]
@@ -39,7 +67,7 @@ namespace TravelWarrants.Controllers
             return BadRequest(result.ErrorMessage);
         }
 
-        [HttpPut]
+        [HttpPut("{inoviceId}")]
 
         public async Task<ActionResult>EditInovice(int inoviceId, InoviceEditDTO inoviceEditDTO)
         {
@@ -62,5 +90,14 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GeneratePdf(int id)
+        {
+            byte[] pdfBytes = await _inovicesService.GeneratePdf(id);
+            string fileName = "Faktura" + ".pdf";
+            return File(pdfBytes, "application/pdf", fileName);
+        }
+
     }
 }

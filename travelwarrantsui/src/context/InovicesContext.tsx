@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useState } from "react";
-import { IAddInovice, Inovices } from "../api/interfaces";
-import { getInovices, newInovice } from "../api/api";
-import { AxiosError } from "axios";
+import { IAddInovice, IEditInovice, Inovices } from "../api/interfaces";
+import { editInovice, getInovices, newInovice } from "../api/api";
+import axios, { AxiosError } from "axios";
 import PopUp from "../ui/PopUp";
 
 export type InovicesContextData = {
@@ -10,6 +10,8 @@ export type InovicesContextData = {
   totalPages: number;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   addInovice: (data: IAddInovice) => Promise<void>;
+  removeInovice: (id: number) => Promise<void>;
+  updateInovice: (id: number, data: IEditInovice) => Promise<void>;
 };
 
 export const InovicesContext = createContext<InovicesContextData>({
@@ -18,6 +20,8 @@ export const InovicesContext = createContext<InovicesContextData>({
   currentPage: 1,
   totalPages: 1,
   addInovice: async (data: IAddInovice) => {},
+  removeInovice: async (id: number) => {},
+  updateInovice: async (id: number, data: IAddInovice) => {},
 });
 export const InovicesProvider = ({
   children,
@@ -55,9 +59,44 @@ export const InovicesProvider = ({
       }
     }
   };
+
+  const removeInovice = async (id: number) => {
+    try {
+      await axios.delete(
+        `https://localhost:7206/api/Inovices/DeleteInovice/${id}`
+      );
+      setInovices(inovices.filter((inv) => inv.id !== id));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const updateInovice = async (
+    id: number,
+    data: IEditInovice
+  ): Promise<void> => {
+    try {
+      const updateInovice = await editInovice(id, data);
+
+      setInovices((x) => {
+        return x.map((i) => (i.id === id ? updateInovice : i));
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <InovicesContext.Provider
-      value={{ inovices, setCurrentPage, currentPage, totalPages, addInovice }}
+      value={{
+        inovices,
+        setCurrentPage,
+        currentPage,
+        totalPages,
+        addInovice,
+        removeInovice,
+        updateInovice,
+      }}
     >
       {isPopupOpen && (
         <PopUp isOpen={isPopupOpen} onClose={() => setPopupOpen(false)} />

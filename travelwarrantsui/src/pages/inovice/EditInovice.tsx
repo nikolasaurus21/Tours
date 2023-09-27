@@ -1,32 +1,50 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { HiOutlinePlusSm, HiMinus } from "react-icons/hi";
 import Button from "../../ui/Button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ClientsContext } from "../../context/ClientsContext";
 import { ServicesContext } from "../../context/ServicesContext";
-import { HiOutlinePlusSm, HiMinus } from "react-icons/hi";
-import "./inoviceform.css";
-import { IAddInovice, IAddItem } from "../../api/interfaces";
+import { IItemsEdit, IEditInovice } from "../../api/interfaces";
+import { getInoviceById } from "../../api/api";
 import { InovicesContext } from "../../context/InovicesContext";
 
-const NewInovice = () => {
+const EditInovice = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
-
   const { clients } = useContext(ClientsContext);
   const { services } = useContext(ServicesContext);
-  const { addInovice } = useContext(InovicesContext);
+  const { updateInovice } = useContext(InovicesContext);
 
-  const [items, setItems] = useState<IAddItem[]>([]);
-  const [addInvoice, setAddInvoice] = useState<IAddInovice>({
+  const [items, setItems] = useState<IItemsEdit[]>([]);
+  const [addInvoice, setAddInvoice] = useState<IEditInovice>({
     clientId: 0,
     date: "",
     paymentDeadline: 0,
     note: "",
     priceWithoutVat: false,
     itemsOnInovice: [],
+    itemsToDelete: [],
   });
 
+  useEffect(() => {
+    const fetchInovice = async () => {
+      try {
+        const inovice = await getInoviceById(Number(id));
+
+        setAddInvoice(inovice);
+        if (inovice.itemsOnInovice) {
+          setItems(inovice.itemsOnInovice);
+        }
+        //console.log("Stanje posle setovanja:", addInvoice);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchInovice();
+  }, [id]);
+
   const addItem = () => {
-    const newItem: IAddItem = {
+    const newItem: IItemsEdit = {
       description: "",
       serviceId: 0,
       quantity: 0,
@@ -36,27 +54,43 @@ const NewInovice = () => {
     setItems([...items, newItem]);
   };
 
-  const removeItem = (indexToRemove: any) => {
+  const removeItem = (indexToRemove: number) => {
+    // Prije nego što obrišemo stavku, pridružimo njen ID u itemsToDelete niz
+    const itemId = items[indexToRemove].id; // Pretpostavimo da svaka stavka ima jedinstveni 'id'
+
+    if (itemId !== undefined) {
+      // Dodamo ID stavke u itemsToDelete niz
+      setAddInvoice((prevInvoice) => ({
+        ...prevInvoice,
+        itemsToDelete: prevInvoice.itemsToDelete
+          ? [...prevInvoice.itemsToDelete, itemId]
+          : [itemId],
+      }));
+    }
+
+    // Onda uklonimo stavku iz niza
     setItems(items.filter((_, index) => index !== indexToRemove));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newInvoiceData: IAddInovice = {
+    const newInvoiceData: IEditInovice = {
       clientId: addInvoice.clientId,
       date: addInvoice.date,
       paymentDeadline: addInvoice.paymentDeadline,
       note: addInvoice.note,
       priceWithoutVat: addInvoice.priceWithoutVat,
       itemsOnInovice: items,
+      itemsToDelete: addInvoice.itemsToDelete || [],
     };
 
-    //console.log("Podaci iz forme:", newInvoiceData);
+    console.log("Podaci iz forme:", newInvoiceData);
 
-    await addInovice(newInvoiceData);
+    await updateInovice(Number(id), newInvoiceData);
     navigate("/inovices");
   };
+
   return (
     <div>
       <div>
@@ -75,7 +109,7 @@ const NewInovice = () => {
             paddingTop: "10px",
           }}
         >
-          Nova faktura
+          Izmjena fakture
         </h1>
       </div>
       <form onSubmit={handleSubmit} className="form-container-inovice">
@@ -113,8 +147,12 @@ const NewInovice = () => {
           <label>Rok plaćanja(dana)</label>
           <input
             type="number"
-            min={0}
             name="paymentDeadline"
+            value={
+              addInvoice.paymentDeadline !== null
+                ? addInvoice.paymentDeadline
+                : ""
+            }
             onChange={(e) =>
               setAddInvoice({
                 ...addInvoice,
@@ -132,8 +170,7 @@ const NewInovice = () => {
         >
           <input
             type="checkbox"
-            name="priceWithoutVAT"
-            id="priceWithoutVAT"
+            checked={addInvoice.priceWithoutVat}
             onChange={(e) =>
               setAddInvoice({
                 ...addInvoice,
@@ -142,7 +179,7 @@ const NewInovice = () => {
             }
           />
           <label
-            htmlFor="priceWithoutVAT"
+            htmlFor="priceWithoutVat"
             style={{ marginTop: "6px", fontSize: "13px" }}
           >
             Cijena bez PDV-a
@@ -182,7 +219,7 @@ const NewInovice = () => {
                 </select>
                 <input
                   type="text"
-                  style={{ width: "255px" }}
+                  style={{ width: "225px" }}
                   placeholder="Opis"
                   value={item.description}
                   onChange={(e) =>
@@ -197,7 +234,6 @@ const NewInovice = () => {
                 <input
                   style={{ width: "60px" }}
                   type="number"
-                  min={0}
                   value={item.price}
                   onChange={(e) =>
                     setItems((prevItems) => {
@@ -211,7 +247,6 @@ const NewInovice = () => {
                 <input
                   style={{ width: "60px" }}
                   type="number"
-                  min={0}
                   value={item.quantity}
                   onChange={(e) =>
                     setItems((prevItems) => {
@@ -225,7 +260,6 @@ const NewInovice = () => {
                 <input
                   style={{ width: "60px" }}
                   type="number"
-                  min={0}
                   value={item.numberOfDays}
                   onChange={(e) =>
                     setItems((prevItems) => {
@@ -254,16 +288,17 @@ const NewInovice = () => {
             name="note"
             rows={3}
             cols={52}
+            value={addInvoice.note || ""}
             onChange={(e) =>
               setAddInvoice({ ...addInvoice, note: e.target.value })
             }
           ></textarea>
         </div>
 
-        <button type="submit">Dodaj fakturu</button>
+        <button type="submit">Sačuvaj izmjene</button>
       </form>
     </div>
   );
 };
 
-export default NewInovice;
+export default EditInovice;

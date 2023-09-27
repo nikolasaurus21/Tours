@@ -9,12 +9,18 @@ import {
 } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import { InovicesContext } from "../../context/InovicesContext";
+import { inoviceToDelete } from "../../api/api";
 
 const Inovices = () => {
   const { inovices, currentPage, totalPages, setCurrentPage } =
     useContext(InovicesContext);
 
   const navigate = useNavigate();
+
+  const handleDeleteClick = async (id: number) => {
+    const inoviceData = await inoviceToDelete(id);
+    navigate(`/inovices/delete/${id}`, { state: { inoviceData } });
+  };
   return (
     <div>
       <h1>Fakture</h1>
@@ -40,8 +46,12 @@ const Inovices = () => {
             </tr>
           </thead>
           <tbody>
-            {inovices.map((inovice, index) => (
-              <tr key={index}>
+            {inovices.map((inovice) => (
+              <tr
+                key={inovice.id}
+                className="firstcolumnorrow"
+                onClick={() => navigate(`/inovices/edit/${inovice.id}`)}
+              >
                 <td>
                   {inovice.number}/{inovice.year}
                 </td>
@@ -53,7 +63,7 @@ const Inovices = () => {
                 </td>
                 <td
                   className="delete-cell"
-                  //onClick={() => handleDeleteClick(inovice.id)}
+                  onClick={() => handleDeleteClick(inovice.id)}
                 >
                   <AiFillDelete style={{ color: "whitesmoke" }} />
                 </td>

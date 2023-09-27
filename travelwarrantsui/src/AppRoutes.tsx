@@ -40,6 +40,8 @@ import DeleteService from "./pages/services/DeleteService";
 import DeleteTour from "./pages/travelwarrants/DeleteTour";
 import Inovices from "./pages/inovice/Inovices";
 import NewInovice from "./pages/inovice/NewInovice";
+import EditInovice from "./pages/inovice/EditInovice";
+import DeleteInovice from "./pages/inovice/DeleteInovice";
 
 const AppRoutes = () => {
   return (
@@ -123,6 +125,8 @@ const AppRoutes = () => {
 
         <Route path="/inovices" element={<Inovices />} />
         <Route path="/inovices/add" element={<NewInovice />} />
+        <Route path="/inovices/edit/:id" element={<EditInovice />} />
+        <Route path="/inovices/delete/:id" element={<DeleteInovice />} />
       </Routes>
     </div>
   );
