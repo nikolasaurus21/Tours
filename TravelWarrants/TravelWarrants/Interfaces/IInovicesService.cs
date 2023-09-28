@@ -11,6 +11,6 @@ namespace TravelWarrants.Interfaces
         Task<ResponseDTO<InoviceGetByIdDeleteDTO>> GetForDelete(int inoviceId);
         Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetInovices(int? page);
         Task<ResponseDTO<InoviceGetDTO>> NewInovice(InoviceNewDTO inoviceSaveDTO);
-        Task<byte[]> GeneratePdf(int id);
+        Task<(byte[],string)> GeneratePdf(int id);
     }
 }

@@ -30,7 +30,7 @@ export const InovicesProvider = ({
 }) => {
   const [inovices, setInovices] = useState<Inovices[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
 
   useEffect(() => {

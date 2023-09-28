@@ -42,7 +42,12 @@ const Reports = () => {
               >
                 Putni nalozi po klijentu
               </td>
-              <td className="firstcolumnorrow">Fakture po klijentu</td>
+              <td
+                className="firstcolumnorrow"
+                onClick={() => navigate("/reports/inovicesforclient")}
+              >
+                Fakture po klijentu
+              </td>
               <td className="firstcolumnorrow">Profakture po klijentu</td>
             </tr>
             <tr>
@@ -52,7 +57,12 @@ const Reports = () => {
               >
                 Putni nalozi za period
               </td>
-              <td className="firstcolumnorrow">Fakture za period</td>
+              <td
+                className="firstcolumnorrow"
+                onClick={() => navigate("/reports/inovicesforperiod")}
+              >
+                Fakture za period
+              </td>
               <td className="firstcolumnorrow">Profakture za period</td>
             </tr>
             <tr>
@@ -62,7 +72,13 @@ const Reports = () => {
               >
                 Putni nalozi po destinaciji
               </td>
-              <td className="firstcolumnorrow">Fakture po opisu usluge</td>
+
+              <td
+                className="firstcolumnorrow"
+                onClick={() => navigate("/reports/inovicesbydescription")}
+              >
+                Fakture po opisu usluge
+              </td>
               <td className="firstcolumnorrow">Profakture po opisu usluge</td>
             </tr>
 

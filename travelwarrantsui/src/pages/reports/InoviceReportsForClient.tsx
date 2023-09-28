@@ -1,21 +1,59 @@
-import React, { useContext } from "react";
-import "./paginationInovice.css";
-import Button from "../../ui/Button";
+import React, { useContext, useEffect, useState } from "react";
 import {
-  AiFillDelete,
   AiFillPrinter,
+  AiFillDelete,
   AiOutlineArrowLeft,
   AiOutlineArrowRight,
 } from "react-icons/ai";
+import Button from "../../ui/Button";
 import { useNavigate } from "react-router-dom";
-import { InovicesContext } from "../../context/InovicesContext";
-import { downloadPdf, inoviceToDelete } from "../../api/api";
+import {
+  downloadPdf,
+  getInoviceForClients,
+  inoviceToDelete,
+} from "../../api/api";
+import { ClientsContext } from "../../context/ClientsContext";
+import { Inovices, ListItem } from "../../api/interfaces";
 
-const Inovices = () => {
-  const { inovices, currentPage, totalPages, setCurrentPage } =
-    useContext(InovicesContext);
-
+const InoviceReportsForClient = () => {
   const navigate = useNavigate();
+
+  const { clients } = useContext(ClientsContext);
+
+  const [inovices, setInovices] = useState<Inovices[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [clientid, setClientid] = useState<number | null>(null);
+  const [clientData, setClientData] = useState<ListItem[]>([]);
+  const [selectedClientName, setSelectedClientName] = useState<string>("");
+
+  const handleShowButtonClick = async () => {
+    try {
+      if (clientid !== null) {
+        const inovicesData = await getInoviceForClients(clientid, currentPage);
+        setInovices(inovicesData);
+        setTotalPages(Math.ceil(inovicesData.length / 10));
+        const selectedClient = clientData.find(
+          (client) => client.id === clientid
+        );
+        setSelectedClientName(selectedClient ? selectedClient.name : "");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    const extractedData: ListItem[] = clients.map((client) => ({
+      id: client.id,
+      name: client.name,
+    }));
+    setClientData(extractedData);
+  }, [clients]);
+  const handleClientSelected = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedClientId = parseInt(e.target.value, 10);
+    setClientid(selectedClientId);
+  };
 
   const handleDeleteClick = async (id: number) => {
     const inoviceData = await inoviceToDelete(id);
@@ -28,20 +66,51 @@ const Inovices = () => {
       console.log("Neuspešno preuzimanje PDF-a");
     }
   };
-
   return (
     <div>
-      <h1>Fakture</h1>
       <Button
         buttonStyle={{
-          backgroundColor: "#005f40",
-          marginLeft: "30px",
+          backgroundColor: "rgb(100,100,100)",
+          marginLeft: "10px",
+          marginTop: "10px",
         }}
-        onClick={() => navigate("/inovices/add")}
+        onClick={() => navigate("/reports")}
       >
-        Nova faktura
+        Nazad
       </Button>
+      <h1>
+        Fakture {selectedClientName && `za klijenta: ${selectedClientName}`}
+      </h1>
+
       <div className="table-container">
+        <div className="selection">
+          <span>Prikaži fakture za klijenta:</span>
+          <select onChange={handleClientSelected}>
+            <option value="">Izaberi klijenta...</option>
+            {clientData.map((client) => (
+              <option key={client.id} value={client.id}>
+                {client.name}
+              </option>
+            ))}
+          </select>
+
+          <span>
+            <Button
+              buttonStyle={{ marginBottom: "7px" }}
+              onClick={handleShowButtonClick}
+            >
+              Prikaži
+            </Button>
+            <Button
+              buttonStyle={{
+                marginBottom: "7px",
+                marginLeft: "5px",
+              }}
+            >
+              Štampaj
+            </Button>
+          </span>
+        </div>
         <table>
           <thead>
             <tr>
@@ -117,4 +186,4 @@ const Inovices = () => {
   );
 };
 
-export default Inovices;
+export default InoviceReportsForClient;

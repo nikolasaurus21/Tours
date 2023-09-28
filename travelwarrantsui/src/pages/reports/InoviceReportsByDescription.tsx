@@ -1,22 +1,44 @@
-import React, { useContext } from "react";
-import "./paginationInovice.css";
-import Button from "../../ui/Button";
+import React, { useState } from "react";
 import {
   AiFillDelete,
   AiFillPrinter,
   AiOutlineArrowLeft,
   AiOutlineArrowRight,
 } from "react-icons/ai";
+import Button from "../../ui/Button";
 import { useNavigate } from "react-router-dom";
-import { InovicesContext } from "../../context/InovicesContext";
-import { downloadPdf, inoviceToDelete } from "../../api/api";
+import { Inovices } from "../../api/interfaces";
+import {
+  downloadPdf,
+  getInovicesByDescription,
+  inoviceToDelete,
+} from "../../api/api";
 
-const Inovices = () => {
-  const { inovices, currentPage, totalPages, setCurrentPage } =
-    useContext(InovicesContext);
-
+const InoviceReportsByDescription = () => {
   const navigate = useNavigate();
+  const [inovices, setInovices] = useState<Inovices[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [description, setDescription] = useState<string>("");
+  const [enteredDescription, setEnteredDescription] = useState<string>("");
+  const handleDestinationChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setDescription(event.target.value);
+  };
 
+  const handleShowButtonClick = async () => {
+    if (description.trim() === "") {
+      setInovices([]);
+      setEnteredDescription("");
+    } else {
+      const data = await getInovicesByDescription(description, currentPage);
+      setInovices(data);
+      setTotalPages(Math.ceil(data.length / 10));
+
+      setEnteredDescription(description);
+    }
+  };
   const handleDeleteClick = async (id: number) => {
     const inoviceData = await inoviceToDelete(id);
     navigate(`/inovices/delete/${id}`, { state: { inoviceData } });
@@ -28,20 +50,50 @@ const Inovices = () => {
       console.log("Neuspešno preuzimanje PDF-a");
     }
   };
-
   return (
     <div>
-      <h1>Fakture</h1>
       <Button
         buttonStyle={{
-          backgroundColor: "#005f40",
-          marginLeft: "30px",
+          backgroundColor: "rgb(100,100,100)",
+          marginLeft: "10px",
+          marginTop: "10px",
         }}
-        onClick={() => navigate("/inovices/add")}
+        onClick={() => navigate("/reports")}
       >
-        Nova faktura
+        Nazad
       </Button>
+      <h1>
+        Fakture {enteredDescription && `sa uslugom: ${enteredDescription}`}
+      </h1>
+
       <div className="table-container">
+        <div className="selection">
+          <span>Prikaži fakture po opisu usluge:</span>
+          <input
+            type="text"
+            name="basis"
+            value={description}
+            onChange={handleDestinationChange}
+            placeholder="Opis usluge..."
+          />
+
+          <span>
+            <Button
+              buttonStyle={{ marginBottom: "7px" }}
+              onClick={handleShowButtonClick}
+            >
+              Prikaži
+            </Button>
+            <Button
+              buttonStyle={{
+                marginBottom: "7px",
+                marginLeft: "5px",
+              }}
+            >
+              Štampaj
+            </Button>
+          </span>
+        </div>
         <table>
           <thead>
             <tr>
@@ -117,4 +169,4 @@ const Inovices = () => {
   );
 };
 
-export default Inovices;
+export default InoviceReportsByDescription;

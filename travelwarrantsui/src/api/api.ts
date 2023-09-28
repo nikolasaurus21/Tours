@@ -834,6 +834,67 @@ export const  getReportsForDestination = async (dest:string):Promise<IReports[]>
   return jsonResponse;
 }
 
+export const getInoviceForClients =async (id:number,page?: number | null):Promise<Inovices[]> => {
+  const response  = await axios.get("https://localhost:7206/api/TravelWarrantsReports/InoviceReportsForClient",
+  {
+    params:{
+      clientId:id,
+      page:page
+    }
+  })
+
+  const jsonResponse = response.data.map((x:any)=>({
+    year: x.year,
+    number:x.number,
+    amount:x.amount,
+    clientName:x.clientName,
+    id:x.id,
+    date: format(new Date(x.date), "dd/MM/yyyy"),
+
+ }))
+
+ return jsonResponse
+}
+export const getInovicesForPeriod =async (from:Date,to:Date,page?:number):Promise<Inovices[]> => {
+  const response = await axios.get(`https://localhost:7206/api/TravelWarrantsReports/InoviceReportsForPeriod`, {
+      params: {
+        from: from.toISOString(),
+        to: to.toISOString(),
+        page:page
+      },
+    });
+    const jsonResponse = response.data.map((x:any)=>({
+      year: x.year,
+      number:x.number,
+      amount:x.amount,
+      clientName:x.clientName,
+      id:x.id,
+      date: format(new Date(x.date), "dd/MM/yyyy"),
+  
+   }))
+  
+   return jsonResponse
+}
+
+export const getInovicesByDescription =async (desc:string,page:number):Promise<Inovices[]> => {
+  const response = await axios.get("https://localhost:7206/api/TravelWarrantsReports/InoviceReportsForDescription",{
+    params:{
+      description:desc,
+      page:page
+    }
+  })
+  const jsonResponse = response.data.map((x:any)=>({
+    year: x.year,
+    number:x.number,
+    amount:x.amount,
+    clientName:x.clientName,
+    id:x.id,
+    date: format(new Date(x.date), "dd/MM/yyyy"),
+
+ }))
+
+ return jsonResponse
+}
 export const excursion = async (onOff: boolean): Promise<void> => {
   try {
     
@@ -849,6 +910,8 @@ export const excursion = async (onOff: boolean): Promise<void> => {
     console.error("Došlo je do greške prilikom slanja zahteva:", error);
   }
 };
+
+
 
 
 export const getReportsDepDest = async (departure: string, destination: string): Promise<IReports[]> => {
@@ -1016,3 +1079,27 @@ const inoviceData:Inovices ={
  return inoviceData
  
 }
+export const downloadPdf = async (id: number, invoiceNumber: string) => {
+  try {
+    const response = await axios.get(`https://localhost:7206/api/Inovices/GeneratePdf/${id}`, {
+      responseType: 'blob',
+    });
+
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const downloadUrl = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `Faktura_${invoiceNumber}.pdf`; 
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(downloadUrl);
+
+    return true;
+  } catch (error) {
+    console.error('Došlo je do greške prilikom preuzimanja PDF-a', error);
+    return false;
+  }
+};

@@ -1,21 +1,60 @@
-import React, { useContext } from "react";
-import "./paginationInovice.css";
-import Button from "../../ui/Button";
+import React, { useState } from "react";
 import {
-  AiFillDelete,
   AiFillPrinter,
+  AiFillDelete,
   AiOutlineArrowLeft,
   AiOutlineArrowRight,
 } from "react-icons/ai";
+import Button from "../../ui/Button";
 import { useNavigate } from "react-router-dom";
-import { InovicesContext } from "../../context/InovicesContext";
-import { downloadPdf, inoviceToDelete } from "../../api/api";
+import {
+  downloadPdf,
+  getInovicesForPeriod,
+  inoviceToDelete,
+} from "../../api/api";
 
-const Inovices = () => {
-  const { inovices, currentPage, totalPages, setCurrentPage } =
-    useContext(InovicesContext);
+import { Inovices } from "../../api/interfaces";
+import { format } from "date-fns";
 
+const InoviceReportsForPeriod = () => {
   const navigate = useNavigate();
+
+  const [inovices, setInovices] = useState<Inovices[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
+
+  const [enteredFrom, setEnteredFrom] = useState<string>("");
+  const [enteredTo, setEnteredTo] = useState<string>("");
+
+  const handleFromDateChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFromDate(e.target.value);
+  };
+
+  const handleToDateChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setToDate(e.target.value);
+  };
+
+  const handleShowButtonClick = async () => {
+    try {
+      const from = new Date(fromDate);
+      const to = new Date(toDate);
+      const inovicesData = await getInovicesForPeriod(from, to, currentPage);
+      setInovices(inovicesData);
+      setTotalPages(Math.ceil(inovicesData.length / 10));
+      setEnteredFrom(format(new Date(from), "dd/MM/yyyy "));
+      setEnteredTo(format(new Date(to), "dd/MM/yyyy  "));
+    } catch (error) {
+      console.error("Error fetching reports:", error);
+      setInovices([]);
+    }
+  };
 
   const handleDeleteClick = async (id: number) => {
     const inoviceData = await inoviceToDelete(id);
@@ -28,20 +67,65 @@ const Inovices = () => {
       console.log("Neuspešno preuzimanje PDF-a");
     }
   };
-
   return (
     <div>
-      <h1>Fakture</h1>
       <Button
         buttonStyle={{
-          backgroundColor: "#005f40",
-          marginLeft: "30px",
+          backgroundColor: "rgb(100,100,100)",
+          marginLeft: "10px",
+          marginTop: "10px",
         }}
-        onClick={() => navigate("/inovices/add")}
+        onClick={() => navigate("/reports")}
       >
-        Nova faktura
+        Nazad
       </Button>
+      <h1>
+        Fakture{" "}
+        {enteredFrom && enteredTo
+          ? `za period: ${enteredFrom} - ${enteredTo}`
+          : ""}
+      </h1>
+
       <div className="table-container">
+        <div className="selection">
+          <span>Prikaži fakture od:</span>
+          <input
+            style={{
+              marginLeft: "5px",
+            }}
+            type="datetime-local"
+            name="from"
+            value={fromDate}
+            onChange={handleFromDateChange}
+          />
+          <span>do:</span>
+          <input
+            style={{
+              marginLeft: "5px",
+            }}
+            type="datetime-local"
+            name="to"
+            value={toDate}
+            onChange={handleToDateChange}
+          />
+
+          <span>
+            <Button
+              buttonStyle={{ marginBottom: "7px" }}
+              onClick={handleShowButtonClick}
+            >
+              Prikaži
+            </Button>
+            <Button
+              buttonStyle={{
+                marginBottom: "7px",
+                marginLeft: "5px",
+              }}
+            >
+              Štampaj
+            </Button>
+          </span>
+        </div>
         <table>
           <thead>
             <tr>
@@ -117,4 +201,4 @@ const Inovices = () => {
   );
 };
 
-export default Inovices;
+export default InoviceReportsForPeriod;

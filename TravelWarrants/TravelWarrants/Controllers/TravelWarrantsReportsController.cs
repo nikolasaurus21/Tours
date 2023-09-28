@@ -87,30 +87,7 @@ namespace TravelWarrants.Controllers
             
         }
 
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<TravelWarrantReportsPeriod>>> GetForPeriod(DateTime from, DateTime to)
-        //{
-
-
-        //    var warrants = await _context.Tours.Include(c => c.Client)
-        //        .Where(x => _excursion || x.Client.Excursion != true)
-        //        .Where(x => x.TimeOfTour >= from && x.TimeOfTour <= to)
-        //        .Select(x => new TravelWarrantReportsPeriod
-        //        {
-        //            Id = x.Id,
-        //            Departure = x.Departure,
-        //            Destination = x.Destination,
-        //            IntermediateDestinations = x.IntermediateDestinations,
-        //            Mileage = x.Mileage,
-        //            ClientName = x.Client.Name,
-        //            DateAndTime = x.TimeOfTour
-
-        //        }).ToListAsync();
-
-        //    return Ok(warrants);
-        //}
-
-
+       
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TravelWarrantReportsPeriod>>> GetForPeriod(DateTime from, DateTime to)
         {
@@ -124,5 +101,37 @@ namespace TravelWarrants.Controllers
             
         }
 
+        [HttpGet]
+        public async Task<ActionResult> InoviceReportsForClient(int clientId, int? page) 
+        {
+            var result = await _reportsService.GetInovicesForClient(clientId,page);
+            if (result.IsSucced)
+            {
+                return Ok(result.Message);
+            }
+            return NotFound();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> InoviceReportsForDescription(string description, int? page)
+        {
+            var result = await _reportsService.GetInovicesForDescription(description, page);
+            if (result.IsSucced)
+            {
+                return Ok(result.Message);
+            }
+            return NotFound();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult>InoviceReportsForPeriod(DateTime from, DateTime to, int? page)
+        {
+            var result = await _reportsService.GetInovicesForPeriod(from, to,page);
+            if (result.IsSucced)
+            {
+                return Ok(result.Message);
+            }
+            return NotFound();
+        }
     }
 }

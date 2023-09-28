@@ -42,6 +42,9 @@ import Inovices from "./pages/inovice/Inovices";
 import NewInovice from "./pages/inovice/NewInovice";
 import EditInovice from "./pages/inovice/EditInovice";
 import DeleteInovice from "./pages/inovice/DeleteInovice";
+import InoviceReportsForClient from "./pages/reports/InoviceReportsForClient";
+import InoviceReportsForPeriod from "./pages/reports/InoviceReportsForPeriod";
+import InoviceReportsByDescription from "./pages/reports/InoviceReportsByDescription";
 
 const AppRoutes = () => {
   return (
@@ -119,6 +122,18 @@ const AppRoutes = () => {
         <Route
           path="/reports/traverwarrantsperiodreports"
           element={<PeriodReports />}
+        />
+        <Route
+          path="/reports/inovicesforclient"
+          element={<InoviceReportsForClient />}
+        />
+        <Route
+          path="/reports/inovicesforperiod"
+          element={<InoviceReportsForPeriod />}
+        />
+        <Route
+          path="/reports/inovicesbydescription"
+          element={<InoviceReportsByDescription />}
         />
 
         <Route path="/status" element={<Status />} />

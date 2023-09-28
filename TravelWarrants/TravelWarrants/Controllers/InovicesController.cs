@@ -94,8 +94,8 @@ namespace TravelWarrants.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> GeneratePdf(int id)
         {
-            byte[] pdfBytes = await _inovicesService.GeneratePdf(id);
-            string fileName = "Faktura" + ".pdf";
+            var (pdfBytes, invoiceNumber) = await _inovicesService.GeneratePdf(id); 
+            string fileName = $"Faktura_{invoiceNumber}.pdf";
             return File(pdfBytes, "application/pdf", fileName);
         }
 

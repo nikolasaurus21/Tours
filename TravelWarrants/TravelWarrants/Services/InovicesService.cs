@@ -483,7 +483,7 @@ namespace TravelWarrants.Services
         }
 
 
-        public async Task<byte[]> GeneratePdf(int id)
+        public async Task<(byte[],string)> GeneratePdf(int id)
         {
             var companyData = await _companyService.Get();
             if (companyData == null || companyData.Message == null)
@@ -519,12 +519,6 @@ namespace TravelWarrants.Services
                                  "<td>" + item.Quantity.ToString() + "</td>" +
                                  "<td>" + item.Price.ToString()+ "€" + "</td></tr>");
             }
-
-            // Debugging
-            Console.WriteLine(tableRows.ToString());
-
-
-
 
             string htmlcontent = $@"<!DOCTYPE html>
                 <html>
@@ -649,8 +643,9 @@ namespace TravelWarrants.Services
                 response = ms.ToArray();
             }
 
-            return response;
+            return (response, inovice.Number);
         }
-
     }
+
+    
 }
