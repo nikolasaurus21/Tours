@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using PdfSharpCore;
-using System.Runtime.CompilerServices;
-using TravelWarrants.DTOs;
+﻿using TravelWarrants.DTOs;
 using TravelWarrants.DTOs.Inovices;
 using TravelWarrants.DTOs.Reports;
 using TravelWarrants.Interfaces;
