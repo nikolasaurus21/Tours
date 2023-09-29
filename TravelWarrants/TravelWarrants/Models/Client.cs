@@ -18,6 +18,7 @@ namespace TravelWarrants.Models
         public bool? Excursion { get; set; }
         public virtual ICollection<Account> Account { get; set; }
         public virtual ICollection<Inovice> Inovice { get; set; }
+        public virtual ICollection<ProformaInvoice> ProformaInvoice { get; set; }
         public virtual ICollection<Tour> Tour { get; set; }
         public virtual ICollection<Payment> Payment { get; set; }
         public virtual ICollection<Status> Status { get; set; }

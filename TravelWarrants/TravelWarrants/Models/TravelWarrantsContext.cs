@@ -19,7 +19,7 @@ namespace TravelWarrants.Models
         public DbSet<Status> Statuses { get; set; }
         public DbSet<Tour> Tours { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
-
+        public DbSet<ProformaInvoice> ProformaInvoices { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -36,12 +36,11 @@ namespace TravelWarrants.Models
             modelBuilder.Entity<Tour>().ToTable("Tours");
             modelBuilder.Entity<Vehicle>().ToTable("Vehicles");
             modelBuilder.Entity<InoviceService>().ToTable("InovicesServices");
+            modelBuilder.Entity<ProformaInvoice>().ToTable("ProformaInovices");
 
 
 
-            //modelBuilder.Entity<Account>()
-            //    .Property(x => x.InoviceId)
-            //    .IsRequired(false);
+            
 
             // One-to-Many relationship between Inovice and Acount +
             modelBuilder.Entity<Inovice>()
@@ -49,12 +48,25 @@ namespace TravelWarrants.Models
                     .WithOne(r => r.Inovice)
                     .HasForeignKey(r => r.InoviceId);
 
+
+            // One-to-Many relationship between ProformaInovice and Acount +
+            modelBuilder.Entity<ProformaInvoice>()
+                    .HasMany(f => f.Account)
+                    .WithOne(r => r.ProformaInvoice)
+                    .HasForeignKey(r => r.ProformaInvoiceId);
+
             // One-to-Many relationship between Client and Inovice +
             modelBuilder.Entity<Client>()
                     .HasMany(k => k.Inovice)
                     .WithOne(f => f.Client)
                     .HasForeignKey(f => f.ClientId);
 
+
+            // One-to-Many relationship between Client and ProformaInvoice +
+            modelBuilder.Entity<Client>()
+                    .HasMany(k => k.ProformaInvoice)
+                    .WithOne(f => f.Client)
+                    .HasForeignKey(f => f.ClientId);
 
             // One-to-Many relationship between Company and CompanyGiroAccount +
             modelBuilder.Entity<Company>()
@@ -97,6 +109,13 @@ namespace TravelWarrants.Models
                     .HasMany(f => f.InoviceService)
                     .WithOne(uf => uf.Inovice)
                     .HasForeignKey(uf => uf.InoviceId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+            // One-to-Many relathionship between ProformaInovice and InoviceService +
+            modelBuilder.Entity<ProformaInvoice>()
+                    .HasMany(f => f.InoviceService)
+                    .WithOne(uf => uf.ProformaInvoice)
+                    .HasForeignKey(uf => uf.ProformaInvoiceId)
                     .OnDelete(DeleteBehavior.Restrict);
 
 

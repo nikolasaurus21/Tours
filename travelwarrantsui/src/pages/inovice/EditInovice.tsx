@@ -109,7 +109,7 @@ const EditInovice = () => {
             paddingTop: "10px",
           }}
         >
-          Izmjena fakture
+          Izmjena fakture {/*Treba odje dodati i broj fakture koji se mijenja*/}
         </h1>
       </div>
       <form onSubmit={handleSubmit} className="form-container-inovice">
