@@ -12,8 +12,8 @@ using TravelWarrants.Models;
 namespace TravelWarrants.Migrations
 {
     [DbContext(typeof(TravelWarrantsContext))]
-    [Migration("20230929094452_NullAgain")]
-    partial class NullAgain
+    [Migration("20231003101808_DatabaseCreate")]
+    partial class DatabaseCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,7 +44,6 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("InoviceId")
-                        .IsRequired()
                         .HasColumnType("integer");
 
                     b.Property<string>("Note")
@@ -52,7 +51,6 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("text");
 
                     b.Property<int?>("ProformaInvoiceId")
-                        .IsRequired()
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -284,7 +282,6 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("text");
 
                     b.Property<int?>("InoviceId")
-                        .IsRequired()
                         .HasColumnType("integer");
 
                     b.Property<string>("NumberOfDays")
@@ -295,7 +292,6 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<int?>("ProformaInvoiceId")
-                        .IsRequired()
                         .HasColumnType("integer");
 
                     b.Property<decimal>("Quantity")
@@ -617,15 +613,11 @@ namespace TravelWarrants.Migrations
 
                     b.HasOne("TravelWarrants.Models.Inovice", "Inovice")
                         .WithMany("Account")
-                        .HasForeignKey("InoviceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("InoviceId");
 
                     b.HasOne("TravelWarrants.Models.ProformaInvoice", "ProformaInvoice")
                         .WithMany("Account")
-                        .HasForeignKey("ProformaInvoiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ProformaInvoiceId");
 
                     b.Navigation("Client");
 
@@ -661,14 +653,12 @@ namespace TravelWarrants.Migrations
                     b.HasOne("TravelWarrants.Models.Inovice", "Inovice")
                         .WithMany("InoviceService")
                         .HasForeignKey("InoviceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("TravelWarrants.Models.ProformaInvoice", "ProformaInvoice")
                         .WithMany("InoviceService")
                         .HasForeignKey("ProformaInvoiceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("TravelWarrants.Models.Service", "Service")
                         .WithMany("InoviceService")

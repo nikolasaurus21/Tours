@@ -69,7 +69,6 @@ namespace TravelWarrants.Services
             var response = new ResponseDTO<IEnumerable<InoviceGetDTO>>() { Message = inovices, IsSucced = true, TotalPages = totalPages };
             return response;
         }
-
         public async Task<ResponseDTO<InoviceGetByIdDTO>> GetById(int inoviceId)
         {
             var inovice = await _context.Inovices
@@ -91,7 +90,10 @@ namespace TravelWarrants.Services
                 PaymentDeadline = (inovice.CurrencyDate - inovice.DocumentDate).Days,
                 PriceWithoutVAT = inovice.PriceWithoutVAT ?? default(bool),
                 Note = inovice.Note,
-                ItemsOnInovice = inovice.InoviceService.Select(i => new ItemsOnInoviceEdit
+                Number = inovice.Number + "/" + inovice.Year,
+                ItemsOnInovice = inovice.InoviceService.Where(i => i.InoviceId.HasValue && !i.ProformaInvoiceId.HasValue)
+
+                .Select(i => new ItemsOnInoviceEdit
                 {
                     Id = i.Id,
                     Description = i.Description,
@@ -104,8 +106,6 @@ namespace TravelWarrants.Services
 
             return new ResponseDTO<InoviceGetByIdDTO> { IsSucced = true, Message = response };
         }
-
-
         public async Task<ResponseDTO<InoviceGetDTO>> NewInovice(InoviceNewDTO inoviceSaveDTO)
         {
 
@@ -132,7 +132,9 @@ namespace TravelWarrants.Services
                 PriceWithoutVAT = inoviceSaveDTO.PriceWithoutVAT,
                 Note = inoviceSaveDTO.Note,
                 Year = inoviceSaveDTO.DocumentDate.Year,
+                
                 InoviceService = new List<InoviceService>()
+                
 
 
             };
@@ -149,7 +151,8 @@ namespace TravelWarrants.Services
                     Quantity = item.Quantity,
                     Price = item.Price,
                     Value = item.Quantity * item.Price,
-                    NumberOfDays = item.NumberOfDays
+                    NumberOfDays = item.NumberOfDays,
+                    
 
 
                 };
@@ -232,8 +235,6 @@ namespace TravelWarrants.Services
 
             return new ResponseDTO<InoviceGetDTO> { IsSucced = true, Message = addedInovice };
         }
-
-
         public async Task<ResponseDTO<InoviceGetDTO>> EditInvoice(int invoiceId, InoviceEditDTO inoviceEditDTO)
         {
             if (inoviceEditDTO == null || inoviceEditDTO.ItemsOnInovice == null)
@@ -253,7 +254,7 @@ namespace TravelWarrants.Services
             var oldClient = existingInvoice.ClientId;
             var oldAmount = existingInvoice.Total;
 
-
+            
             existingInvoice.ClientId = inoviceEditDTO.ClientId;
             existingInvoice.DocumentDate = inoviceEditDTO.DocumentDate;
             existingInvoice.CurrencyDate = inoviceEditDTO.DocumentDate.AddDays(inoviceEditDTO.PaymentDeadline);
@@ -261,12 +262,15 @@ namespace TravelWarrants.Services
             existingInvoice.Note = inoviceEditDTO.Note;
             existingInvoice.Year = inoviceEditDTO.DocumentDate.Year;
 
-            foreach (var Id in inoviceEditDTO.ItemsToDeleteId)
+            if (inoviceEditDTO.ItemsToDeleteId != null)
             {
-                var toDelete = await _context.InovicesServices.FirstOrDefaultAsync(i => i.Id == Id);
-                if (toDelete != null)
+                foreach (var Id in inoviceEditDTO.ItemsToDeleteId)
                 {
-                    _context.InovicesServices.Remove(toDelete);
+                    var toDelete = await _context.InovicesServices.FirstOrDefaultAsync(i => i.Id == Id);
+                    if (toDelete != null)
+                    {
+                        _context.InovicesServices.Remove(toDelete);
+                    }
                 }
             }
 
@@ -280,6 +284,7 @@ namespace TravelWarrants.Services
                     continue;
                 }
 
+                
                 updateItem.Price = item.Price;
                 updateItem.Quantity = item.Quantity;
                 updateItem.Description = item.Description;
@@ -310,7 +315,8 @@ namespace TravelWarrants.Services
                     Quantity = item.Quantity,
                     Price = item.Price,
                     Value = item.Quantity * item.Price,
-                    NumberOfDays = item.NumberOfDays
+                    NumberOfDays = item.NumberOfDays,
+                    
 
 
                 };
@@ -339,11 +345,13 @@ namespace TravelWarrants.Services
 
 
             var acc = await _context.Accounts.FirstOrDefaultAsync(x => x.InoviceId == existingInvoice.Id)
-                ?? new Account { InoviceId = existingInvoice.Id };
+                ?? new Account { InoviceId = existingInvoice.Id, ProformaInvoiceId = null };
+
 
             acc.Date = existingInvoice.DocumentDate;
             acc.Amount = existingInvoice.Total;
             acc.ClientId = existingInvoice.ClientId;
+            
 
             var oldStatus = await _context.Statuses.FirstOrDefaultAsync(x => x.ClientId == oldClient);
             if (oldStatus != null)
@@ -384,10 +392,10 @@ namespace TravelWarrants.Services
 
             return new ResponseDTO<InoviceGetDTO> { IsSucced = true, Message = addedInovice };
         }
-
         public async Task<ResponseDTO<bool>> DeleteInovice(int inoviceId)
         {
-            var deleteInovice = await _context.Inovices.Include(i => i.InoviceService).FirstOrDefaultAsync(x => x.Id == inoviceId);
+            var deleteInovice = await _context.Inovices.Include(i => i.InoviceService)
+                .FirstOrDefaultAsync(x => x.Id == inoviceId);
 
             if (deleteInovice == null)
             {
@@ -433,18 +441,17 @@ namespace TravelWarrants.Services
                 return new ResponseDTO<bool> { IsSucced = false, Message = false };
             }
         }
-
         private async Task<ResponseDTO<InviocePdf>> InoviceForPDf(int id)
         {
             var invoice = await _context.Inovices
-                .Include(i => i.InoviceService).ThenInclude(s => s.Service)
+                .Include(i => i.InoviceService.Where(i => i.InoviceId.HasValue && !i.ProformaInvoiceId.HasValue))
+                .ThenInclude(s => s.Service)
                 .Include(c => c.Client)
 
                 .Where(x => x.Id == id)
                 .Select(x => new InviocePdf
                 {
                     Id = x.Id,
-
                     ClientName = x.Client.Name,
                     ClientAddress = x.Client.Address,
                     ClientPlace = x.Client.PlaceName,
@@ -453,7 +460,9 @@ namespace TravelWarrants.Services
                     Total = x.Total,
                     PriceWithoutVat = x.NoVAT,
                     Vat = x.VAT,
-                    ItemsOnInovice = x.InoviceService.Select(i => new ItemsOnInovicePdf
+                    ItemsOnInovice = x.InoviceService
+                    
+                    .Select(i => new ItemsOnInovicePdf
                     {
 
                         Description = i.Description,
@@ -481,8 +490,6 @@ namespace TravelWarrants.Services
                 };
             }
         }
-
-
         public async Task<(byte[],string)> GeneratePdf(int id)
         {
             var companyData = await _companyService.Get();
@@ -492,17 +499,13 @@ namespace TravelWarrants.Services
             }
             var company = companyData.Message.FirstOrDefault();
 
-            var inoviceData = await InoviceForPDf(id);
-            if (inoviceData == null || inoviceData.Message == null)
-            {
-                throw new InvalidOperationException("Inovice data is not available");
-            }
+            var inoviceData = await InoviceForPDf(id) ?? throw new InvalidOperationException("Inovice data is not available");
             var inovice = inoviceData.Message;
-
-            if (inovice.ItemsOnInovice.Count() == 0)
+            if (inovice.ItemsOnInovice.Count == 0)
             {
                 throw new InvalidOperationException("No items on inovice");
             }
+
 
             var document = new PdfDocument();
 

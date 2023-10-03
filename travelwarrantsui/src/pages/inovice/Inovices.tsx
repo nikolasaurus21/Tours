@@ -90,29 +90,31 @@ const Inovices = () => {
           </tbody>
         </table>
       </div>
-      <div className="paginationInoivice">
-        <button
-          className={`page-button ${currentPage === 1 ? "disabled" : ""}`}
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-        >
-          <AiOutlineArrowLeft />
-        </button>
-        <span className="page-info">
-          {currentPage} / {totalPages}
-        </span>
-        <button
-          className={`page-button ${
-            currentPage === totalPages ? "disabled" : ""
-          }`}
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          disabled={currentPage === totalPages}
-        >
-          <AiOutlineArrowRight />
-        </button>
-      </div>
+      {inovices.length === 0 ? null : (
+        <div className="paginationInoivice">
+          <button
+            className={`page-button ${currentPage === 1 ? "disabled" : ""}`}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            <AiOutlineArrowLeft />
+          </button>
+          <span className="page-info">
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            className={`page-button ${
+              currentPage === totalPages ? "disabled" : ""
+            }`}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+          >
+            <AiOutlineArrowRight />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

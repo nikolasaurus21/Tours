@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.DTOs.Proinovce;
 using TravelWarrants.Interfaces;
+using TravelWarrants.Models;
 using TravelWarrants.Services;
 
 namespace TravelWarrants.Controllers
@@ -16,7 +17,13 @@ namespace TravelWarrants.Controllers
         {
             _proInoviceService = proInoviceService;
         }
-
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GeneratePdf(int id)
+        {
+            var (pdfBytes, proformaInvoiceNumber) = await _proInoviceService.GeneratePdf(id);
+            string fileName = $"Faktura_{proformaInvoiceNumber}.pdf";
+            return File(pdfBytes, "application/pdf", fileName);
+        }
 
         [HttpGet("{invoiceId}")]
         public async Task<ActionResult> GetProformaInvoiceForDelete(int invoiceId)
@@ -30,7 +37,7 @@ namespace TravelWarrants.Controllers
         }
         
 
-        [HttpGet("{invoiceId}")]
+        [HttpDelete("{invoiceId}")]
         public async Task<ActionResult> DeleteProformaInvoice(int invoiceId)
         {
             var result  = await _proInoviceService.DeleteProInovice(invoiceId);
@@ -39,7 +46,7 @@ namespace TravelWarrants.Controllers
 
 
         [HttpGet("{invoiceId}")]
-        public async Task<IActionResult> DownloadRoutePlan(int invoiceId)
+        public async Task<ActionResult> DownloadRoutePlan(int invoiceId)
         {
             var fileData = await _proInoviceService.GetRoutePlanFile(invoiceId);
             if (fileData == null || fileData.FileBytes == null || string.IsNullOrWhiteSpace(fileData.FileName))

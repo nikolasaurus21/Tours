@@ -68,3 +68,13 @@
 .form-container-basic input[type="checkbox"] {
   margin-left: 0;
 }
+.custom-file-input::-webkit-file-upload-button {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+.custom-file-input::-webkit-file-upload-button:hover {
+  background-color: #ccc;
+}

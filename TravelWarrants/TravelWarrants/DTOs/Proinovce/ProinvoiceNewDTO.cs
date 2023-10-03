@@ -15,6 +15,6 @@ namespace TravelWarrants.DTOs.Proinovce
         public bool? ProinoviceWithoutVAT { get; set; }
 
         public IFormFile? RoutePlan { get; set; }
-        //public bool OfferAccepted { get; set; }
+      
     }
 }

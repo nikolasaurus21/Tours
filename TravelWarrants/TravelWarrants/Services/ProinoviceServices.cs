@@ -1,8 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PdfSharpCore.Pdf;
+using PdfSharpCore;
+using System.Text;
+using TheArtOfDev.HtmlRenderer.PdfSharp;
 using TravelWarrants.DTOs;
 using TravelWarrants.DTOs.Inovices;
 using TravelWarrants.DTOs.Proinovce;
 using TravelWarrants.Interfaces;
+using TravelWarrants.Models;
 
 
 namespace TravelWarrants.Services
@@ -49,7 +54,7 @@ namespace TravelWarrants.Services
 
             try
             {
-                var acc = await _context.Accounts.FirstOrDefaultAsync(x => x.InoviceId == deleteProinovice.Id);
+                var acc = await _context.Accounts.FirstOrDefaultAsync(x => x.ProformaInvoiceId == deleteProinovice.Id);
                 if (acc != null)
                 {
                     _context.Accounts.Remove(acc);
@@ -133,7 +138,7 @@ namespace TravelWarrants.Services
         public async Task<ResponseDTO<ProinvoiceGetByIdDTO>> GetProInvoiceById(int invoiceId)
         {
             var proinvoice = await _context.ProformaInvoices
-                .Include(i => i.InoviceService)
+                .Include(i => i.InoviceService.Where(i => !i.InoviceId.HasValue && i.ProformaInvoiceId.HasValue))
                 .Include(c => c.Client)
                 .Where(x => x.Id == invoiceId)
                 .FirstOrDefaultAsync();
@@ -154,7 +159,8 @@ namespace TravelWarrants.Services
                 Number = proinvoice.Number + "/" + proinvoice.Year,
                 OfferAccepted = proinvoice.OfferAccepted ?? default,
                 FileName = proinvoice.Route,
-                ItemsOnInovice = proinvoice.InoviceService.Select(i => new ItemsOnInoviceEdit
+                ItemsOnInovice = proinvoice.InoviceService
+                .Select(i => new ItemsOnInoviceEdit
                 {
                     Id = i.Id,
                     Description = i.Description,
@@ -509,6 +515,219 @@ namespace TravelWarrants.Services
                 }).ToListAsync();
 
             return new ResponseDTO<IEnumerable<ProinvoiceGetDTO>> { IsSucced = true, Message = proinvoice };
+        }
+        private async Task<ResponseDTO<ProformaInvoicePdf>> ProformaInvoiceForPDF(int id)
+        {
+            var invoice = await _context.ProformaInvoices
+                .Include(i => i.InoviceService.Where(i => !i.InoviceId.HasValue && i.ProformaInvoiceId.HasValue))
+                .ThenInclude(s => s.Service)
+                .Include(c => c.Client)
+                .Where(x => x.Id == id)
+                .Select(x => new ProformaInvoicePdf
+                {
+                    Id = x.Id,
+                    ClientName = x.Client.Name,
+                    ClientAddress = x.Client.Address,
+                    ClientPlace = x.Client.PlaceName,
+                    Email = x.Client.Email,
+                    Number = x.Number + "/" + x.Year,
+                    Total = x.Total,
+                    PriceWithoutVat = x.NoVAT,
+                    Vat = x.VAT,
+                    ShowVat = x.ProinoviceWithoutVAT ?? false,
+                    ItemsOnInovice = x.InoviceService
+                    .Select(i => new ItemsOnInovicePdf
+                    {
+
+                        Description = i.Description,
+                        Service = i.Service.Name,
+                        Quantity = i.Quantity,
+                        Price = i.Price,
+                        NumberOfDays = i.NumberOfDays
+                    }).ToList()
+                }).FirstOrDefaultAsync();
+
+            if (invoice != null)
+            {
+                return new ResponseDTO<ProformaInvoicePdf>
+                {
+                    IsSucced = true,
+                    Message = invoice
+                };
+            }
+            else
+            {
+                return new ResponseDTO<ProformaInvoicePdf>
+                {
+                    IsSucced = false
+
+                };
+            }
+        }
+        public async Task<(byte[], string)> GeneratePdf(int id)
+        {
+            var companyData = await _companyService.Get();
+            if (companyData == null || companyData.Message == null)
+            {
+                throw new InvalidOperationException("Company data is not available");
+            }
+            var company = companyData.Message.FirstOrDefault();
+
+            var proformaInvoiceData = await ProformaInvoiceForPDF(id);
+            if (proformaInvoiceData == null || proformaInvoiceData.Message == null)
+            {
+                throw new InvalidOperationException("Inovice data is not available");
+            }
+            var proformaInvoice = proformaInvoiceData.Message;
+
+            if (proformaInvoice.ItemsOnInovice.Count() == 0)
+            {
+                throw new InvalidOperationException("No items on inovice");
+            }
+
+            var document = new PdfDocument();
+
+            var tableRows = new StringBuilder();
+            int i = 0;
+
+            foreach (var item in proformaInvoice.ItemsOnInovice)
+            {
+                i++;
+                tableRows.Append("<tr><td>" + i.ToString() + "</td>" +
+                                 "<td>" + item.Service + "</td>" +
+                                 "<td>" + item.Description + "</td>" +
+                                 "<td>" + item.NumberOfDays.ToString() + "</td>" +
+                                 "<td>" + item.Quantity.ToString() + "</td>" +
+                                 "<td>" + item.Price.ToString() + "€" + "</td></tr>");
+            }
+
+            string htmlcontent = $@"<!DOCTYPE html>
+                <html>
+                    <head>
+                        <title>Faktura</title>
+                        <style>
+                            body {{
+                                font-family: Arial, sans-serif;
+                                margin: 20px;
+                            }}
+                            header, section, footer {{
+                                margin-bottom: 20px;
+                            }}
+                            h1, h2 {{
+                                color: #333;
+                            }}
+                            table {{
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-top: 30px; /* Dodajemo marginu iznad tabele */
+                            }}
+                            th, td {{
+                                border: 1px solid #ccc;
+                                padding: 8px;
+                                text-align: left;
+                            }}
+                            th {{
+                                background-color: #f2f2f2;
+                            }}
+                            footer {{
+                                text-align: center;
+                                margin-top: 30px;
+                                border-top: 1px solid #ccc;
+                                padding-top: 10px;
+                            }}
+                            .flex-container {{
+                                display: flex;
+                                justify-content: space-between; 
+                            }}
+                            .no-border{{
+                                 border: none !important;
+                            }}
+                            .tfoot-right{{
+                                 text-align: right;
+                            }}
+                            .hidden {{
+                                display: none;
+                            }}
+                        </style>
+                    </head>
+                    <body>
+                        <header>
+                            <h1>Pro-faktura: {proformaInvoice.Number}</h1>
+                            <p>Datum: {DateTime.Now:dd/MM/yyyy}</p>
+                        </header>
+                        <hr>
+                        <section class=\""{{flex-container}}\""> 
+                            <div>
+                                <h2>{company.Name}</h2>
+                                <address>
+                                    Adresa: {company.Address}<br>
+                                    Grad: {company.Place}, Poštanski broj: {company.PTT}<br>
+                                    Telefon: {company.Telephone}<br>
+                                    Faks: {company.Fax}<br>
+                                    PIB: {company.TIN}
+                                </address>
+                            </div>
+                            <div>
+                                <h2>Za:</h2>
+                                <address>
+                                    {proformaInvoice.ClientName}<br>
+                                    {proformaInvoice.ClientAddress}<br>
+                                    {proformaInvoice.ClientPlace}<br>
+                                    {proformaInvoice.Email}
+                                </address>
+                            </div>
+                        </section>
+                        <hr>
+                        <div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Usluga</th>
+                                        <th>Opis usluge</th>
+                                        <th>Broj dana</th>
+                                        <th>Količina</th>
+                                        <th>Cijena</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {tableRows}
+                                </tbody>
+                                <tfoot>
+                                    <tr class='{(proformaInvoice.ShowVat ? "" : "hidden")}'>
+                                        <td class='no-border' colspan='4'></td>
+                                        <td class='tfoot-right no-border'>Ukupno bez PDV:</td>
+                                        <td class='no-border'>{proformaInvoice.PriceWithoutVat}€</td>
+                                    </tr>
+                                    <tr class='{(proformaInvoice.ShowVat ? "" : "hidden")}'>
+                                        <td class='no-border' colspan='4'></td>
+                                        <td class='tfoot-right no-border'>PDV:</td>
+                                        <td class='no-border'>{proformaInvoice.Vat}€</td>
+                                    </tr>
+                                    <tr>
+                                        <td class='no-border' colspan='4'></td>
+                                        <td class='tfoot-right no-border'>Ukupno:</td>
+                                        <td class='no-border'>{proformaInvoice.Total}€</td>
+                                    </tr>
+                                </tfoot>
+
+                            </table>
+                        </div>
+                        
+                    </body>
+                </html>";
+
+
+            PdfGenerator.AddPdfPages(document, htmlcontent, PageSize.A4);
+
+            byte[] response;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                document.Save(ms);
+                response = ms.ToArray();
+            }
+
+            return (response, proformaInvoice.Number);
         }
     }
 }

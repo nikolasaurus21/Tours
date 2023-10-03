@@ -1,4 +1,4 @@
-import {  addClient, addVehicle,allClients, allVehicles,allDrivers,addDriver,ICompany, allGiroAccounts, addGiroAccounts, allServices, addService, allTravelWarrants, addTravelWarrant, allPayments, addPayment, IReports, Statuses, deleteTour, Inovices, IAddInovice, IDeleteInovice, IGetInoviceById, IItemsEdit, IEditInovice} from "./interfaces";
+import {  addClient, addVehicle,allClients, allVehicles,allDrivers,addDriver,ICompany, allGiroAccounts, addGiroAccounts, allServices, addService, allTravelWarrants, addTravelWarrant, allPayments, addPayment, IReports, Statuses, deleteTour, Inovices, IAddInovice, IDeleteInovice, IGetInoviceById, IItemsEdit, IEditInovice, IProformaInvoices, IAddProformaInvoice} from "./interfaces";
 import axios from "axios";
 import { format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
@@ -1031,6 +1031,7 @@ export const getInoviceById =async (id:number):Promise<IGetInoviceById> => {
     clientId:jsonResponse.clientId,
     paymentDeadline:jsonResponse.paymentDeadline,
     note:jsonResponse.note,
+    number:jsonResponse.number,
     priceWithoutVat:jsonResponse.priceWithoutVAT,
     itemsOnInovice: jsonResponse.itemsOnInovice.map((i:any) => {
       return{
@@ -1103,3 +1104,102 @@ export const downloadPdf = async (id: number, invoiceNumber: string) => {
     return false;
   }
 };
+
+
+//ProformaInvoices
+
+export const newProformaInvoice = async (data: IAddProformaInvoice): Promise<IProformaInvoices> => {
+  try {
+    const utcDate = utcToZonedTime(data.date, "UTC");
+    const response = await axios.post(
+      "https://localhost:7206/api/ProformaInvoice/NewProformaInvoice",
+      {
+        clientId: data.clientId,
+        documentDate: format(utcDate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
+        paymentDeadline: data.paymentDeadline,
+        priceWithoutVAT: data.priceWithoutVat,
+        note: data.note,
+        itemsOnInovice: data.itemsOnInovice,
+        proinoviceWithoutVAT: data.proinvoiceWithoutVat
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        }
+      }
+    );
+    console.log('Server Response:', response.data);  // Ovdje će se ispisati odgovor servera u konzoli
+    const inoviceData: IProformaInvoices = {
+      id: response.data.id,
+      accepted: response.data.offerAccepted,
+      number: response.data.number,
+      date: format(new Date(response.data.date), "dd/MM/yyyy"),
+      amount: response.data.amount,
+      clientName: response.data.clientName
+    };
+    return inoviceData;
+  } catch (error) {
+    console.error('Error:', error);  // Ovdje će se ispisati greška u konzoli ako se dogodi
+    throw error;  // Ovo će proslijediti grešku dalje u vašem kodu tako da možete dalje rukovati greškom
+  }
+};
+
+export const allProformaInvoices =async (page?:number):Promise<IProformaInvoices[]> => {
+  const response = await axios.get("https://localhost:7206/api/ProformaInvoice/GetProformaInvoice",{
+    params:{
+      page:page
+    }
+   })
+  const jsonResponse:IProformaInvoices[] = response.data.map((x:any)=>({
+    
+    number:x.number,
+    amount:x.amount,
+    clientName:x.clientName,
+    id:x.id,
+    accepted:x.offerAccepted,
+    date: format(new Date(x.date), "dd/MM/yyyy"),
+
+ }))
+
+ return jsonResponse
+}
+
+export const downloadPdfProformaInvoice = async (id: number, invoiceNumber: string) => {
+  try {
+    const response = await axios.get(`https://localhost:7206/api/ProformaInvoice/GeneratePdf/${id}`, {
+      responseType: 'blob',
+    });
+
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const downloadUrl = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `Faktura_${invoiceNumber}.pdf`; 
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(downloadUrl);
+
+    return true;
+  } catch (error) {
+    console.error('Došlo je do greške prilikom preuzimanja PDF-a', error);
+    return false;
+  }
+};
+
+export const proformaInvoiceToDelete =async (id:number):Promise<IDeleteInovice> => {
+  const response = await axios.get(`https://localhost:7206/api/ProformaInvoice/GetProformaInvoiceForDelete/${id}`)
+  const jsonResponse = response.data
+
+  const proformaInvoiceToDelete:IDeleteInovice={
+    number:jsonResponse.number,
+    clientName: jsonResponse.clientName,
+    date:jsonResponse.date,
+    amount:jsonResponse.amount
+  }
+
+  return proformaInvoiceToDelete
+}

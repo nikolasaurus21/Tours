@@ -9,6 +9,7 @@ namespace TravelWarrants.Interfaces
         Task<bool> DeleteProInovice(int inoviceId);
         Task<bool> DeleteRoutePlan(int invoiceId);
         Task<ResponseDTO<ProinvoiceGetDTO>> EditProinvoice(int invoiceId, ProinvoiceEditDTO proinvoiceEditDTO);
+        Task<(byte[], string)> GeneratePdf(int id);
         Task<ResponseDTO<InoviceGetByIdDeleteDTO>> GetForDeleteProinvoice(int inoviceId);
         Task<ResponseDTO<IEnumerable<ProinvoiceGetDTO>>> GetProformaInvoices(int? page);
         Task<ResponseDTO<ProinvoiceGetByIdDTO>> GetProInvoiceById(int invoiceId);

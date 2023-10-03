@@ -106,7 +106,12 @@ const SideMenu = () => {
           <div className="submenu-item" onClick={() => navigate("/inovices")}>
             Fakture
           </div>
-          <div className="submenu-item">Profakture</div>
+          <div
+            className="submenu-item"
+            onClick={() => navigate("/proformainvoices")}
+          >
+            Profakture
+          </div>
         </div>
       )}
       <div className="menu-item " onClick={() => navigate("/reports")}>

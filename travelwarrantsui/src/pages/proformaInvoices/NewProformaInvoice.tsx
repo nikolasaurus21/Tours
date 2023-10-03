@@ -1,53 +1,33 @@
-import React, { useContext, useEffect, useState } from "react";
-import { HiOutlinePlusSm, HiMinus } from "react-icons/hi";
+import React, { useContext, useState } from "react";
 import Button from "../../ui/Button";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ClientsContext } from "../../context/ClientsContext";
 import { ServicesContext } from "../../context/ServicesContext";
-import { IItemsEdit, IEditInovice } from "../../api/interfaces";
-import { getInoviceById } from "../../api/api";
-import { InovicesContext } from "../../context/InovicesContext";
+import { HiMinus, HiOutlinePlusSm } from "react-icons/hi";
+import { IAddItem, IAddProformaInvoice } from "../../api/interfaces";
+import { ProformaInovicesContext } from "../../context/ProformaInvoicesContext";
 
-const EditInovice = () => {
-  const { id } = useParams();
+const NewProformaInvoice = () => {
   const navigate = useNavigate();
+
   const { clients } = useContext(ClientsContext);
   const { services } = useContext(ServicesContext);
-  const { updateInovice } = useContext(InovicesContext);
+  const { addProformaInvoice } = useContext(ProformaInovicesContext);
 
-  const [items, setItems] = useState<IItemsEdit[]>([]);
-  const [invoiceNumber, setInvoiceNumber] = useState<string | null>(null);
-  const [addInvoice, setAddInvoice] = useState<IEditInovice>({
-    clientId: 0,
-    date: "",
-    paymentDeadline: 0,
-    note: "",
-
-    priceWithoutVat: false,
-    itemsOnInovice: [],
-    itemsToDelete: [],
-  });
-
-  useEffect(() => {
-    const fetchInovice = async () => {
-      try {
-        const inovice = await getInoviceById(Number(id));
-
-        setAddInvoice(inovice);
-        if (inovice.itemsOnInovice) {
-          setItems(inovice.itemsOnInovice);
-        }
-        setInvoiceNumber(inovice.number);
-        //console.log("Stanje posle setovanja:", addInvoice);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchInovice();
-  }, [id]);
-
+  const [items, setItems] = useState<IAddItem[]>([]);
+  const [newProformaInvoice, setNewProformaInvoice] =
+    useState<IAddProformaInvoice>({
+      clientId: 0,
+      date: "",
+      paymentDeadline: 0,
+      note: "",
+      priceWithoutVat: false,
+      itemsOnInovice: [],
+      proinvoiceWithoutVat: false,
+      file: null,
+    });
   const addItem = () => {
-    const newItem: IItemsEdit = {
+    const newItem: IAddItem = {
       description: "",
       serviceId: 0,
       quantity: 0,
@@ -57,43 +37,37 @@ const EditInovice = () => {
     setItems([...items, newItem]);
   };
 
-  const removeItem = (indexToRemove: number) => {
-    // Prije nego što obrišemo stavku, pridružimo njen ID u itemsToDelete niz
-    const itemId = items[indexToRemove].id; // Pretpostavimo da svaka stavka ima jedinstveni 'id'
-
-    if (itemId !== undefined) {
-      // Dodamo ID stavke u itemsToDelete niz
-      setAddInvoice((prevInvoice) => ({
-        ...prevInvoice,
-        itemsToDelete: prevInvoice.itemsToDelete
-          ? [...prevInvoice.itemsToDelete, itemId]
-          : [itemId],
-      }));
-    }
-
-    // Onda uklonimo stavku iz niza
+  const removeItem = (indexToRemove: any) => {
     setItems(items.filter((_, index) => index !== indexToRemove));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newInvoiceData: IEditInovice = {
-      clientId: addInvoice.clientId,
-      date: addInvoice.date,
-      paymentDeadline: addInvoice.paymentDeadline,
-      note: addInvoice.note,
-      priceWithoutVat: addInvoice.priceWithoutVat,
+    const newProformaInvoiceData: IAddProformaInvoice = {
+      clientId: newProformaInvoice.clientId,
+      date: newProformaInvoice.date,
+      paymentDeadline: newProformaInvoice.paymentDeadline,
+      note: newProformaInvoice.note,
+      priceWithoutVat: newProformaInvoice.priceWithoutVat,
       itemsOnInovice: items,
-      itemsToDelete: addInvoice.itemsToDelete || [],
+      proinvoiceWithoutVat: newProformaInvoice.proinvoiceWithoutVat,
+      file: newProformaInvoice.file,
     };
 
-    console.log("Podaci iz forme:", newInvoiceData);
+    console.log("Podaci iz forme:", newProformaInvoiceData);
 
-    await updateInovice(Number(id), newInvoiceData);
-    navigate("/inovices");
+    await addProformaInvoice(newProformaInvoiceData);
+    navigate("/proformainvoices");
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    setNewProformaInvoice((prevState) => ({
+      ...prevState,
+      file: file,
+    }));
+  };
   return (
     <div>
       <div>
@@ -103,7 +77,7 @@ const EditInovice = () => {
             marginTop: "15px",
             backgroundColor: "rgb(100,100,100)",
           }}
-          onClick={() => navigate("/inovices")}
+          onClick={() => navigate("/proformainvoices")}
         >
           Nazad
         </Button>
@@ -112,17 +86,24 @@ const EditInovice = () => {
             paddingTop: "10px",
           }}
         >
-          Izmjena fakture:{invoiceNumber}
+          Nova profaktura
         </h1>
       </div>
-      <form onSubmit={handleSubmit} className="form-container-inovice">
+      <form
+        encType="multipart/form-data"
+        onSubmit={handleSubmit}
+        className="form-container-inovice"
+      >
         <div>
           <label>Klijent</label>
           <select
             name="clientId"
-            value={addInvoice.clientId || ""}
+            value={newProformaInvoice.clientId || ""}
             onChange={(e) =>
-              setAddInvoice({ ...addInvoice, clientId: Number(e.target.value) })
+              setNewProformaInvoice({
+                ...newProformaInvoice,
+                clientId: Number(e.target.value),
+              })
             }
           >
             <option value="" disabled>
@@ -141,24 +122,23 @@ const EditInovice = () => {
             type="datetime-local"
             name="date"
             onChange={(e) =>
-              setAddInvoice({ ...addInvoice, date: e.target.value })
+              setNewProformaInvoice({
+                ...newProformaInvoice,
+                date: e.target.value,
+              })
             }
-            value={addInvoice.date}
+            value={newProformaInvoice.date}
           />
         </div>
         <div>
           <label>Rok plaćanja(dana)</label>
           <input
             type="number"
+            min={0}
             name="paymentDeadline"
-            value={
-              addInvoice.paymentDeadline !== null
-                ? addInvoice.paymentDeadline
-                : ""
-            }
             onChange={(e) =>
-              setAddInvoice({
-                ...addInvoice,
+              setNewProformaInvoice({
+                ...newProformaInvoice,
                 paymentDeadline: Number(e.target.value),
               })
             }
@@ -173,21 +153,42 @@ const EditInovice = () => {
         >
           <input
             type="checkbox"
-            checked={addInvoice.priceWithoutVat}
+            name="priceWithoutVAT"
+            id="priceWithoutVAT"
             onChange={(e) =>
-              setAddInvoice({
-                ...addInvoice,
+              setNewProformaInvoice({
+                ...newProformaInvoice,
                 priceWithoutVat: e.target.checked,
               })
             }
           />
           <label
-            htmlFor="priceWithoutVat"
+            htmlFor="priceWithoutVAT"
             style={{ marginTop: "6px", fontSize: "13px" }}
           >
             Cijena bez PDV-a
           </label>
+
+          <input
+            type="checkbox"
+            name="proinvoiceWithoutVat"
+            id="proinvoiceWithoutVat"
+            onChange={(e) =>
+              setNewProformaInvoice({
+                ...newProformaInvoice,
+                proinvoiceWithoutVat: e.target.checked,
+              })
+            }
+            style={{ marginLeft: "10px" }}
+          />
+          <label
+            htmlFor="proinvoiceWithoutVat"
+            style={{ marginTop: "6px", fontSize: "13px" }}
+          >
+            Ponuda bez prikazivanja PDV-a
+          </label>
         </div>
+
         <div>
           <label style={{ fontSize: "17px" }}>Stavke na računu</label>
           <button type="button" onClick={addItem} className="add-item-button">
@@ -222,7 +223,7 @@ const EditInovice = () => {
                 </select>
                 <input
                   type="text"
-                  style={{ width: "225px" }}
+                  style={{ width: "255px" }}
                   placeholder="Opis"
                   value={item.description}
                   onChange={(e) =>
@@ -237,6 +238,7 @@ const EditInovice = () => {
                 <input
                   style={{ width: "60px" }}
                   type="number"
+                  min={0}
                   value={item.price}
                   onChange={(e) =>
                     setItems((prevItems) => {
@@ -250,6 +252,7 @@ const EditInovice = () => {
                 <input
                   style={{ width: "60px" }}
                   type="number"
+                  min={0}
                   value={item.quantity}
                   onChange={(e) =>
                     setItems((prevItems) => {
@@ -263,6 +266,7 @@ const EditInovice = () => {
                 <input
                   style={{ width: "60px" }}
                   type="number"
+                  min={0}
                   value={item.numberOfDays}
                   onChange={(e) =>
                     setItems((prevItems) => {
@@ -291,17 +295,27 @@ const EditInovice = () => {
             name="note"
             rows={3}
             cols={52}
-            value={addInvoice.note || ""}
             onChange={(e) =>
-              setAddInvoice({ ...addInvoice, note: e.target.value })
+              setNewProformaInvoice({
+                ...newProformaInvoice,
+                note: e.target.value,
+              })
             }
           ></textarea>
         </div>
+        <label>Plan puta</label>
+        <input
+          type="file"
+          name="routeplan"
+          id="routeplan"
+          className="custom-file-input"
+          onChange={handleFileChange}
+        />
 
-        <button type="submit">Sačuvaj izmjene</button>
+        <button type="submit">Dodaj profakturu</button>
       </form>
     </div>
   );
 };
 
-export default EditInovice;
+export default NewProformaInvoice;

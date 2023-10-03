@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace TravelWarrants.Migrations
 {
     /// <inheritdoc />
-    public partial class Database : Migration
+    public partial class DatabaseCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -304,8 +304,8 @@ namespace TravelWarrants.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    InoviceId = table.Column<int>(type: "integer", nullable: false),
-                    ProformaInvoiceId = table.Column<int>(type: "integer", nullable: false),
+                    InoviceId = table.Column<int>(type: "integer", nullable: true),
+                    ProformaInvoiceId = table.Column<int>(type: "integer", nullable: true),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     ClientId = table.Column<int>(type: "integer", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: true),
@@ -324,14 +324,12 @@ namespace TravelWarrants.Migrations
                         name: "FK_Accounts_Inovices_InoviceId",
                         column: x => x.InoviceId,
                         principalTable: "Inovices",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Accounts_ProformaInovices_ProformaInvoiceId",
                         column: x => x.ProformaInvoiceId,
                         principalTable: "ProformaInovices",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -340,9 +338,9 @@ namespace TravelWarrants.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    InoviceId = table.Column<int>(type: "integer", nullable: false),
+                    InoviceId = table.Column<int>(type: "integer", nullable: true),
                     ServiceId = table.Column<int>(type: "integer", nullable: false),
-                    ProformaInvoiceId = table.Column<int>(type: "integer", nullable: false),
+                    ProformaInvoiceId = table.Column<int>(type: "integer", nullable: true),
                     Description = table.Column<string>(type: "text", nullable: false),
                     Quantity = table.Column<decimal>(type: "numeric", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),

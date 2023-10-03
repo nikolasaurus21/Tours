@@ -45,6 +45,10 @@ import DeleteInovice from "./pages/inovice/DeleteInovice";
 import InoviceReportsForClient from "./pages/reports/InoviceReportsForClient";
 import InoviceReportsForPeriod from "./pages/reports/InoviceReportsForPeriod";
 import InoviceReportsByDescription from "./pages/reports/InoviceReportsByDescription";
+import ProformaInvoices from "./pages/proformaInvoices/ProformaInvoices";
+import NewProformaInvoice from "./pages/proformaInvoices/NewProformaInvoice";
+import EditProformaInvoice from "./pages/proformaInvoices/EditProformaInvoice";
+import DeleteProformaInvoice from "./pages/proformaInvoices/DeleteProformaInvoice";
 
 const AppRoutes = () => {
   return (
@@ -142,6 +146,17 @@ const AppRoutes = () => {
         <Route path="/inovices/add" element={<NewInovice />} />
         <Route path="/inovices/edit/:id" element={<EditInovice />} />
         <Route path="/inovices/delete/:id" element={<DeleteInovice />} />
+
+        <Route path="/proformainvoices" element={<ProformaInvoices />} />
+        <Route path="/proformainvoices/add" element={<NewProformaInvoice />} />
+        <Route
+          path="/proformainvoices/edit/:id"
+          element={<EditProformaInvoice />}
+        />
+        <Route
+          path="/proformainvoices/delete/:id"
+          element={<DeleteProformaInvoice />}
+        />
       </Routes>
     </div>
   );

@@ -223,5 +223,26 @@ export interface IGetInoviceById{
   note:string
   date:string
   priceWithoutVat:boolean
+  number:string
   itemsOnInovice:IItemsEdit[]
+}
+
+export interface IProformaInvoices{
+  id:number,
+  number:string,
+  amount:number,
+  clientName:number
+  date:string
+  accepted:boolean
+}
+
+export interface IAddProformaInvoice{
+  clientId: number
+  paymentDeadline:number
+  note:string
+  date:string
+  priceWithoutVat:boolean
+  itemsOnInovice:IAddItem[]
+  proinvoiceWithoutVat:boolean
+  file: File | null;
 }

@@ -20,6 +20,8 @@ namespace TravelWarrants.Models
         public DbSet<Tour> Tours { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<ProformaInvoice> ProformaInvoices { get; set; }
+
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -131,7 +133,22 @@ namespace TravelWarrants.Models
                     .WithOne(t => t.Driver)
                     .HasForeignKey(t => t.DriverId);
 
-           
+            modelBuilder.Entity<Account>()
+                .Property(a => a.InoviceId)
+                .IsRequired(false);  
+
+            modelBuilder.Entity<Account>()
+                .Property(a => a.ProformaInvoiceId)
+                .IsRequired(false);  
+
+            modelBuilder.Entity<InoviceService>()
+            .Property(a => a.InoviceId)
+            .IsRequired(false);  
+
+            modelBuilder.Entity<InoviceService>()
+                .Property(a => a.ProformaInvoiceId)
+                .IsRequired(false);  
+
         }
 
 
