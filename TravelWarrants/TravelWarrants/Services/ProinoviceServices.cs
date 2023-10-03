@@ -8,7 +8,7 @@ using TravelWarrants.DTOs.Inovices;
 using TravelWarrants.DTOs.Proinovce;
 using TravelWarrants.Interfaces;
 using TravelWarrants.Models;
-
+using Newtonsoft.Json;
 
 namespace TravelWarrants.Services
 {
@@ -356,7 +356,9 @@ namespace TravelWarrants.Services
                 return new ResponseDTO<ProinvoiceGetDTO> { IsSucced = false, ErrorMessage = "Add a company first" };
             }
 
-            if (proinvoiceNewDTO == null || proinvoiceNewDTO.ItemsOnInovice.Count == 0)
+            var ItemsOnInovice = JsonConvert.DeserializeObject<List<ItemsOnInovice>>(proinvoiceNewDTO.ItemsOnInovice);
+
+            if (proinvoiceNewDTO == null || ItemsOnInovice.Count == 0)
             {
                 return new ResponseDTO<ProinvoiceGetDTO>() { IsSucced = false };
             }
@@ -375,7 +377,7 @@ namespace TravelWarrants.Services
                 InoviceService = new List<InoviceService>()
             };
 
-            foreach (var item in proinvoiceNewDTO.ItemsOnInovice)
+            foreach (var item in ItemsOnInovice)
             {
                 var serviceOnInovice = new InoviceService()
                 {

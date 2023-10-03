@@ -240,5 +240,87 @@ namespace TravelWarrants.Services
 
             return new ResponseDTO<IEnumerable<InoviceGetDTO>> { IsSucced = false};
         }
+
+        public async Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetProformaInvoicesForClient(int clientId, int? page)
+        {
+            int pageSize = 10;
+            int pageNumber = (page ?? 1);
+            var proformaInvoices = await _context.ProformaInvoices.Include(c => c.Client)
+                .Where(x => x.ClientId == clientId)
+                .OrderByDescending(x => x.DocumentDate)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+
+                .Select(x => new InoviceGetDTO
+                {
+                    Id = x.Id,
+                    Number = x.Number,
+                    Year = x.Year,
+                    Date = x.DocumentDate,
+                    ClientName = x.Client.Name,
+                    Amount = x.Total
+
+                }).ToListAsync();
+            int totalRecords = proformaInvoices.Count();
+            int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+
+            return new ResponseDTO<IEnumerable<InoviceGetDTO>> { IsSucced = true, Message = proformaInvoices, TotalPages = totalPages };
+        }
+        public async Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetProformaInvoicesForPeriod(DateTime from, DateTime to, int? page)
+        {
+            int pageSize = 10;
+            int pageNumber = (page ?? 1);
+            var proformaInvoices = await _context.ProformaInvoices.Include(c => c.Client)
+                .Where(x => x.DocumentDate >= from && x.DocumentDate <= to)
+                .OrderByDescending(x => x.DocumentDate)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new InoviceGetDTO
+                {
+                    Id = x.Id,
+                    Number = x.Number,
+                    Year = x.Year,
+                    Date = x.DocumentDate,
+                    ClientName = x.Client.Name,
+                    Amount = x.Total
+
+                }).ToListAsync();
+
+            int totalRecords = proformaInvoices.Count();
+            int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+
+            return new ResponseDTO<IEnumerable<InoviceGetDTO>> { IsSucced = true, Message = proformaInvoices, TotalPages = totalPages };
+        }
+        public async Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetProformaInvoicesForDescription(string description, int? page)
+        {
+            if (!string.IsNullOrWhiteSpace(description))
+            {
+                int pageSize = 10;
+                int pageNumber = (page ?? 1);
+                var proformaInvoices = await _context.ProformaInvoices.Include(c => c.InoviceService)
+                    .Include(c => c.Client)
+                    .Where(x => x.InoviceService.Any(i => i.Description.Contains(description)))
+                    .OrderByDescending(x => x.DocumentDate)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(x => new InoviceGetDTO
+                    {
+                        Id = x.Id,
+                        Number = x.Number,
+                        Year = x.Year,
+                        Date = x.DocumentDate,
+                        ClientName = x.Client.Name,
+                        Amount = x.Total
+
+                    }).ToListAsync();
+
+                int totalRecords = proformaInvoices.Count();
+                int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+
+                return new ResponseDTO<IEnumerable<InoviceGetDTO>> { IsSucced = true, Message = proformaInvoices, TotalPages = totalPages };
+            }
+
+            return new ResponseDTO<IEnumerable<InoviceGetDTO>> { IsSucced = false };
+        }
     }
 }

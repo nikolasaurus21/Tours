@@ -133,5 +133,36 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
         }
+
+        [HttpGet]
+        public async Task<ActionResult> ProformaInvoiceReportsForClient(int clientId, int? page)
+        {
+            var result = await _reportsService.GetProformaInvoicesForClient(clientId, page);
+            if (result.IsSucced)
+            {
+                return Ok(result.Message);
+            }
+            return NotFound();
+        }
+        [HttpGet]
+        public async Task<ActionResult> ProformaInvoiceReportsForDescription(string description, int? page)
+        {
+            var result = await _reportsService.GetProformaInvoicesForDescription(description, page);
+            if (result.IsSucced)
+            {
+                return Ok(result.Message);
+            }
+            return NotFound();
+        }
+        [HttpGet]
+        public async Task<ActionResult> ProformaInvoiceReportsForPeriod(DateTime from, DateTime to, int? page)
+        {
+            var result = await _reportsService.GetProformaInvoicesForPeriod(from, to, page);
+            if (result.IsSucced)
+            {
+                return Ok(result.Message);
+            }
+            return NotFound();
+        }
     }
 }

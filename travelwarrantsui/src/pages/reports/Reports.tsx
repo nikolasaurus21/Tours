@@ -48,7 +48,12 @@ const Reports = () => {
               >
                 Fakture po klijentu
               </td>
-              <td className="firstcolumnorrow">Profakture po klijentu</td>
+              <td
+                className="firstcolumnorrow"
+                onClick={() => navigate("/reports/proformainoviceforclient")}
+              >
+                Profakture po klijentu
+              </td>
             </tr>
             <tr>
               <td
@@ -63,7 +68,12 @@ const Reports = () => {
               >
                 Fakture za period
               </td>
-              <td className="firstcolumnorrow">Profakture za period</td>
+              <td
+                className="firstcolumnorrow"
+                onClick={() => navigate("/reports/proformainoviceforperiod")}
+              >
+                Profakture za period
+              </td>
             </tr>
             <tr>
               <td
@@ -79,7 +89,14 @@ const Reports = () => {
               >
                 Fakture po opisu usluge
               </td>
-              <td className="firstcolumnorrow">Profakture po opisu usluge</td>
+              <td
+                className="firstcolumnorrow"
+                onClick={() =>
+                  navigate("/reports/proformainovicebydescription")
+                }
+              >
+                Profakture po opisu usluge
+              </td>
             </tr>
 
             <tr>

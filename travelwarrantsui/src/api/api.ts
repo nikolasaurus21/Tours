@@ -895,6 +895,66 @@ export const getInovicesByDescription =async (desc:string,page:number):Promise<I
 
  return jsonResponse
 }
+export const getProformaInvoiceForClients =async (id:number,page?: number | null):Promise<Inovices[]> => {
+  const response  = await axios.get("https://localhost:7206/api/TravelWarrantsReports/ProformaInvoiceReportsForClient",
+  {
+    params:{
+      clientId:id,
+      page:page
+    }
+  })
+
+  const jsonResponse = response.data.map((x:any)=>({
+    year: x.year,
+    number:x.number,
+    amount:x.amount,
+    clientName:x.clientName,
+    id:x.id,
+    date: format(new Date(x.date), "dd/MM/yyyy"),
+
+ }))
+
+ return jsonResponse
+}
+export const getProformaInvoiceForPeriod =async (from:Date,to:Date,page?:number):Promise<Inovices[]> => {
+  const response = await axios.get(`https://localhost:7206/api/TravelWarrantsReports/ProformaInvoiceReportsForPeriod`, {
+      params: {
+        from: from.toISOString(),
+        to: to.toISOString(),
+        page:page
+      },
+    });
+    const jsonResponse = response.data.map((x:any)=>({
+      year: x.year,
+      number:x.number,
+      amount:x.amount,
+      clientName:x.clientName,
+      id:x.id,
+      date: format(new Date(x.date), "dd/MM/yyyy"),
+  
+   }))
+  
+   return jsonResponse
+}
+export const getProformaInvoiceByDescription =async (desc:string,page:number):Promise<Inovices[]> => {
+  const response = await axios.get("https://localhost:7206/api/TravelWarrantsReports/ProformaInvoiceReportsForDescription",{
+    params:{
+      description:desc,
+      page:page
+    }
+  })
+  const jsonResponse = response.data.map((x:any)=>({
+    year: x.year,
+    number:x.number,
+    amount:x.amount,
+    clientName:x.clientName,
+    id:x.id,
+    date: format(new Date(x.date), "dd/MM/yyyy"),
+
+ }))
+
+ return jsonResponse
+}
 export const excursion = async (onOff: boolean): Promise<void> => {
   try {
     

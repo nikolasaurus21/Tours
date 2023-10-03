@@ -49,6 +49,9 @@ import ProformaInvoices from "./pages/proformaInvoices/ProformaInvoices";
 import NewProformaInvoice from "./pages/proformaInvoices/NewProformaInvoice";
 import EditProformaInvoice from "./pages/proformaInvoices/EditProformaInvoice";
 import DeleteProformaInvoice from "./pages/proformaInvoices/DeleteProformaInvoice";
+import ProformaInvoiceReportsForClient from "./pages/reports/ProformaInvoiceReportsForClient";
+import ProformaInvoiceReportsForPeriod from "./pages/reports/ProformaInvoiceReportsForPeriod";
+import ProformaInvoiceReportsByDescription from "./pages/reports/ProformaInvoiceReportsByDescription";
 
 const AppRoutes = () => {
   return (
@@ -138,6 +141,18 @@ const AppRoutes = () => {
         <Route
           path="/reports/inovicesbydescription"
           element={<InoviceReportsByDescription />}
+        />
+        <Route
+          path="/reports/proformainoviceforclient"
+          element={<ProformaInvoiceReportsForClient />}
+        />
+        <Route
+          path="/reports/proformainoviceforperiod"
+          element={<ProformaInvoiceReportsForPeriod />}
+        />
+        <Route
+          path="/reports/proformainovicebydescription"
+          element={<ProformaInvoiceReportsByDescription />}
         />
 
         <Route path="/status" element={<Status />} />

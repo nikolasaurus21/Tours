@@ -18,5 +18,8 @@ namespace TravelWarrants.Interfaces
         Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetInovicesForDescription(string description,int? page);
         Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetInovicesForPeriod(DateTime from, DateTime to, int? page);
         Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetInovicesForClient(int clientId, int? page);
+        Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetProformaInvoicesForClient(int clientId, int? page);
+        Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetProformaInvoicesForPeriod(DateTime from, DateTime to, int? page);
+        Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetProformaInvoicesForDescription(string description, int? page);
     }
 }

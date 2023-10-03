@@ -21,7 +21,7 @@ const ProformaInvoices = () => {
 
   const handleDeleteClick = async (id: number) => {
     const proformaInvoiceData = await proformaInvoiceToDelete(id);
-    navigate(`/inovices/delete/${id}`, {
+    navigate(`/proformainvoices/delete/${id}`, {
       state: { inoviceData: proformaInvoiceData },
     });
   };
