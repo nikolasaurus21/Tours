@@ -29,6 +29,7 @@ builder.Services.AddScoped<IStatusesService,StatusesService>();
 builder.Services.AddScoped<IReportsService,ReportsService>();
 builder.Services.AddScoped<IInovicesService,InovicesService>();
 builder.Services.AddScoped<IProInoviceService,ProinoviceServices>();
+builder.Services.AddScoped<IFileUploadService,FileUploadsService>();
 
 var configuration = builder.Configuration;
 builder.Services.AddCors(options =>
@@ -38,11 +39,12 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(frontendUrl)
         .AllowAnyMethod()
-        .AllowAnyHeader();
-        
+        .AllowAnyHeader()
+        .WithExposedHeaders("Content-Disposition");
     });
 }
 );
+
 
 var app = builder.Build();
 

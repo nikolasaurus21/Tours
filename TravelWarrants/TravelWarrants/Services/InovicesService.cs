@@ -6,6 +6,7 @@ using TravelWarrants.DTOs;
 using TravelWarrants.DTOs.Inovices;
 using TravelWarrants.Interfaces;
 using System.Text;
+using TravelWarrants.Models;
 
 namespace TravelWarrants.Services
 {
@@ -523,121 +524,31 @@ namespace TravelWarrants.Services
                                  "<td>" + item.Price.ToString()+ "€" + "</td></tr>");
             }
 
-            string htmlcontent = $@"<!DOCTYPE html>
-                <html>
-                    <head>
-                        <title>Faktura</title>
-                        <style>
-                            body {{
-                                font-family: Arial, sans-serif;
-                                margin: 20px;
-                            }}
-                            header, section, footer {{
-                                margin-bottom: 20px;
-                            }}
-                            h1, h2 {{
-                                color: #333;
-                            }}
-                            table {{
-                                width: 100%;
-                                border-collapse: collapse;
-                                margin-top: 30px; /* Dodajemo marginu iznad tabele */
-                            }}
-                            th, td {{
-                                border: 1px solid #ccc;
-                                padding: 8px;
-                                text-align: left;
-                            }}
-                            th {{
-                                background-color: #f2f2f2;
-                            }}
-                            footer {{
-                                text-align: center;
-                                margin-top: 30px;
-                                border-top: 1px solid #ccc;
-                                padding-top: 10px;
-                            }}
-                            .flex-container {{
-                                display: flex;
-                                justify-content: space-between; 
-                            }}
-                            .no-border{{
-                                 border: none !important;
-                            }}
-                            .tfoot-right{{
-                                 text-align: right;
-                            }}
-                        </style>
-                    </head>
-                    <body>
-                        <header>
-                            <h1>Faktura: {inovice.Number}</h1>
-                            <p>Datum: {DateTime.Now:dd/MM/yyyy}</p>
-                        </header>
-                        <hr>
-                        <section class=\""{{flex-container}}\""> 
-                            <div>
-                                <h2>{company.Name}</h2>
-                                <address>
-                                    Adresa: {company.Address}<br>
-                                    Grad: {company.Place}, Poštanski broj: {company.PTT}<br>
-                                    Telefon: {company.Telephone}<br>
-                                    Faks: {company.Fax}<br>
-                                    PIB: {company.TIN}
-                                </address>
-                            </div>
-                            <div>
-                                <h2>Za:</h2>
-                                <address>
-                                    {inovice.ClientName}<br>
-                                    {inovice.ClientAddress}<br>
-                                    {inovice.ClientPlace}<br>
-                                    {inovice.Email}
-                                </address>
-                            </div>
-                        </section>
-                        <hr>
-                        <div>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Usluga</th>
-                                        <th>Opis usluge</th>
-                                        <th>Broj dana</th>
-                                        <th>Količina</th>
-                                        <th>Cijena</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {tableRows}
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td class='no-border' colspan='4'></td>
-                                        <td class='tfoot-right no-border'>Ukupno bez PDV:</td>
-                                        <td class='no-border'>{inovice.PriceWithoutVat}€</td>
-                                    </tr>
-                                    <tr>
-                                        <td class='no-border' colspan='4'></td>
-                                        <td class='tfoot-right no-border'>PDV:</td>
-                                        <td class='no-border'>{inovice.Vat}€</td>
-                                    </tr>
-                                    <tr>
-                                        <td class='no-border' colspan='4'></td>
-                                        <td class='tfoot-right no-border'>Ukupno:</td>
-                                        <td class='no-border'>{inovice.Total}€</td>
-                                    </tr>
-                                </tfoot>
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "Services", "InvoiceTemplate.html");
+            string htmlTemplate = File.ReadAllText(path);
 
-                            </table>
-                        </div>
-                        
-                    </body>
-                </html>";
+            string htmlContent = htmlTemplate
+                .Replace("{{InvoiceNumber}}", inovice.Number)
+                .Replace("{{InvoiceDate}}", DateTime.Now.ToString("dd/MM/yyyy"))
+                .Replace("{{CompanyName}}", company.Name)
+                .Replace("{{CompanyAddress}}", company.Address)
+                .Replace("{{CompanyCity}}", company.Place)
+                .Replace("{{CompanyPostalCode}}", company.PTT)
+                .Replace("{{CompanyPhone}}", company.Telephone)
+                .Replace("{{CompanyFax}}", company.Fax)
+                .Replace("{{CompanyTIN}}", company.TIN)
+                .Replace("{{ClientName}}", inovice.ClientName)
+                .Replace("{{ClientAddress}}", inovice.ClientAddress)
+                .Replace("{{ClientCity}}", inovice.ClientPlace)
+                .Replace("{{ClientEmail}}", inovice.Email)
+                .Replace("{{TableRows}}", tableRows.ToString())
+                
+                .Replace("{{PriceWithoutVat}}", inovice.PriceWithoutVat.ToString() + "€")
+                .Replace("{{Vat}}", inovice.Vat.ToString() + "€")
+                .Replace("{{Total}}", inovice.Total.ToString() + "€");
 
 
-            PdfGenerator.AddPdfPages(document, htmlcontent, PageSize.A4);
+            PdfGenerator.AddPdfPages(document, htmlContent, PageSize.A4);
 
             byte[] response;
             using (MemoryStream ms = new MemoryStream())

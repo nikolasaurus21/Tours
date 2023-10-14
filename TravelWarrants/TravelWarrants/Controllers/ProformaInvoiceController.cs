@@ -54,8 +54,11 @@ namespace TravelWarrants.Controllers
                 return NotFound("Nema plana puta ili proinvoice nije pronađen.");
             }
 
+            
+
             return File(fileData.FileBytes, "application/octet-stream", fileData.FileName);
         }
+
 
         [HttpDelete("{invoiceId}")]
         public async Task<ActionResult> DeleteRoutePlan(int invoiceId)
@@ -71,7 +74,7 @@ namespace TravelWarrants.Controllers
         [HttpGet("{invoiceId}")]
         public async Task<ActionResult> GetProformaInvoiceById(int invoiceId)
         {
-            var result = await _proInoviceService.GetProInvoiceById(invoiceId);
+            var result = await _proInoviceService.GetProformaInvoiceById(invoiceId);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
@@ -80,7 +83,7 @@ namespace TravelWarrants.Controllers
         }
        
         [HttpPost]
-        public async Task<ActionResult> NewProformaInvoice([FromForm]ProinvoiceNewDTO proinvoiceNewDTO)
+        public async Task<ActionResult> NewProformaInvoice([FromBody]ProinvoiceNewDTO proinvoiceNewDTO)
         {
             var result = await _proInoviceService.NewProinvoice(proinvoiceNewDTO);
             if (result.IsSucced)
@@ -91,8 +94,8 @@ namespace TravelWarrants.Controllers
         }
 
 
-        [HttpPut("{invoideId}")]
-        public async Task<ActionResult> EditProformaInvoice(int invoiceId,[FromForm]ProinvoiceEditDTO proinvoiceEditDTO)
+        [HttpPut("{invoiceId}")]
+        public async Task<ActionResult> EditProformaInvoice(int invoiceId,[FromBody]ProinvoiceEditDTO proinvoiceEditDTO)
         {
             var result = await _proInoviceService.EditProinvoice(invoiceId, proinvoiceEditDTO);
             if (result.IsSucced)

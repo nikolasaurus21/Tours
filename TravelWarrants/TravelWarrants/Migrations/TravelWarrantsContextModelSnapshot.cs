@@ -238,17 +238,8 @@ namespace TravelWarrants.Migrations
                     b.Property<int>("Number")
                         .HasColumnType("integer");
 
-                    b.Property<bool?>("OfferAccepted")
-                        .HasColumnType("boolean");
-
                     b.Property<bool?>("PriceWithoutVAT")
                         .HasColumnType("boolean");
-
-                    b.Property<bool?>("ProinoviceWithoutVAT")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Route")
-                        .HasColumnType("text");
 
                     b.Property<decimal>("Total")
                         .HasColumnType("numeric");
@@ -405,11 +396,11 @@ namespace TravelWarrants.Migrations
                     b.Property<bool?>("ProinoviceWithoutVAT")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Route")
-                        .HasColumnType("text");
-
                     b.Property<decimal>("Total")
                         .HasColumnType("numeric");
+
+                    b.Property<int?>("UploadedFileId")
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("VAT")
                         .HasColumnType("numeric");
@@ -420,6 +411,9 @@ namespace TravelWarrants.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId");
+
+                    b.HasIndex("UploadedFileId")
+                        .IsUnique();
 
                     b.ToTable("ProformaInovices", (string)null);
                 });
@@ -561,6 +555,30 @@ namespace TravelWarrants.Migrations
                     b.ToTable("Tours", (string)null);
                 });
 
+            modelBuilder.Entity("TravelWarrants.Models.UploadedFiles", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UploadDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UploadedFiles", (string)null);
+                });
+
             modelBuilder.Entity("TravelWarrants.Models.Vehicle", b =>
                 {
                     b.Property<int>("Id")
@@ -689,7 +707,13 @@ namespace TravelWarrants.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TravelWarrants.Models.UploadedFiles", "UploadedFiles")
+                        .WithOne("ProformaInvoice")
+                        .HasForeignKey("TravelWarrants.Models.ProformaInvoice", "UploadedFileId");
+
                     b.Navigation("Client");
+
+                    b.Navigation("UploadedFiles");
                 });
 
             modelBuilder.Entity("TravelWarrants.Models.Status", b =>
@@ -772,6 +796,12 @@ namespace TravelWarrants.Migrations
             modelBuilder.Entity("TravelWarrants.Models.Service", b =>
                 {
                     b.Navigation("InoviceService");
+                });
+
+            modelBuilder.Entity("TravelWarrants.Models.UploadedFiles", b =>
+                {
+                    b.Navigation("ProformaInvoice")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("TravelWarrants.Models.Vehicle", b =>

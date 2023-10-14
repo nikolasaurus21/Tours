@@ -244,5 +244,31 @@ export interface IAddProformaInvoice{
   priceWithoutVat:boolean
   itemsOnInovice:IAddItem[]
   proinvoiceWithoutVat:boolean
-  file: File | null;
+  file: number | null;
+}
+
+export interface IGetProformaInvoiceById{
+  clientId: number
+  paymentDeadline:number
+  note:string
+  date:string
+  priceWithoutVat:boolean
+  number:string
+  itemsOnInovice:IItemsEdit[]
+  offerAccepted:boolean
+  proformaWithoutVat:boolean
+  fileName:string
+}
+
+export interface IEditProformaInvoice{
+  clientId: number
+  paymentDeadline:number
+  note:string
+  date:string
+  priceWithoutVat:boolean
+  itemsOnInovice:IItemsEdit[]
+  itemsToDelete?: number[]
+  offerAccepted:boolean
+  proformaWithoutVat:boolean
+  file?: File | null;
 }

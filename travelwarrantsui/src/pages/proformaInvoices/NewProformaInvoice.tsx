@@ -6,6 +6,7 @@ import { ServicesContext } from "../../context/ServicesContext";
 import { HiMinus, HiOutlinePlusSm } from "react-icons/hi";
 import { IAddItem, IAddProformaInvoice } from "../../api/interfaces";
 import { ProformaInovicesContext } from "../../context/ProformaInvoicesContext";
+import { uploadFileBuffering, uploadfileStreaming } from "../../api/api";
 
 const NewProformaInvoice = () => {
   const navigate = useNavigate();
@@ -61,13 +62,27 @@ const NewProformaInvoice = () => {
     navigate("/proformainvoices");
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files ? event.target.files[0] : null;
-    setNewProformaInvoice((prevState) => ({
-      ...prevState,
-      file: file,
-    }));
+    if (!file) {
+      return;
+    }
+
+    try {
+      const fileId = await uploadfileStreaming(file);
+      setNewProformaInvoice((prevState) => ({
+        ...prevState,
+        file: fileId,
+      }));
+
+      //console.log(fileId);
+    } catch (error) {
+      console.error("Greska prilikom upload-a: ", error);
+    }
   };
+
   return (
     <div>
       <div>

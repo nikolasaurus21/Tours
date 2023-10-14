@@ -22,7 +22,7 @@ const ProformaInvoices = () => {
   const handleDeleteClick = async (id: number) => {
     const proformaInvoiceData = await proformaInvoiceToDelete(id);
     navigate(`/proformainvoices/delete/${id}`, {
-      state: { inoviceData: proformaInvoiceData },
+      state: { proformaInvoiceData: proformaInvoiceData },
     });
   };
 

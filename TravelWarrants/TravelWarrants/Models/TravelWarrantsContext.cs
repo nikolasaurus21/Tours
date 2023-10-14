@@ -20,7 +20,7 @@ namespace TravelWarrants.Models
         public DbSet<Tour> Tours { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<ProformaInvoice> ProformaInvoices { get; set; }
-
+        public DbSet<UploadedFiles> UploadedFiles { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,10 +39,11 @@ namespace TravelWarrants.Models
             modelBuilder.Entity<Vehicle>().ToTable("Vehicles");
             modelBuilder.Entity<InoviceService>().ToTable("InovicesServices");
             modelBuilder.Entity<ProformaInvoice>().ToTable("ProformaInovices");
+            modelBuilder.Entity<UploadedFiles>().ToTable("UploadedFiles");
 
 
 
-            
+
 
             // One-to-Many relationship between Inovice and Acount +
             modelBuilder.Entity<Inovice>()
@@ -132,6 +133,13 @@ namespace TravelWarrants.Models
                     .HasMany(v => v.Tour)
                     .WithOne(t => t.Driver)
                     .HasForeignKey(t => t.DriverId);
+
+            //One-to-One relationship between Uploadedfiles nad ProformaInvoices
+            modelBuilder.Entity<ProformaInvoice>()
+                     .HasOne(p => p.UploadedFiles)
+                     .WithOne(u => u.ProformaInvoice)
+                     .HasForeignKey<ProformaInvoice>(p => p.UploadedFileId)
+                     .IsRequired(false);
 
             modelBuilder.Entity<Account>()
                 .Property(a => a.InoviceId)

@@ -1,4 +1,4 @@
-import {  addClient, addVehicle,allClients, allVehicles,allDrivers,addDriver,ICompany, allGiroAccounts, addGiroAccounts, allServices, addService, allTravelWarrants, addTravelWarrant, allPayments, addPayment, IReports, Statuses, deleteTour, Inovices, IAddInovice, IDeleteInovice, IGetInoviceById, IItemsEdit, IEditInovice, IProformaInvoices, IAddProformaInvoice} from "./interfaces";
+import {  addClient, addVehicle,allClients, allVehicles,allDrivers,addDriver,ICompany, allGiroAccounts, addGiroAccounts, allServices, addService, allTravelWarrants, addTravelWarrant, allPayments, addPayment, IReports, Statuses, deleteTour, Inovices, IAddInovice, IDeleteInovice, IGetInoviceById, IItemsEdit, IEditInovice, IProformaInvoices, IAddProformaInvoice, IGetProformaInvoiceById, IEditProformaInvoice} from "./interfaces";
 import axios from "axios";
 import { format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
@@ -1168,6 +1168,112 @@ export const downloadPdf = async (id: number, invoiceNumber: string) => {
 
 //ProformaInvoices
 
+export const uploadFileBuffering =async (file:File):Promise<number> => {
+  if (!file) {
+    throw new Error('Fajl je obavezan.');
+  }
+
+      const formData = new FormData();
+      formData.append('file', file);  
+
+      try {
+        
+        const response = await axios.post('https://localhost:7206/api/UploadFiles/buffering-upload', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        
+        const data = response.data;
+
+        return data;  
+        
+    } catch (error) {
+        console.error('Greska prilikom upload-a: ', error);
+        throw error;  
+    }
+}
+
+export const uploadfileStreaming =async (file:File):Promise<number> => {
+  if (!file) {
+    throw new Error('Fajl je obavezan.');
+}
+
+const formData = new FormData();
+formData.append('file', file);
+
+try {
+  
+  const response = await axios.post('https://localhost:7206/api/UploadFiles/streaming-upload', formData, {
+      headers: {
+          'Content-Type': 'multipart/form-data',
+      },
+  });
+
+  
+  const data = response.data;
+
+  return data;  
+  
+
+} catch (error) {
+  console.error('Greska prilikom upload-a: ', error);
+  throw error;  
+}
+}
+export const editProformaInvoice = async (id: number, data: IEditProformaInvoice): Promise<IProformaInvoices> => {
+  const utcDate = utcToZonedTime(data.date, "UTC");
+  const formData = new FormData();
+
+  // Dodajte ove provere
+  if(data.clientId !== undefined) formData.append('clientId', data.clientId.toString());
+  formData.append('documentDate', format(utcDate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+  if(data.paymentDeadline !== undefined) formData.append('paymentDeadline', data.paymentDeadline.toString());
+  if(data.priceWithoutVat !== undefined) formData.append('priceWithoutVAT', data.priceWithoutVat.toString());
+  if(data.note !== undefined) formData.append('note', data.note);
+  if(data.offerAccepted !== undefined) formData.append('offerAccepted', data.offerAccepted.toString());
+  if(data.proformaWithoutVat !== undefined) formData.append('proinoviceWithoutVAT', data.proformaWithoutVat.toString());
+
+  data.itemsOnInovice.forEach((item, index) => {
+      if(item.id !== undefined) formData.append(`itemsOnInovice[${index}].id`, item.id.toString());
+      if(item.description !== undefined) formData.append(`itemsOnInovice[${index}].description`, item.description);
+      if(item.serviceId !== undefined) formData.append(`itemsOnInovice[${index}].serviceId`, item.serviceId.toString());
+      if(item.quantity !== undefined) formData.append(`itemsOnInovice[${index}].quantity`, item.quantity.toString());
+      if(item.price !== undefined) formData.append(`itemsOnInovice[${index}].price`, item.price.toString());
+      if(item.numberOfDays !== undefined) formData.append(`itemsOnInovice[${index}].numberOfDays`, item.numberOfDays);
+  });
+
+  data.itemsToDelete?.forEach((itemId, index) => {
+    if(itemId !== undefined) formData.append(`itemsToDeleteId[${index}]`, itemId.toString());
+ });
+ 
+
+  if (data.file) {
+    formData.append('routePlan', data.file, data.file.name);
+  }
+  const response = await axios.put(
+      `https://localhost:7206/api/ProformaInvoice/EditProformaInvoice/${id}`,
+      formData,
+      {
+          headers: {
+              'Content-Type': 'multipart/form-data',
+          },
+      }
+  );
+
+  const invoiceData: IProformaInvoices = {
+      id: response.data.id,
+      number: response.data.number,
+      date: format(new Date(response.data.date), "dd/MM/yyyy"),
+      amount: response.data.amount,
+      clientName: response.data.clientName,
+      accepted:response.data.offerAccepted
+  };
+
+  return invoiceData;
+};
+
 export const newProformaInvoice = async (data: IAddProformaInvoice): Promise<IProformaInvoices> => {
   try {
     const utcDate = utcToZonedTime(data.date, "UTC");
@@ -1180,7 +1286,8 @@ export const newProformaInvoice = async (data: IAddProformaInvoice): Promise<IPr
         priceWithoutVAT: data.priceWithoutVat,
         note: data.note,
         itemsOnInovice: data.itemsOnInovice,
-        proinoviceWithoutVAT: data.proinvoiceWithoutVat
+        proinoviceWithoutVAT: data.proinvoiceWithoutVat,
+        routePlan:data.file
       },
       {
         headers: {
@@ -1189,7 +1296,7 @@ export const newProformaInvoice = async (data: IAddProformaInvoice): Promise<IPr
         }
       }
     );
-    console.log('Server Response:', response.data);  // Ovdje će se ispisati odgovor servera u konzoli
+    
     const inoviceData: IProformaInvoices = {
       id: response.data.id,
       accepted: response.data.offerAccepted,
@@ -1200,8 +1307,8 @@ export const newProformaInvoice = async (data: IAddProformaInvoice): Promise<IPr
     };
     return inoviceData;
   } catch (error) {
-    console.error('Error:', error);  // Ovdje će se ispisati greška u konzoli ako se dogodi
-    throw error;  // Ovo će proslijediti grešku dalje u vašem kodu tako da možete dalje rukovati greškom
+    console.error('Error:', error);  
+    throw error
   }
 };
 
@@ -1222,6 +1329,7 @@ export const allProformaInvoices =async (page?:number):Promise<IProformaInvoices
 
  }))
 
+ 
  return jsonResponse
 }
 
@@ -1263,3 +1371,96 @@ export const proformaInvoiceToDelete =async (id:number):Promise<IDeleteInovice> 
 
   return proformaInvoiceToDelete
 }
+
+export const getProformaInvoiceById =async (id:number):Promise<IGetProformaInvoiceById> => {
+  var response = await axios.get(`https://localhost:7206/api/ProformaInvoice/GetProformaInvoiceById/${id}`)
+  const jsonResponse = response.data
+  
+  const date = new Date(jsonResponse.documentDate);
+  const formattedDate = format(date, "yyyy-MM-dd'T'HH:mm");
+
+  const singleProformaInvoice:IGetProformaInvoiceById={
+    date:formattedDate,
+    clientId:jsonResponse.clientId,
+    paymentDeadline:jsonResponse.paymentDeadline,
+    note:jsonResponse.note,
+    number:jsonResponse.number,
+    priceWithoutVat:jsonResponse.priceWithoutVAT,
+    offerAccepted:jsonResponse.offerAccepted,
+    proformaWithoutVat:jsonResponse.proinvoiceWithoutVAT,
+    fileName:jsonResponse.fileName,
+    itemsOnInovice: jsonResponse.itemsOnInovice.map((i:any) => {
+      return{
+        id: i.id,
+        description:i.description,
+        serviceId: i.serviceId,
+        quantity: i.quantity,
+        price: i.price,
+        numberOfDays: i.numberOfDays
+      } as IItemsEdit
+    })
+   
+  }
+  
+  return singleProformaInvoice
+}
+
+export const downloadRoutePlan = async (id: number) => {
+  try {
+    var response = await axios.get(`https://localhost:7206/api/ProformaInvoice/DownloadRoutePlan/${id}`, {
+        responseType: 'blob',
+        headers: {
+            'Accept': 'application/octet-stream'
+        }
+    });
+
+    if (response.status === 200 && response.headers) {
+      const headerName = Object.keys(response.headers).find(key => key.toLowerCase() === 'content-disposition');
+      const contentDisposition = headerName ? response.headers[headerName] : '';
+        var fileName = 'route-plan-file';
+        if (contentDisposition) {
+          //mora ovaj komplikovaniji regex
+          const fileNameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+            const fileNameMatch = contentDisposition.match(fileNameRegex);
+            if (fileNameMatch && fileNameMatch[1]) {
+                fileName = fileNameMatch[1].replace(/['"]/g, '');
+            }
+
+        }
+
+        var url = window.URL.createObjectURL(new Blob([response.data]));
+        var link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } else {
+        console.error(`Failed to download file: ${response.statusText}`);
+    }
+} catch (error) {
+    console.error(`Error: ${error}`);
+}
+}
+
+
+
+
+
+  export const deleteRoutePlan = async (id: number) => {
+    try {
+        var response = await axios.delete(`https://localhost:7206/api/ProformaInvoice/DeleteRoutePlan/${id}`);
+
+        if (response.status === 200) {
+            console.log('Route plan deleted successfully');
+            return response.data;
+        } else {
+            console.error(`Failed to delete route plan: ${response.statusText}`);
+            return null;
+        }
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        return null;
+    }
+}
+

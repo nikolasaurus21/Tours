@@ -11,7 +11,7 @@ type Props = {
 const PopUp = ({
   isOpen,
   onClose,
-  text = "Molim Vas dodajte prvo firmu da bi ste nastavili.",
+  text = "Došlo je do greške ili nijeste dodali firmu.",
 }: Props) => {
   if (!isOpen) return null;
   return (

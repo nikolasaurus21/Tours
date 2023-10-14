@@ -11,7 +11,6 @@ namespace TravelWarrants.Controllers
     {
         private readonly IReportsService _reportsService;
 
-        private static bool _excursion;
         public TravelWarrantsReportsController(IReportsService reportsService)
         {
             _reportsService = reportsService;

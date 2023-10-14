@@ -14,9 +14,7 @@
         public DateTime CurrencyDate { get; set; }
         public string Note { get; set; }
         public bool? PriceWithoutVAT { get; set; }
-        public bool? ProinoviceWithoutVAT { get; set; }
-        public string? Route { get; set; }
-        public bool? OfferAccepted { get; set; }
+       
         public virtual Client Client { get; set; }
         public virtual ICollection<InoviceService> InoviceService { get; set; }
         public virtual ICollection<Account> Account { get; set; }

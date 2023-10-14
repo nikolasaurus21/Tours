@@ -7,7 +7,7 @@ using TravelWarrants.DTOs;
 using TravelWarrants.DTOs.Inovices;
 using TravelWarrants.DTOs.Proinovce;
 using TravelWarrants.Interfaces;
-using TravelWarrants.Models;
+
 using Newtonsoft.Json;
 
 namespace TravelWarrants.Services
@@ -16,11 +16,13 @@ namespace TravelWarrants.Services
     {
         private readonly TravelWarrantsContext _context;
         private readonly ICompanyService _companyService;
+        private readonly IFileUploadService _fileUploadService;
 
-        public ProinoviceServices(TravelWarrantsContext context, ICompanyService companyService)
+        public ProinoviceServices(TravelWarrantsContext context, ICompanyService companyService, IFileUploadService fileUploadService)
         {
             _context = context;
             _companyService = companyService;
+            _fileUploadService = fileUploadService;
         }
         public async Task<ResponseDTO<InoviceGetByIdDeleteDTO>> GetForDeleteProinvoice(int inoviceId)
         {
@@ -94,52 +96,43 @@ namespace TravelWarrants.Services
         public async Task<FileData> GetRoutePlanFile(int invoiceId)
         {
             var proinvoice = await _context.ProformaInvoices.FirstOrDefaultAsync(x => x.Id == invoiceId);
-            if (proinvoice == null || string.IsNullOrWhiteSpace(proinvoice.Route))
+            if (proinvoice == null || proinvoice.UploadedFileId == null)
             {
-                return null;
+                return new FileData { FileStream=null };
             }
 
-            var path = proinvoice.Route;
-            var fileName = Path.GetFileName(path);
-            var fileBytes = await File.ReadAllBytesAsync(path);
+            var result = await _fileUploadService.DownloadRoutePlan(proinvoice.UploadedFileId.Value);
 
-            return new FileData { FileBytes = fileBytes, FileName = fileName };
+            return new FileData { FileStream = result.FileStream ,FileName = result.FileName };
+            
         }
         public async Task<bool> DeleteRoutePlan(int invoiceId)
         {
-            var proinvoice = await _context.ProformaInvoices.FirstOrDefaultAsync(x => x.Id == invoiceId);
-            if (proinvoice == null)
-            {
-                return false;
-            }
+            var proinvoice = await _context.ProformaInvoices
+                .Include(p => p.UploadedFiles)
+                .FirstOrDefaultAsync(x => x.Id == invoiceId);
 
-            if (String.IsNullOrWhiteSpace(proinvoice.Route))
-            {
-                return false;
-            }
-
-            var filePath = proinvoice.Route;
-            if (File.Exists(filePath))
-            {
-                File.Delete(filePath);
-            }
-            else
+            if (proinvoice == null || proinvoice.UploadedFileId == null)
             {
                 return false;
             }
 
             
-            proinvoice.Route = null;
-            await _context.SaveChangesAsync();
+            await _fileUploadService.DeleteFile((int)proinvoice.UploadedFileId);
 
-            return true ;
+            proinvoice.UploadedFileId = null;
+
+            _context.ProformaInvoices.Update(proinvoice);
+            await _context.SaveChangesAsync();
+            return true;
 
         }
-        public async Task<ResponseDTO<ProinvoiceGetByIdDTO>> GetProInvoiceById(int invoiceId)
+        public async Task<ResponseDTO<ProinvoiceGetByIdDTO>> GetProformaInvoiceById(int invoiceId)
         {
             var proinvoice = await _context.ProformaInvoices
                 .Include(i => i.InoviceService.Where(i => !i.InoviceId.HasValue && i.ProformaInvoiceId.HasValue))
                 .Include(c => c.Client)
+                .Include(u => u.UploadedFiles)
                 .Where(x => x.Id == invoiceId)
                 .FirstOrDefaultAsync();
 
@@ -158,7 +151,7 @@ namespace TravelWarrants.Services
                 Note = proinvoice.Note,
                 Number = proinvoice.Number + "/" + proinvoice.Year,
                 OfferAccepted = proinvoice.OfferAccepted ?? default,
-                FileName = proinvoice.Route,
+                FileName = proinvoice.UploadedFiles?.FileName,
                 ItemsOnInovice = proinvoice.InoviceService
                 .Select(i => new ItemsOnInoviceEdit
                 {
@@ -180,13 +173,16 @@ namespace TravelWarrants.Services
                 return new ResponseDTO<ProinvoiceGetDTO>() { IsSucced = false };
             }
 
-            var existingProformaInvoice = await _context.Inovices.Include(i => i.InoviceService)
+            var existingProformaInvoice = await _context.ProformaInvoices.Include(i => i.InoviceService)
                                                 .FirstOrDefaultAsync(i => i.Id == invoiceId);
 
             if (existingProformaInvoice == null)
             {
                 return new ResponseDTO<ProinvoiceGetDTO>() { IsSucced = false, };
             }
+
+           
+
 
             decimal vat = 0;
             var oldClient = existingProformaInvoice.ClientId;
@@ -200,6 +196,9 @@ namespace TravelWarrants.Services
             existingProformaInvoice.Year = proinvoiceEditDTO.DocumentDate.Year;
             existingProformaInvoice.OfferAccepted = proinvoiceEditDTO.OfferAccepted;
 
+
+           
+            
             foreach (var Id in proinvoiceEditDTO.ItemsToDeleteId)
             {
                 var toDelete = await _context.InovicesServices.FirstOrDefaultAsync(i => i.Id == Id);
@@ -208,6 +207,10 @@ namespace TravelWarrants.Services
                     _context.InovicesServices.Remove(toDelete);
                 }
             }
+            
+            
+
+
 
             foreach (var item in proinvoiceEditDTO.ItemsOnInovice.Where(x => x.Id != 0))
             {
@@ -261,7 +264,7 @@ namespace TravelWarrants.Services
                     ? serviceOnInovice.Value * service.VATRate / 100
                     : serviceOnInovice.Value * service.VATRate * 100 / (service.VATRate + 100) / 100;
 
-                existingProformaInvoice.InoviceService.Add(serviceOnInovice);  // Dodavanje usluge na fakturu
+                existingProformaInvoice.InoviceService.Add(serviceOnInovice);  
                 serviceOnInovice.VAT = Math.Round(serviceOnInovice.VAT, 2);
 
                 vat += serviceOnInovice.VAT;
@@ -275,28 +278,9 @@ namespace TravelWarrants.Services
             existingProformaInvoice.VAT = vat;
             existingProformaInvoice.Total = proinvoiceEditDTO.PriceWithoutVAT ? amount + vat : amount;
 
-            if (proinvoiceEditDTO.RoutePlan != null && proinvoiceEditDTO.RoutePlan.Length > 0)
-            {
-                var folderName = "RoutePlan";
-                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+            //dio za fajl cu odje
 
-                var fileName = $"{DateTime.UtcNow.Year}-" +
-                    $"{existingProformaInvoice.Number}-{proinvoiceEditDTO.RoutePlan.FileName}";
-                var fullPath = Path.Combine(pathToSave, fileName);
 
-                if (!Directory.Exists(pathToSave))
-                {
-                    Directory.CreateDirectory(pathToSave);
-                }
-
-                // Čuvanje fajla
-                using (var stream = new FileStream(fullPath, FileMode.Create))
-                {
-                    proinvoiceEditDTO.RoutePlan.CopyTo(stream);
-                }
-
-                existingProformaInvoice.Route = fullPath;
-            }
 
             var acc = await _context.Accounts.FirstOrDefaultAsync(x => x.InoviceId == existingProformaInvoice.Id)
                  ?? new Account { InoviceId = existingProformaInvoice.Id };
@@ -356,9 +340,9 @@ namespace TravelWarrants.Services
                 return new ResponseDTO<ProinvoiceGetDTO> { IsSucced = false, ErrorMessage = "Add a company first" };
             }
 
-            var ItemsOnInovice = JsonConvert.DeserializeObject<List<ItemsOnInovice>>(proinvoiceNewDTO.ItemsOnInovice);
+           
 
-            if (proinvoiceNewDTO == null || ItemsOnInovice.Count == 0)
+            if (proinvoiceNewDTO == null || proinvoiceNewDTO.ItemsOnInovice.Count == 0)
             {
                 return new ResponseDTO<ProinvoiceGetDTO>() { IsSucced = false };
             }
@@ -374,10 +358,11 @@ namespace TravelWarrants.Services
                 Note = proinvoiceNewDTO.Note,
                 Year = proinvoiceNewDTO.DocumentDate.Year,
                 ProinoviceWithoutVAT = proinvoiceNewDTO.ProinoviceWithoutVAT,
+                
                 InoviceService = new List<InoviceService>()
             };
 
-            foreach (var item in ItemsOnInovice)
+            foreach (var item in proinvoiceNewDTO.ItemsOnInovice)
             {
                 var serviceOnInovice = new InoviceService()
                 {
@@ -418,9 +403,10 @@ namespace TravelWarrants.Services
             newProformaInovice.NoVAT = proinvoiceNewDTO.PriceWithoutVAT ? amount : amount - vat;
             newProformaInovice.VAT = vat;
             newProformaInovice.Total = proinvoiceNewDTO.PriceWithoutVAT ? amount + vat : amount;
+
             try
             {
-                newProformaInovice.Number = _context.Inovices.OrderByDescending(n => n.Number)
+                newProformaInovice.Number = _context.ProformaInvoices.OrderByDescending(n => n.Number)
                     .First(z => z.Year == newProformaInovice.Year).Number + 1;
             }
             catch
@@ -430,28 +416,15 @@ namespace TravelWarrants.Services
             }
 
 
-            // da pitam deja treba li da korisim frombody i fromform itd
-            if (proinvoiceNewDTO.RoutePlan != null && proinvoiceNewDTO.RoutePlan.Length > 0)
+            //dio za fajl odje
+
+            if (proinvoiceNewDTO.RoutePlan > 0)
             {
-                var folderName = "RoutePlan";
-                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-
-                var fileName = $"{DateTime.UtcNow.Year}-" +
-                    $"{newProformaInovice.Number}-{proinvoiceNewDTO.RoutePlan.FileName}";
-                var fullPath = Path.Combine(pathToSave, fileName);
-
-                if (!Directory.Exists(pathToSave))
+                var uploadedFile = await _context.UploadedFiles.FirstOrDefaultAsync(x => x.Id == proinvoiceNewDTO.RoutePlan);
+                if (uploadedFile != null)
                 {
-                    Directory.CreateDirectory(pathToSave);
+                    newProformaInovice.UploadedFileId = uploadedFile.Id;
                 }
-
-                // Čuvanje fajla
-                using (var stream = new FileStream(fullPath, FileMode.Create))
-                {
-                    proinvoiceNewDTO.RoutePlan.CopyTo(stream);
-                }
-
-                newProformaInovice.Route = fullPath;
             }
 
             _context.ProformaInvoices.Add(newProformaInovice);
@@ -491,7 +464,8 @@ namespace TravelWarrants.Services
                 .Where(x => x.Id == newProformaInovice.ClientId)
                 .Select(x => x.Name).FirstOrDefaultAsync(),
                 Date = newProformaInovice.DocumentDate,
-                OfferAccepted = (bool)newProformaInovice.OfferAccepted
+                OfferAccepted = newProformaInovice.OfferAccepted ?? false
+
             };
 
             return new ResponseDTO<ProinvoiceGetDTO> { IsSucced = true, Message = addedInovice };
@@ -603,124 +577,32 @@ namespace TravelWarrants.Services
                                  "<td>" + item.Price.ToString() + "€" + "</td></tr>");
             }
 
-            string htmlcontent = $@"<!DOCTYPE html>
-                <html>
-                    <head>
-                        <title>Faktura</title>
-                        <style>
-                            body {{
-                                font-family: Arial, sans-serif;
-                                margin: 20px;
-                            }}
-                            header, section, footer {{
-                                margin-bottom: 20px;
-                            }}
-                            h1, h2 {{
-                                color: #333;
-                            }}
-                            table {{
-                                width: 100%;
-                                border-collapse: collapse;
-                                margin-top: 30px; /* Dodajemo marginu iznad tabele */
-                            }}
-                            th, td {{
-                                border: 1px solid #ccc;
-                                padding: 8px;
-                                text-align: left;
-                            }}
-                            th {{
-                                background-color: #f2f2f2;
-                            }}
-                            footer {{
-                                text-align: center;
-                                margin-top: 30px;
-                                border-top: 1px solid #ccc;
-                                padding-top: 10px;
-                            }}
-                            .flex-container {{
-                                display: flex;
-                                justify-content: space-between; 
-                            }}
-                            .no-border{{
-                                 border: none !important;
-                            }}
-                            .tfoot-right{{
-                                 text-align: right;
-                            }}
-                            .hidden {{
-                                display: none;
-                            }}
-                        </style>
-                    </head>
-                    <body>
-                        <header>
-                            <h1>Pro-faktura: {proformaInvoice.Number}</h1>
-                            <p>Datum: {DateTime.Now:dd/MM/yyyy}</p>
-                        </header>
-                        <hr>
-                        <section class=\""{{flex-container}}\""> 
-                            <div>
-                                <h2>{company.Name}</h2>
-                                <address>
-                                    Adresa: {company.Address}<br>
-                                    Grad: {company.Place}, Poštanski broj: {company.PTT}<br>
-                                    Telefon: {company.Telephone}<br>
-                                    Faks: {company.Fax}<br>
-                                    PIB: {company.TIN}
-                                </address>
-                            </div>
-                            <div>
-                                <h2>Za:</h2>
-                                <address>
-                                    {proformaInvoice.ClientName}<br>
-                                    {proformaInvoice.ClientAddress}<br>
-                                    {proformaInvoice.ClientPlace}<br>
-                                    {proformaInvoice.Email}
-                                </address>
-                            </div>
-                        </section>
-                        <hr>
-                        <div>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Usluga</th>
-                                        <th>Opis usluge</th>
-                                        <th>Broj dana</th>
-                                        <th>Količina</th>
-                                        <th>Cijena</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {tableRows}
-                                </tbody>
-                                <tfoot>
-                                    <tr class='{(proformaInvoice.ShowVat ? "" : "hidden")}'>
-                                        <td class='no-border' colspan='4'></td>
-                                        <td class='tfoot-right no-border'>Ukupno bez PDV:</td>
-                                        <td class='no-border'>{proformaInvoice.PriceWithoutVat}€</td>
-                                    </tr>
-                                    <tr class='{(proformaInvoice.ShowVat ? "" : "hidden")}'>
-                                        <td class='no-border' colspan='4'></td>
-                                        <td class='tfoot-right no-border'>PDV:</td>
-                                        <td class='no-border'>{proformaInvoice.Vat}€</td>
-                                    </tr>
-                                    <tr>
-                                        <td class='no-border' colspan='4'></td>
-                                        <td class='tfoot-right no-border'>Ukupno:</td>
-                                        <td class='no-border'>{proformaInvoice.Total}€</td>
-                                    </tr>
-                                </tfoot>
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "Services", "ProformaInvoiceTemplate.html");
+            string htmlTemplate = File.ReadAllText(path);
 
-                            </table>
-                        </div>
-                        
-                    </body>
-                </html>";
+            string htmlContent = htmlTemplate
+                .Replace("{{ProformaInvoiceNumber}}", proformaInvoice.Number)
+                .Replace("{{InvoiceDate}}", DateTime.Now.ToString("dd/MM/yyyy"))
+                .Replace("{{CompanyName}}", company.Name)
+                .Replace("{{CompanyAddress}}", company.Address)
+                .Replace("{{CompanyCity}}", company.Place)
+                .Replace("{{CompanyPostalCode}}", company.PTT)
+                .Replace("{{CompanyPhone}}", company.Telephone)
+                .Replace("{{CompanyFax}}", company.Fax)
+                .Replace("{{CompanyTIN}}", company.TIN)
+                .Replace("{{ClientName}}", proformaInvoice.ClientName)
+                .Replace("{{ClientAddress}}", proformaInvoice.ClientAddress)
+                .Replace("{{ClientCity}}", proformaInvoice.ClientPlace)
+                .Replace("{{ClientEmail}}", proformaInvoice.Email)
+                .Replace("{{TableRows}}", tableRows.ToString())
+                .Replace("{{ShowVatClass}}", proformaInvoice.ShowVat ? "hidden" : "")
+                .Replace("{{PriceWithoutVat}}", proformaInvoice.PriceWithoutVat.ToString() + "€")
+                .Replace("{{Vat}}", proformaInvoice.Vat.ToString() + "€")
+                .Replace("{{Total}}", proformaInvoice.Total.ToString() + "€");
 
 
-            PdfGenerator.AddPdfPages(document, htmlcontent, PageSize.A4);
+
+            PdfGenerator.AddPdfPages(document, htmlContent, PageSize.A4);
 
             byte[] response;
             using (MemoryStream ms = new MemoryStream())

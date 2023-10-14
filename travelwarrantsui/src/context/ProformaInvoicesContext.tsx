@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useState } from "react";
 import PopUp from "../ui/PopUp";
 import { IAddProformaInvoice, IProformaInvoices } from "../api/interfaces";
 import { allProformaInvoices, newProformaInvoice } from "../api/api";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 
 export type ProformaInvoicesContextData = {
   proformaInvoices: IProformaInvoices[];
@@ -23,7 +23,7 @@ export const ProformaInovicesContext =
     addProformaInvoice: async (data: IAddProformaInvoice) => {},
   });
 
-export const InovicesProvider = ({
+export const ProformaInvoicesProvider = ({
   children,
 }: {
   children: React.ReactNode;
@@ -40,7 +40,7 @@ export const InovicesProvider = ({
     const fetchInovices = async () => {
       try {
         const proInvoiceData = await allProformaInvoices(currentPage);
-        console.log(proInvoiceData);
+
         setProformaInvoices(proInvoiceData);
         setTotalPages(Math.ceil(proInvoiceData.length / 10));
       } catch (error) {
@@ -54,7 +54,7 @@ export const InovicesProvider = ({
   const removeProformaInvoice = async (id: number) => {
     try {
       await axios.delete(
-        `https://localhost:7206/api/Inovices/DeleteInovice/${id}`
+        `https://localhost:7206/api/ProformaInvoice/DeleteProformaInvoice/${id}`
       );
       setProformaInvoices(proformaInvoices.filter((inv) => inv.id !== id));
     } catch (error) {
@@ -72,10 +72,7 @@ export const InovicesProvider = ({
         ...prevInovices,
       ]);
     } catch (error) {
-      const axiosError = error as AxiosError;
-      if (axiosError.response && axiosError.response.status === 400) {
-        setPopupOpen(true);
-      }
+      setPopupOpen(true);
     }
   };
   return (
