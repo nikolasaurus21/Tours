@@ -1,7 +1,15 @@
 import React, { createContext, useEffect, useState } from "react";
 import PopUp from "../ui/PopUp";
-import { IAddProformaInvoice, IProformaInvoices } from "../api/interfaces";
-import { allProformaInvoices, newProformaInvoice } from "../api/api";
+import {
+  IAddProformaInvoice,
+  IEditProformaInvoice,
+  IProformaInvoices,
+} from "../api/interfaces";
+import {
+  allProformaInvoices,
+  editProformaInvoice,
+  newProformaInvoice,
+} from "../api/api";
 import axios from "axios";
 
 export type ProformaInvoicesContextData = {
@@ -11,6 +19,10 @@ export type ProformaInvoicesContextData = {
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   removeProformaInvoice: (id: number) => Promise<void>;
   addProformaInvoice: (data: IAddProformaInvoice) => Promise<void>;
+  updateProformaInvoice: (
+    id: number,
+    data: IEditProformaInvoice
+  ) => Promise<void>;
 };
 
 export const ProformaInovicesContext =
@@ -21,6 +33,7 @@ export const ProformaInovicesContext =
     totalPages: 1,
     removeProformaInvoice: async (id: number) => {},
     addProformaInvoice: async (data: IAddProformaInvoice) => {},
+    updateProformaInvoice: async (id: number, data: IEditProformaInvoice) => {},
   });
 
 export const ProformaInvoicesProvider = ({
@@ -75,9 +88,30 @@ export const ProformaInvoicesProvider = ({
       setPopupOpen(true);
     }
   };
+
+  const updateProformaInvoice = async (
+    id: number,
+    data: IEditProformaInvoice
+  ): Promise<void> => {
+    try {
+      const updatedInvoice: IProformaInvoices = await editProformaInvoice(
+        id,
+        data
+      ); // Adjust the return type here
+      setProformaInvoices((prevInvoices) => {
+        return prevInvoices.map((invoice) =>
+          invoice.id === updatedInvoice.id ? updatedInvoice : invoice
+        );
+      });
+    } catch (error) {
+      console.error("Error editing invoice:", error);
+    }
+  };
+
   return (
     <ProformaInovicesContext.Provider
       value={{
+        updateProformaInvoice,
         proformaInvoices,
         totalPages,
         setCurrentPage,

@@ -21,7 +21,7 @@ namespace TravelWarrants.Controllers
         public async Task<ActionResult> GeneratePdf(int id)
         {
             var (pdfBytes, proformaInvoiceNumber) = await _proInoviceService.GeneratePdf(id);
-            string fileName = $"Faktura_{proformaInvoiceNumber}.pdf";
+            string fileName = $"Profaktura_{proformaInvoiceNumber}.pdf";
             return File(pdfBytes, "application/pdf", fileName);
         }
 
@@ -49,14 +49,14 @@ namespace TravelWarrants.Controllers
         public async Task<ActionResult> DownloadRoutePlan(int invoiceId)
         {
             var fileData = await _proInoviceService.GetRoutePlanFile(invoiceId);
-            if (fileData == null || fileData.FileBytes == null || string.IsNullOrWhiteSpace(fileData.FileName))
+            if (fileData.FileStream == null || string.IsNullOrWhiteSpace(fileData.FileName))
             {
                 return NotFound("Nema plana puta ili proinvoice nije pronađen.");
             }
 
             
 
-            return File(fileData.FileBytes, "application/octet-stream", fileData.FileName);
+            return File(fileData.FileStream, "application/octet-stream", fileData.FileName);
         }
 
 

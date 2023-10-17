@@ -88,8 +88,6 @@ const EditInovice = () => {
       itemsToDelete: addInvoice.itemsToDelete || [],
     };
 
-    console.log("Podaci iz forme:", newInvoiceData);
-
     await updateInovice(Number(id), newInvoiceData);
     navigate("/inovices");
   };

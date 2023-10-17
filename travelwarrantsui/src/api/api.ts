@@ -2,6 +2,7 @@ import {  addClient, addVehicle,allClients, allVehicles,allDrivers,addDriver,ICo
 import axios from "axios";
 import { format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
+
 //Clients
 export const getAllClients =async ():Promise<allClients[]> => {
     const response = await axios.get("https://localhost:7206/api/Clients/GetClients");
@@ -1223,56 +1224,46 @@ try {
 }
 }
 export const editProformaInvoice = async (id: number, data: IEditProformaInvoice): Promise<IProformaInvoices> => {
-  const utcDate = utcToZonedTime(data.date, "UTC");
-  const formData = new FormData();
-
-  // Dodajte ove provere
-  if(data.clientId !== undefined) formData.append('clientId', data.clientId.toString());
-  formData.append('documentDate', format(utcDate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
-  if(data.paymentDeadline !== undefined) formData.append('paymentDeadline', data.paymentDeadline.toString());
-  if(data.priceWithoutVat !== undefined) formData.append('priceWithoutVAT', data.priceWithoutVat.toString());
-  if(data.note !== undefined) formData.append('note', data.note);
-  if(data.offerAccepted !== undefined) formData.append('offerAccepted', data.offerAccepted.toString());
-  if(data.proformaWithoutVat !== undefined) formData.append('proinoviceWithoutVAT', data.proformaWithoutVat.toString());
-
-  data.itemsOnInovice.forEach((item, index) => {
-      if(item.id !== undefined) formData.append(`itemsOnInovice[${index}].id`, item.id.toString());
-      if(item.description !== undefined) formData.append(`itemsOnInovice[${index}].description`, item.description);
-      if(item.serviceId !== undefined) formData.append(`itemsOnInovice[${index}].serviceId`, item.serviceId.toString());
-      if(item.quantity !== undefined) formData.append(`itemsOnInovice[${index}].quantity`, item.quantity.toString());
-      if(item.price !== undefined) formData.append(`itemsOnInovice[${index}].price`, item.price.toString());
-      if(item.numberOfDays !== undefined) formData.append(`itemsOnInovice[${index}].numberOfDays`, item.numberOfDays);
-  });
-
-  data.itemsToDelete?.forEach((itemId, index) => {
-    if(itemId !== undefined) formData.append(`itemsToDeleteId[${index}]`, itemId.toString());
- });
- 
-
-  if (data.file) {
-    formData.append('routePlan', data.file, data.file.name);
-  }
-  const response = await axios.put(
+  try {
+    const utcDate = utcToZonedTime(data.date, "UTC");
+    const response = await axios.put(
       `https://localhost:7206/api/ProformaInvoice/EditProformaInvoice/${id}`,
-      formData,
       {
-          headers: {
-              'Content-Type': 'multipart/form-data',
-          },
+        clientId: data.clientId,
+        documentDate: format(utcDate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
+        paymentDeadline: data.paymentDeadline,
+        priceWithoutVAT: data.priceWithoutVat,
+        note: data.note,
+        offerAccepted: data.offerAccepted,
+        proinoviceWithoutVAT: data.proformaWithoutVat,
+        itemsOnInovice: data.itemsOnInovice,
+        itemsToDeleteId: data.itemsToDelete,
+        routePlan: data.file 
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        }
       }
-  );
+    );
 
-  const invoiceData: IProformaInvoices = {
+    const invoiceData: IProformaInvoices = {
       id: response.data.id,
       number: response.data.number,
       date: format(new Date(response.data.date), "dd/MM/yyyy"),
       amount: response.data.amount,
       clientName: response.data.clientName,
-      accepted:response.data.offerAccepted
-  };
+      accepted: response.data.offerAccepted
+    };
 
-  return invoiceData;
+    return invoiceData;
+  } catch (error) {
+    console.error('Error:', error);  
+    throw error;
+  }
 };
+
 
 export const newProformaInvoice = async (data: IAddProformaInvoice): Promise<IProformaInvoices> => {
   try {
@@ -1389,6 +1380,7 @@ export const getProformaInvoiceById =async (id:number):Promise<IGetProformaInvoi
     offerAccepted:jsonResponse.offerAccepted,
     proformaWithoutVat:jsonResponse.proinvoiceWithoutVAT,
     fileName:jsonResponse.fileName,
+    fileId:jsonResponse.fileId,
     itemsOnInovice: jsonResponse.itemsOnInovice.map((i:any) => {
       return{
         id: i.id,

@@ -1,4 +1,6 @@
-﻿namespace TravelWarrants.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace TravelWarrants.Models
 {
     public class InoviceService
     {
@@ -8,7 +10,9 @@
         public int? ProformaInvoiceId { get; set; }
         public string Description { get; set; }
         public decimal Quantity { get; set; }
+        [Column(TypeName = "decimal(10, 2)")]
         public decimal Price { get; set; }
+        [Column(TypeName = "decimal(10, 2)")]
         public decimal Value { get; set; }
         public decimal VAT { get; set; }
         public string NumberOfDays { get; set; }

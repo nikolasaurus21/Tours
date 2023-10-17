@@ -258,6 +258,7 @@ export interface IGetProformaInvoiceById{
   offerAccepted:boolean
   proformaWithoutVat:boolean
   fileName:string
+  fileId?:number
 }
 
 export interface IEditProformaInvoice{
@@ -270,5 +271,5 @@ export interface IEditProformaInvoice{
   itemsToDelete?: number[]
   offerAccepted:boolean
   proformaWithoutVat:boolean
-  file?: File | null;
+  file?: number | null;
 }

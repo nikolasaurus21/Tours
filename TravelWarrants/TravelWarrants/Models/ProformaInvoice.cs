@@ -1,4 +1,6 @@
-﻿namespace TravelWarrants.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace TravelWarrants.Models
 {
     public class ProformaInvoice
     {
@@ -6,8 +8,11 @@
         public int Number { get; set; }
         public int Year { get; set; }
         public int ClientId { get; set; }
+        [Column(TypeName = "decimal(10, 2)")]
         public decimal NoVAT { get; set; }
+        [Column(TypeName = "decimal(10, 2)")]
         public decimal VAT { get; set; }
+        [Column(TypeName = "decimal(10, 2)")]
         public decimal Total { get; set; }
         public DateTime DocumentDate { get; set; }
         public DateTime CurrencyDate { get; set; }

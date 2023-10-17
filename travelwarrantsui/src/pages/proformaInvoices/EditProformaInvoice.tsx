@@ -6,24 +6,26 @@ import { CiCircleRemove } from "react-icons/ci";
 import {
   deleteRoutePlan,
   downloadRoutePlan,
-  editProformaInvoice,
   getProformaInvoiceById,
+  uploadfileStreaming,
 } from "../../api/api";
 import { IItemsEdit, IEditProformaInvoice } from "../../api/interfaces";
 import { ClientsContext } from "../../context/ClientsContext";
 
 import { ServicesContext } from "../../context/ServicesContext";
+import { ProformaInovicesContext } from "../../context/ProformaInvoicesContext";
 
 const EditProformaInvoice = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { clients } = useContext(ClientsContext);
   const { services } = useContext(ServicesContext);
+  const { updateProformaInvoice } = useContext(ProformaInovicesContext);
 
   const [fileName, setFileName] = useState<string | null>(null);
-  const [file, setFile] = useState<File | null>(null);
+  const [fileId, setFileId] = useState<number | undefined>(undefined);
   const [items, setItems] = useState<IItemsEdit[]>([]);
-  const [tempFileDeletion, setTempFileDeletion] = useState<boolean>(false);
+
   const [proformaInvoiceNumber, setProformaInvoiceNumber] = useState<
     string | null
   >(null);
@@ -41,28 +43,45 @@ const EditProformaInvoice = () => {
       file: null,
     });
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files ? event.target.files[0] : null;
-    setTempFileDeletion(false);
-    setFile(file);
-    setFileName(file ? file.name : null);
-    setAddProformaInvoice((prevState) => ({
-      ...prevState,
-      file: file,
-    }));
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const fileToUpload = event.target.files ? event.target.files[0] : null;
+    if (fileToUpload) {
+      try {
+        // Otpremanje fajla na server
+        const fileIdFromApi = await uploadfileStreaming(fileToUpload); // uploadFile je vaša funkcija za otpremanje fajla
+        setFileId(fileIdFromApi); // Postavljanje ID fajla u stanje
+        setFileName(fileToUpload.name);
+        setAddProformaInvoice((prevState) => ({
+          ...prevState,
+          file: fileIdFromApi, // Ažuriranje file polja u vašem stanju proforma fakture
+        }));
+      } catch (error) {
+        console.error("Error uploading file:", error);
+      }
+    }
   };
 
-  const handleFileDeletion = async () => {
-    setTempFileDeletion(true);
-    setFile(null);
+  const handleFileDeletion = async (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+    setFileId(undefined);
     setFileName(null);
+    setAddProformaInvoice((prevState) => ({
+      ...prevState,
+      file: null, // Ažuriranje file polja u vašem stanju proforma fakture
+    }));
   };
 
   useEffect(() => {
     const fetchInovice = async () => {
       try {
         const proformaInvoice = await getProformaInvoiceById(Number(id));
-
+        console.log(proformaInvoice);
+        console.log(proformaInvoice.fileId);
+        setFileId(proformaInvoice.fileId);
         setAddProformaInvoice(proformaInvoice);
         setFileName(proformaInvoice.fileName);
         if (proformaInvoice.itemsOnInovice) {
@@ -108,21 +127,6 @@ const EditProformaInvoice = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (tempFileDeletion) {
-      await deleteRoutePlan(Number(id));
-      setFileName(null);
-      setAddProformaInvoice((prevState) => ({
-        ...prevState,
-        file: null,
-      }));
-    } else if (file) {
-      setFileName(fileName);
-      setAddProformaInvoice((prevState) => ({
-        ...prevState,
-        file: file,
-      }));
-    }
-
     const newInvoiceData: IEditProformaInvoice = {
       clientId: addProformaInvoice.clientId,
       date: addProformaInvoice.date,
@@ -133,11 +137,12 @@ const EditProformaInvoice = () => {
       itemsToDelete: addProformaInvoice.itemsToDelete || [],
       offerAccepted: addProformaInvoice.offerAccepted,
       proformaWithoutVat: addProformaInvoice.proformaWithoutVat,
+      file: addProformaInvoice.file,
     };
 
     console.log("Podaci iz forme:", newInvoiceData);
 
-    await editProformaInvoice(Number(id), newInvoiceData);
+    await updateProformaInvoice(Number(id), newInvoiceData);
     navigate("/proformainvoices");
   };
 
@@ -250,6 +255,8 @@ const EditProformaInvoice = () => {
         >
           <input
             type="checkbox"
+            name="priceWithoutVAT"
+            id="priceWithoutVAT"
             checked={addProformaInvoice.priceWithoutVat}
             onChange={(e) =>
               setAddProformaInvoice({
@@ -259,10 +266,30 @@ const EditProformaInvoice = () => {
             }
           />
           <label
-            htmlFor="priceWithoutVat"
+            htmlFor="priceWithoutVAT"
             style={{ marginTop: "6px", fontSize: "13px" }}
           >
             Cijena bez PDV-a
+          </label>
+
+          <input
+            type="checkbox"
+            name="proinvoiceWithoutVat"
+            id="proinvoiceWithoutVat"
+            checked={addProformaInvoice.proformaWithoutVat}
+            onChange={(e) =>
+              setAddProformaInvoice({
+                ...addProformaInvoice,
+                proformaWithoutVat: e.target.checked,
+              })
+            }
+            style={{ marginLeft: "10px" }}
+          />
+          <label
+            htmlFor="proinvoiceWithoutVat"
+            style={{ marginTop: "6px", fontSize: "13px" }}
+          >
+            Ponuda bez prikazivanja PDV-a
           </label>
         </div>
         <div>
@@ -390,24 +417,7 @@ const EditProformaInvoice = () => {
           >
             Plan puta
           </label>
-          {tempFileDeletion ? (
-            <>
-              <input
-                type="file"
-                name="routeplan"
-                id="routeplan"
-                className="custom-file-input"
-                onChange={handleFileUpload}
-              />
-            </>
-          ) : file ? (
-            <div>
-              {/* Renderovanje tempFileName ili neke druge informacije o tempFile */}
-              {fileName}
-              {/* ... */}
-            </div>
-          ) : // ... renderovanje fileName i file iz addProformaInvoice stanja
-          fileName ? (
+          {fileId ? (
             <div
               style={{
                 display: "flex",
@@ -422,11 +432,14 @@ const EditProformaInvoice = () => {
                   textDecoration: "underline",
                   cursor: "pointer",
                   paddingBottom: "6px",
-                  background: "none", // Uklanja pozadinsku boju
-                  border: "none", // Uklanja ivicu
-                  padding: 0, // Uklanja dodatni padding
+                  background: "none",
+                  border: "none",
+                  padding: 0,
                 }}
-                onClick={() => downloadRoutePlan(Number(id))}
+                onClick={(e) => {
+                  e.preventDefault();
+                  downloadRoutePlan(Number(id));
+                }}
               >
                 {fileName}
               </button>
@@ -465,6 +478,7 @@ const EditProformaInvoice = () => {
             />
           )}
         </div>
+
         <button type="submit">Sačuvaj izmjene</button>
       </form>
     </div>

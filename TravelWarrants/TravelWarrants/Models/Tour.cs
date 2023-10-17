@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace TravelWarrants.Models
@@ -11,7 +12,9 @@ namespace TravelWarrants.Models
         public string Destination { get; set; }
         public decimal Mileage { get; set; }
         public int NumberOfPassengers { get; set; }
+        [Column(TypeName = "decimal(10, 2)")]
         public decimal Price { get; set; }
+        [Column(TypeName = "decimal(10, 2)")]
         public decimal Toll { get; set; }
         public decimal Fuel { get; set; }
         public DateTime TimeOfTour { get; set; }
@@ -26,6 +29,7 @@ namespace TravelWarrants.Models
         public string Note { get; set; }
         public int? DriverId { get; set; }
         public decimal? FuelPrice { get; set; }
+        [Column(TypeName = "decimal(10, 2)")]
         public decimal? NumberOfDays { get; set; }
         public string IntermediateDestinations { get; set; }
         

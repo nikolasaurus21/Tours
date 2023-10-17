@@ -10,7 +10,7 @@ namespace TravelWarrants.DTOs.Proinovce
         public string Note { get; set; }
         public DateTime DocumentDate { get; set; }
         public List<ItemsOnInoviceEdit> ItemsOnInovice { get; set; } = new List<ItemsOnInoviceEdit>();
-       
+        public int? FileId { get; set; }
         public bool OfferAccepted { get; set; }
         public bool PriceWithoutVAT { get; set; }
         public string Number {  get; set; }

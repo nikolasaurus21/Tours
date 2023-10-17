@@ -31,7 +31,7 @@ namespace TravelWarrants.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal?>("Amount")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int?>("ClientId")
                         .IsRequired()
@@ -229,7 +229,7 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("NoVAT")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<string>("Note")
                         .IsRequired()
@@ -242,10 +242,10 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<decimal>("Total")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<decimal>("VAT")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int>("Year")
                         .HasColumnType("integer");
@@ -277,7 +277,7 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("text");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int?>("ProformaInvoiceId")
                         .HasColumnType("integer");
@@ -292,7 +292,7 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<decimal>("Value")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.HasKey("Id");
 
@@ -314,7 +314,7 @@ namespace TravelWarrants.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int>("ClientId")
                         .HasColumnType("integer");
@@ -378,7 +378,7 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("NoVAT")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<string>("Note")
                         .IsRequired()
@@ -397,13 +397,13 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<decimal>("Total")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int?>("UploadedFileId")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("VAT")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int>("Year")
                         .HasColumnType("integer");
@@ -447,13 +447,13 @@ namespace TravelWarrants.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("AmountOfAccount")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<decimal>("AmountOfDeposit")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<decimal>("Balance")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int>("ClientId")
                         .HasColumnType("integer");
@@ -521,13 +521,13 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("text");
 
                     b.Property<decimal?>("NumberOfDays")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int>("NumberOfPassengers")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<decimal>("StartMileage")
                         .HasColumnType("numeric");
@@ -536,7 +536,7 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("Toll")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int>("VehicleId")
                         .HasColumnType("integer");

@@ -54,22 +54,39 @@ namespace TravelWarrants.Services
         public async Task<int> UploadFileStreaming(IFormFile file)
         {
             if (file == null || file.Length == 0)
+            {
+
                 throw new ArgumentException("Invalid file.");
+            }
 
             if (!Directory.Exists(_folderPath))
-                Directory.CreateDirectory(_folderPath);
+            {
 
-            var date = DateTime.Now.ToString("yyyy_MM_dd-HH_mm_ss");
-            var newFileName = $"{date}_{file.FileName}";
+                Directory.CreateDirectory(_folderPath);
+            }
+
+            var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+            var fileExtension = Path.GetExtension(file.FileName);
+            var newFileName = fileName;
+            int count = 1;
+
+            while (File.Exists(Path.Combine(_folderPath, newFileName + fileExtension)))
+            {
+                newFileName = $"{fileName}({count})";
+                count++;
+            }
+            newFileName += fileExtension;
+
             var filePath = Path.Combine(_folderPath, newFileName);
+
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
                 var buffer = new byte[1048576]; // 1 MB buffer
                 int bytesRead;
                 var fileReadStream = file.OpenReadStream();
-                while ((bytesRead = await fileReadStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                while ((bytesRead = await fileReadStream.ReadAsync(buffer)) > 0)
                 {
-                    await fileStream.WriteAsync(buffer, 0, bytesRead);
+                    await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead));
                     _logger.LogInformation($"{bytesRead} bytes read and written to file");
                 }
             }
@@ -86,6 +103,7 @@ namespace TravelWarrants.Services
 
             return uploadedFile.Id;
         }
+
 
         public async Task DeleteFile(int fileId)
         {
@@ -111,12 +129,16 @@ namespace TravelWarrants.Services
                 ?? throw new FileNotFoundException("File not found.");
 
             var path = file.Path;
-
-            var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-
             var fileName = Path.GetFileName(path);
 
-            return new FileData { FileStream = fileStream, FileName = fileName };
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(path, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            memory.Position = 0;
+
+            return new FileData { FileStream = memory, FileName = fileName };
 
         }
     }

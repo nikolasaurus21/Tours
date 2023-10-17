@@ -524,7 +524,7 @@ namespace TravelWarrants.Services
                                  "<td>" + item.Price.ToString()+ "€" + "</td></tr>");
             }
 
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "Services", "InvoiceTemplate.html");
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "PdfTemplates", "InvoiceTemplate.html");
             string htmlTemplate = File.ReadAllText(path);
 
             string htmlContent = htmlTemplate

@@ -150,8 +150,10 @@ namespace TravelWarrants.Services
                 PriceWithoutVAT = proinvoice.PriceWithoutVAT ?? default,
                 Note = proinvoice.Note,
                 Number = proinvoice.Number + "/" + proinvoice.Year,
+                ProinvoiceWithoutVAT = proinvoice.PriceWithoutVAT ?? default,
                 OfferAccepted = proinvoice.OfferAccepted ?? default,
                 FileName = proinvoice.UploadedFiles?.FileName,
+                FileId = proinvoice.UploadedFileId ?? null,
                 ItemsOnInovice = proinvoice.InoviceService
                 .Select(i => new ItemsOnInoviceEdit
                 {
@@ -195,6 +197,7 @@ namespace TravelWarrants.Services
             existingProformaInvoice.Note = proinvoiceEditDTO.Note;
             existingProformaInvoice.Year = proinvoiceEditDTO.DocumentDate.Year;
             existingProformaInvoice.OfferAccepted = proinvoiceEditDTO.OfferAccepted;
+            existingProformaInvoice.ProinoviceWithoutVAT = proinvoiceEditDTO.ProinoviceWithoutVAT;
 
 
            
@@ -280,7 +283,16 @@ namespace TravelWarrants.Services
 
             //dio za fajl cu odje
 
-
+            if (proinvoiceEditDTO.RoutePlan.HasValue)
+            {
+                
+                existingProformaInvoice.UploadedFileId = proinvoiceEditDTO.RoutePlan.Value;
+            }
+            else
+            {
+                
+                existingProformaInvoice.UploadedFileId = null;
+            }
 
             var acc = await _context.Accounts.FirstOrDefaultAsync(x => x.InoviceId == existingProformaInvoice.Id)
                  ?? new Account { InoviceId = existingProformaInvoice.Id };
@@ -312,13 +324,14 @@ namespace TravelWarrants.Services
                 _context.Statuses.Add(status);
             }
 
-            _context.SaveChanges();
+           
+            await _context.SaveChangesAsync();
 
             var addedInovice = new ProinvoiceGetDTO
             {
                 Id = existingProformaInvoice.Id,
                 Number = existingProformaInvoice.Number + "/" + existingProformaInvoice.Year,
-                
+                OfferAccepted = existingProformaInvoice.OfferAccepted ?? false,
                 Amount = existingProformaInvoice.Total,
                 ClientName = await _context.Clients
                 .Where(x => x.Id == existingProformaInvoice.ClientId)
@@ -577,7 +590,7 @@ namespace TravelWarrants.Services
                                  "<td>" + item.Price.ToString() + "€" + "</td></tr>");
             }
 
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "Services", "ProformaInvoiceTemplate.html");
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "PdfTemplates", "ProformaInvoiceTemplate.html");
             string htmlTemplate = File.ReadAllText(path);
 
             string htmlContent = htmlTemplate
