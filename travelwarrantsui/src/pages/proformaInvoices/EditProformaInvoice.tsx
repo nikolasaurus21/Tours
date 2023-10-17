@@ -4,7 +4,6 @@ import Button from "../../ui/Button";
 import { useParams, useNavigate } from "react-router-dom";
 import { CiCircleRemove } from "react-icons/ci";
 import {
-  deleteRoutePlan,
   downloadRoutePlan,
   getProformaInvoiceById,
   uploadfileStreaming,
@@ -21,7 +20,7 @@ const EditProformaInvoice = () => {
   const { clients } = useContext(ClientsContext);
   const { services } = useContext(ServicesContext);
   const { updateProformaInvoice } = useContext(ProformaInovicesContext);
-
+  const [isFileDeleted, setIsFileDeleted] = useState<boolean>(false);
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileId, setFileId] = useState<number | undefined>(undefined);
   const [items, setItems] = useState<IItemsEdit[]>([]);
@@ -67,6 +66,7 @@ const EditProformaInvoice = () => {
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
+    setIsFileDeleted(true);
     setFileId(undefined);
     setFileName(null);
     setAddProformaInvoice((prevState) => ({
@@ -417,7 +417,7 @@ const EditProformaInvoice = () => {
           >
             Plan puta
           </label>
-          {fileId ? (
+          {fileId && !isFileDeleted ? (
             <div
               style={{
                 display: "flex",

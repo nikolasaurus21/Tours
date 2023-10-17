@@ -1335,7 +1335,7 @@ export const downloadPdfProformaInvoice = async (id: number, invoiceNumber: stri
 
     const link = document.createElement('a');
     link.href = downloadUrl;
-    link.download = `Faktura_${invoiceNumber}.pdf`; 
+    link.download = `Profaktura_${invoiceNumber}.pdf`; 
     
     document.body.appendChild(link);
     link.click();

@@ -521,13 +521,14 @@ namespace TravelWarrants.Services
                     Email = x.Client.Email,
                     Number = x.Number + "/" + x.Year,
                     Total = x.Total,
+                    
                     PriceWithoutVat = x.NoVAT,
                     Vat = x.VAT,
                     ShowVat = x.ProinoviceWithoutVAT ?? false,
                     ItemsOnInovice = x.InoviceService
                     .Select(i => new ItemsOnInovicePdf
                     {
-
+                        ServiceVat = i.Service.VATRate,
                         Description = i.Description,
                         Service = i.Service.Name,
                         Quantity = i.Quantity,
@@ -586,6 +587,7 @@ namespace TravelWarrants.Services
                                  "<td>" + item.Service + "</td>" +
                                  "<td>" + item.Description + "</td>" +
                                  "<td>" + item.NumberOfDays.ToString() + "</td>" +
+                                 "<td>" + item.ServiceVat.ToString() + "%"+"</td>" +
                                  "<td>" + item.Quantity.ToString() + "</td>" +
                                  "<td>" + item.Price.ToString() + "€" + "</td></tr>");
             }
@@ -612,6 +614,7 @@ namespace TravelWarrants.Services
                 .Replace("{{PriceWithoutVat}}", proformaInvoice.PriceWithoutVat.ToString() + "€")
                 .Replace("{{Vat}}", proformaInvoice.Vat.ToString() + "€")
                 .Replace("{{Total}}", proformaInvoice.Total.ToString() + "€");
+                
 
 
 
