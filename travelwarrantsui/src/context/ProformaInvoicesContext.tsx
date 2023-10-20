@@ -9,6 +9,7 @@ import {
   allProformaInvoices,
   editProformaInvoice,
   newProformaInvoice,
+  uploadfileStreaming,
 } from "../api/api";
 import axios from "axios";
 
@@ -23,6 +24,7 @@ export type ProformaInvoicesContextData = {
     id: number,
     data: IEditProformaInvoice
   ) => Promise<void>;
+  uploadFile: (file: File) => Promise<number>;
 };
 
 export const ProformaInovicesContext =
@@ -34,6 +36,9 @@ export const ProformaInovicesContext =
     removeProformaInvoice: async (id: number) => {},
     addProformaInvoice: async (data: IAddProformaInvoice) => {},
     updateProformaInvoice: async (id: number, data: IEditProformaInvoice) => {},
+    uploadFile: async (file: File) => {
+      return 0;
+    },
   });
 
 export const ProformaInvoicesProvider = ({
@@ -97,7 +102,7 @@ export const ProformaInvoicesProvider = ({
       const updatedInvoice: IProformaInvoices = await editProformaInvoice(
         id,
         data
-      ); // Adjust the return type here
+      );
       setProformaInvoices((prevInvoices) => {
         return prevInvoices.map((invoice) =>
           invoice.id === updatedInvoice.id ? updatedInvoice : invoice
@@ -108,6 +113,15 @@ export const ProformaInvoicesProvider = ({
     }
   };
 
+  const uploadFile = async (file: File): Promise<number> => {
+    try {
+      const fileId = await uploadfileStreaming(file);
+      return fileId;
+    } catch (error) {
+      console.error("Greska prilikom upload-a: ", error);
+      throw error;
+    }
+  };
   return (
     <ProformaInovicesContext.Provider
       value={{
@@ -118,6 +132,7 @@ export const ProformaInvoicesProvider = ({
         currentPage,
         removeProformaInvoice,
         addProformaInvoice,
+        uploadFile,
       }}
     >
       {isPopupOpen && (

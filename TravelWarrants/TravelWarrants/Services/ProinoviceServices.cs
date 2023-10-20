@@ -9,6 +9,8 @@ using TravelWarrants.DTOs.Proinovce;
 using TravelWarrants.Interfaces;
 
 using Newtonsoft.Json;
+using PuppeteerSharp.Media;
+using PuppeteerSharp;
 
 namespace TravelWarrants.Services
 {
@@ -511,6 +513,7 @@ namespace TravelWarrants.Services
                 .Include(i => i.InoviceService.Where(i => !i.InoviceId.HasValue && i.ProformaInvoiceId.HasValue))
                 .ThenInclude(s => s.Service)
                 .Include(c => c.Client)
+                
                 .Where(x => x.Id == id)
                 .Select(x => new ProformaInvoicePdf
                 {
@@ -570,12 +573,19 @@ namespace TravelWarrants.Services
             }
             var proformaInvoice = proformaInvoiceData.Message;
 
-            if (proformaInvoice.ItemsOnInovice.Count() == 0)
+            if (proformaInvoice.ItemsOnInovice.Count == 0)
             {
                 throw new InvalidOperationException("No items on inovice");
             }
 
-            var document = new PdfDocument();
+            var vatRates = proformaInvoice.ItemsOnInovice
+                                    .Select(x => x.ServiceVat)
+                                    .Distinct()
+                                    .ToList();
+
+            int totalRows = proformaInvoice.ItemsOnInovice.Count;
+            int rowsPerPage = 9; // za prvu stranicu
+            int remainingRows = totalRows;
 
             var tableRows = new StringBuilder();
             int i = 0;
@@ -583,6 +593,8 @@ namespace TravelWarrants.Services
             foreach (var item in proformaInvoice.ItemsOnInovice)
             {
                 i++;
+
+
                 tableRows.Append("<tr><td>" + i.ToString() + "</td>" +
                                  "<td>" + item.Service + "</td>" +
                                  "<td>" + item.Description + "</td>" +
@@ -590,10 +602,39 @@ namespace TravelWarrants.Services
                                  "<td>" + item.ServiceVat.ToString() + "%"+"</td>" +
                                  "<td>" + item.Quantity.ToString() + "</td>" +
                                  "<td>" + item.Price.ToString() + "€" + "</td></tr>");
+                if (i == rowsPerPage)
+                {
+                    tableRows.Append("<tr style=\"page-break-before: always;\"></tr>");
+
+                    if (remainingRows > 15)
+                    {
+                        rowsPerPage += 15; // Za naredne stranice, dopušta 15 redova
+                    }
+                    else
+                    {
+                        rowsPerPage += remainingRows; // Dodaj sve preostale redove ako ih je manje od 15
+                    }
+                }
+
+                remainingRows--;
             }
 
             string path = Path.Combine(Directory.GetCurrentDirectory(), "PdfTemplates", "ProformaInvoiceTemplate.html");
             string htmlTemplate = File.ReadAllText(path);
+
+            var vatFooterRows = new StringBuilder();
+
+            foreach (var vatRate in vatRates)
+            {
+                decimal totalForThisVatRate = proformaInvoice.ItemsOnInovice
+                                             .Where(x => x.ServiceVat == vatRate)
+                                             .Sum(x => x.Price * x.Quantity * vatRate / 100m);
+
+                vatFooterRows.Append("<tr " + (proformaInvoice.ShowVat ? "style=\"display:none;\"" : "") + ">" +
+                                     "<td class='no-border' colspan='5'></td>" +
+                                     "<td class='tfoot-right no-border'>PDV (" + vatRate + "%):</td>" +
+                                     "<td class='no-border'>" + totalForThisVatRate + "€" + "</td></tr>");
+            }
 
             string htmlContent = htmlTemplate
                 .Replace("{{ProformaInvoiceNumber}}", proformaInvoice.Number)
@@ -610,23 +651,43 @@ namespace TravelWarrants.Services
                 .Replace("{{ClientCity}}", proformaInvoice.ClientPlace)
                 .Replace("{{ClientEmail}}", proformaInvoice.Email)
                 .Replace("{{TableRows}}", tableRows.ToString())
-                .Replace("{{ShowVatClass}}", proformaInvoice.ShowVat ? "hidden" : "")
+                .Replace("{{ShowVatStyle}}", proformaInvoice.ShowVat ? "style=\"display:none;\"" : "" )
                 .Replace("{{PriceWithoutVat}}", proformaInvoice.PriceWithoutVat.ToString() + "€")
                 .Replace("{{Vat}}", proformaInvoice.Vat.ToString() + "€")
-                .Replace("{{Total}}", proformaInvoice.Total.ToString() + "€");
-                
+                .Replace("{{Total}}", proformaInvoice.Total.ToString() + "€")
+                .Replace("{{VatRows}}", vatFooterRows.ToString());
 
 
 
-            PdfGenerator.AddPdfPages(document, htmlContent, PageSize.A4);
 
-            byte[] response;
-            using (MemoryStream ms = new MemoryStream())
+
+            var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
+            var page = await browser.NewPageAsync();
+
+            await page.SetContentAsync(htmlContent);
+          
+            var options = new PdfOptions
             {
-                document.Save(ms);
-                response = ms.ToArray();
-            }
+                Format = PaperFormat.A4,
+                PrintBackground = true,
+                MarginOptions = new MarginOptions
+                {
+                    Top = "2.5cm",
+                    Right = "0.5cm",
+                    Bottom = "2.5cm",
+                    Left = "0.5cm"
+                }
+            };
 
+            var pdfStream = await page.PdfStreamAsync(options);
+
+            await browser.CloseAsync();
+
+            var ms = new MemoryStream();
+            await pdfStream.CopyToAsync(ms);
+            ms.Position = 0;
+
+            byte[] response = ms.ToArray();
             return (response, proformaInvoice.Number);
         }
     }

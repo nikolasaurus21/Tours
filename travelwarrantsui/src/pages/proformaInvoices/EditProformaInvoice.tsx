@@ -3,11 +3,7 @@ import { HiOutlinePlusSm, HiMinus } from "react-icons/hi";
 import Button from "../../ui/Button";
 import { useParams, useNavigate } from "react-router-dom";
 import { CiCircleRemove } from "react-icons/ci";
-import {
-  downloadRoutePlan,
-  getProformaInvoiceById,
-  uploadfileStreaming,
-} from "../../api/api";
+import { downloadRoutePlan, getProformaInvoiceById } from "../../api/api";
 import { IItemsEdit, IEditProformaInvoice } from "../../api/interfaces";
 import { ClientsContext } from "../../context/ClientsContext";
 
@@ -19,10 +15,14 @@ const EditProformaInvoice = () => {
   const navigate = useNavigate();
   const { clients } = useContext(ClientsContext);
   const { services } = useContext(ServicesContext);
-  const { updateProformaInvoice } = useContext(ProformaInovicesContext);
+  const { updateProformaInvoice, uploadFile } = useContext(
+    ProformaInovicesContext
+  );
   const [isFileDeleted, setIsFileDeleted] = useState<boolean>(false);
   const [fileName, setFileName] = useState<string | null>(null);
-  const [fileId, setFileId] = useState<number | undefined>(undefined);
+  const [oldFileId, setOldFileId] = useState<number | undefined>(undefined);
+  const [newFileId, setNewFileId] = useState<number | undefined>(undefined);
+
   const [items, setItems] = useState<IItemsEdit[]>([]);
 
   const [proformaInvoiceNumber, setProformaInvoiceNumber] = useState<
@@ -48,13 +48,12 @@ const EditProformaInvoice = () => {
     const fileToUpload = event.target.files ? event.target.files[0] : null;
     if (fileToUpload) {
       try {
-        // Otpremanje fajla na server
-        const fileIdFromApi = await uploadfileStreaming(fileToUpload); // uploadFile je vaša funkcija za otpremanje fajla
-        setFileId(fileIdFromApi); // Postavljanje ID fajla u stanje
+        const fileIdFromApi = await uploadFile(fileToUpload);
+        setNewFileId(fileIdFromApi);
         setFileName(fileToUpload.name);
         setAddProformaInvoice((prevState) => ({
           ...prevState,
-          file: fileIdFromApi, // Ažuriranje file polja u vašem stanju proforma fakture
+          file: fileIdFromApi,
         }));
       } catch (error) {
         console.error("Error uploading file:", error);
@@ -67,11 +66,11 @@ const EditProformaInvoice = () => {
   ) => {
     event.preventDefault();
     setIsFileDeleted(true);
-    setFileId(undefined);
+    setNewFileId(undefined);
     setFileName(null);
     setAddProformaInvoice((prevState) => ({
       ...prevState,
-      file: null, // Ažuriranje file polja u vašem stanju proforma fakture
+      file: null,
     }));
   };
 
@@ -79,9 +78,9 @@ const EditProformaInvoice = () => {
     const fetchInovice = async () => {
       try {
         const proformaInvoice = await getProformaInvoiceById(Number(id));
-        console.log(proformaInvoice);
-        console.log(proformaInvoice.fileId);
-        setFileId(proformaInvoice.fileId);
+        console.log("POdaci sa servera:", proformaInvoice);
+        // console.log("File id:", proformaInvoice.fileId);
+        setOldFileId(proformaInvoice.fileId);
         setAddProformaInvoice(proformaInvoice);
         setFileName(proformaInvoice.fileName);
         if (proformaInvoice.itemsOnInovice) {
@@ -127,6 +126,8 @@ const EditProformaInvoice = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    let fileId = isFileDeleted ? null : newFileId || oldFileId;
+
     const newInvoiceData: IEditProformaInvoice = {
       clientId: addProformaInvoice.clientId,
       date: addProformaInvoice.date,
@@ -137,13 +138,15 @@ const EditProformaInvoice = () => {
       itemsToDelete: addProformaInvoice.itemsToDelete || [],
       offerAccepted: addProformaInvoice.offerAccepted,
       proformaWithoutVat: addProformaInvoice.proformaWithoutVat,
-      file: addProformaInvoice.file,
+      file: fileId,
     };
 
-    console.log("Podaci iz forme:", newInvoiceData);
+    // console.log("Podaci iz forme:", newInvoiceData);
 
     await updateProformaInvoice(Number(id), newInvoiceData);
+
     navigate("/proformainvoices");
+    setIsFileDeleted(false);
   };
 
   return (
@@ -417,7 +420,7 @@ const EditProformaInvoice = () => {
           >
             Plan puta
           </label>
-          {fileId && !isFileDeleted ? (
+          {oldFileId && !isFileDeleted ? (
             <div
               style={{
                 display: "flex",
