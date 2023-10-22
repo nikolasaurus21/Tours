@@ -57,11 +57,11 @@
             }
         }
 
-        @media print {
+        /*@media print {
             thead {
                 display: table-row-group
             }
-        }
+        }*/
     </style>
 </head>
 <body>
@@ -100,8 +100,9 @@
                     <th>Usluga</th>
                     <th>Opis usluge</th>
                     <th>Broj dana</th>
+                    <th>PDV(%)</th>
                     <th>Količina</th>
-                    <th>Cijena</th>
+                    <th>Cijena(€)</th>
                 </tr>
             </thead>
             <tbody>
@@ -109,17 +110,13 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td class='no-border' colspan='4'></td>
+                    <td class='no-border' colspan='5'></td>
                     <td class='tfoot-right no-border'>Ukupno bez PDV:</td>
                     <td class='no-border'>{{PriceWithoutVat}}</td>
                 </tr>
+                {{VatRows}}
                 <tr>
-                    <td class='no-border' colspan='4'></td>
-                    <td class='tfoot-right no-border'>PDV:</td>
-                    <td class='no-border'>{{Vat}}</td>
-                </tr>
-                <tr>
-                    <td class='no-border' colspan='4'></td>
+                    <td class='no-border' colspan='5'></td>
                     <td class='tfoot-right no-border'>Ukupno:</td>
                     <td class='no-border'>{{Total}}</td>
                 </tr>

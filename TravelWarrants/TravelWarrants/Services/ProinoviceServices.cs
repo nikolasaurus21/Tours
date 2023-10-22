@@ -583,9 +583,9 @@ namespace TravelWarrants.Services
                                     .Distinct()
                                     .ToList();
 
-            int totalRows = proformaInvoice.ItemsOnInovice.Count;
+            int totalRowsCount = proformaInvoice.ItemsOnInovice.Count;
             int rowsPerPage = 9; // za prvu stranicu
-            int remainingRows = totalRows;
+            int remainingRows = totalRowsCount;
 
             var tableRows = new StringBuilder();
             int i = 0;

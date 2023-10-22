@@ -7,6 +7,8 @@ using TravelWarrants.DTOs.Inovices;
 using TravelWarrants.Interfaces;
 using System.Text;
 using TravelWarrants.Models;
+using PuppeteerSharp.Media;
+using PuppeteerSharp;
 
 namespace TravelWarrants.Services
 {
@@ -465,7 +467,7 @@ namespace TravelWarrants.Services
                     
                     .Select(i => new ItemsOnInovicePdf
                     {
-
+                        ServiceVat = i.Service.VATRate,
                         Description = i.Description,
                         Service = i.Service.Name,
                         Quantity = i.Quantity,
@@ -494,6 +496,7 @@ namespace TravelWarrants.Services
         public async Task<(byte[],string)> GeneratePdf(int id)
         {
             var companyData = await _companyService.Get();
+
             if (companyData == null || companyData.Message == null)
             {
                 throw new InvalidOperationException("Company data is not available");
@@ -502,16 +505,26 @@ namespace TravelWarrants.Services
 
             var inoviceData = await InoviceForPDf(id) ?? throw new InvalidOperationException("Inovice data is not available");
             var inovice = inoviceData.Message;
+
             if (inovice.ItemsOnInovice.Count == 0)
             {
                 throw new InvalidOperationException("No items on inovice");
             }
 
 
-            var document = new PdfDocument();
+            var vatRates = inovice.ItemsOnInovice
+                                    .Select(x => x.ServiceVat)
+                                    .Distinct()
+                                    .ToList();
+
+            int totalRowsCount = inovice.ItemsOnInovice.Count;
+            int rowsPerPage = 9; // za prvu stranicu
+            int remainingRows = totalRowsCount;
 
             var tableRows = new StringBuilder();
             int i = 0;
+
+
 
             foreach (var item in inovice.ItemsOnInovice)
             {
@@ -520,14 +533,45 @@ namespace TravelWarrants.Services
                                  "<td>" + item.Service + "</td>" +
                                  "<td>" + item.Description + "</td>" +
                                  "<td>" + item.NumberOfDays.ToString() + "</td>" +
+                                 "<td>" + item.ServiceVat.ToString() + "%"  + "</td>" +
                                  "<td>" + item.Quantity.ToString() + "</td>" +
                                  "<td>" + item.Price.ToString()+ "€" + "</td></tr>");
+
+                if (i == rowsPerPage)
+                {
+                    tableRows.Append("<tr style=\"page-break-before: always;\"></tr>");
+
+                    if (remainingRows > 15)
+                    {
+                        rowsPerPage += 15; // Za naredne stranice, dopušta 15 redova
+                    }
+                    else
+                    {
+                        rowsPerPage += remainingRows; // Dodaj sve preostale redove ako ih je manje od 15
+                    }
+                }
+
+                remainingRows--;
             }
 
             string path = Path.Combine(Directory.GetCurrentDirectory(), "PdfTemplates", "InvoiceTemplate.html");
             string htmlTemplate = File.ReadAllText(path);
 
-            string htmlContent = htmlTemplate
+            var vatFooterRows = new StringBuilder();
+
+            foreach (var vatRate in vatRates)
+            {
+                decimal totalForThisVatRate = inovice.ItemsOnInovice
+                                             .Where(x => x.ServiceVat == vatRate)
+                                             .Sum(x => x.Price * x.Quantity * vatRate / 100m);
+
+                vatFooterRows.Append("<tr>" +
+                                     "<td class='no-border' colspan='5'></td>" +
+                                     "<td class='tfoot-right no-border'>PDV (" + vatRate + "%):</td>" +
+                                     "<td class='no-border'>" + totalForThisVatRate + "€" + "</td></tr>");
+            }
+
+                string htmlContent = htmlTemplate
                 .Replace("{{InvoiceNumber}}", inovice.Number)
                 .Replace("{{InvoiceDate}}", DateTime.Now.ToString("dd/MM/yyyy"))
                 .Replace("{{CompanyName}}", company.Name)
@@ -542,21 +586,41 @@ namespace TravelWarrants.Services
                 .Replace("{{ClientCity}}", inovice.ClientPlace)
                 .Replace("{{ClientEmail}}", inovice.Email)
                 .Replace("{{TableRows}}", tableRows.ToString())
-                
                 .Replace("{{PriceWithoutVat}}", inovice.PriceWithoutVat.ToString() + "€")
                 .Replace("{{Vat}}", inovice.Vat.ToString() + "€")
-                .Replace("{{Total}}", inovice.Total.ToString() + "€");
+                .Replace("{{Total}}", inovice.Total.ToString() + "€")
+                .Replace("{{VatRows}}", vatFooterRows.ToString());
 
 
-            PdfGenerator.AddPdfPages(document, htmlContent, PageSize.A4);
 
-            byte[] response;
-            using (MemoryStream ms = new MemoryStream())
+
+            var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
+            var page = await browser.NewPageAsync();
+
+            await page.SetContentAsync(htmlContent);
+
+            var options = new PdfOptions
             {
-                document.Save(ms);
-                response = ms.ToArray();
-            }
+                Format = PaperFormat.A4,
+                PrintBackground = true,
+                MarginOptions = new MarginOptions
+                {
+                    Top = "2.5cm",
+                    Right = "0.5cm",
+                    Bottom = "2.5cm",
+                    Left = "0.5cm"
+                }
+            };
 
+            var pdfStream = await page.PdfStreamAsync(options);
+
+            await browser.CloseAsync();
+
+            var ms = new MemoryStream();
+            await pdfStream.CopyToAsync(ms);
+            ms.Position = 0;
+
+            byte[] response = ms.ToArray();
             return (response, inovice.Number);
         }
     }

@@ -67,6 +67,7 @@ const EditProformaInvoice = () => {
     event.preventDefault();
     setIsFileDeleted(true);
     setNewFileId(undefined);
+    setOldFileId(undefined);
     setFileName(null);
     setAddProformaInvoice((prevState) => ({
       ...prevState,
