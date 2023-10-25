@@ -1,6 +1,6 @@
 ﻿namespace TravelWarrants.Models
 {
-    public class CompanyGiroAccount
+    public class CompanyBankAccount
     {
         public int Id { get; set; }
         public int CompanyId { get; set; }

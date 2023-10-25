@@ -1,9 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TravelWarrants.DTOs;
-using TravelWarrants.DTOs.GiroAcc;
+﻿using TravelWarrants.DTOs;
 using TravelWarrants.DTOs.Payments;
 using TravelWarrants.Interfaces;
-using TravelWarrants.Models;
 
 namespace TravelWarrants.Services
 {
@@ -85,7 +82,7 @@ namespace TravelWarrants.Services
                 Note = paymentDb.Note,
             };
 
-            return new ResponseDTO<PaymentsDTO>() { IsSucced = true,Message=updatedPayment };
+            return new ResponseDTO<PaymentsDTO>() { IsSucced = true, Message = updatedPayment };
         }
 
         public async Task<ResponseDTO<PaymentsDTO>> GetPayment(int id)
@@ -119,7 +116,7 @@ namespace TravelWarrants.Services
 
         public async Task<ResponseDTO<PaymentsDTO>> NewPayment(PaymentsDTOSave paymentsDTO)
         {
-            var companyExists = await _context.Companies.AnyAsync();
+            var companyExists = await _context.Company.AnyAsync();
             if (!companyExists)
             {
                 return new ResponseDTO<PaymentsDTO>() { IsSucced = false, ErrorMessage = "Add a company first" };

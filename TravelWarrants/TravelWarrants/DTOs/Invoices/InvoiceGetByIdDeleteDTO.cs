@@ -1,6 +1,6 @@
 ﻿namespace TravelWarrants.DTOs.Inovices
 {
-    public class InoviceGetByIdDeleteDTO
+    public class InvoiceGetByIdDeleteDTO
     {
         public string Number { get; set; }
 

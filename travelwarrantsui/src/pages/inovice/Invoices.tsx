@@ -8,18 +8,18 @@ import {
   AiOutlineArrowRight,
 } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
-import { InovicesContext } from "../../context/InovicesContext";
-import { downloadPdf, inoviceToDelete } from "../../api/api";
+import { InvoicesContext } from "../../context/InvoicesContext";
+import { downloadPdf, invoiceToDelete } from "../../api/api";
 
 const Inovices = () => {
-  const { inovices, currentPage, totalPages, setCurrentPage } =
-    useContext(InovicesContext);
+  const { invoices, currentPage, totalPages, setCurrentPage } =
+    useContext(InvoicesContext);
 
   const navigate = useNavigate();
 
   const handleDeleteClick = async (id: number) => {
-    const inoviceData = await inoviceToDelete(id);
-    navigate(`/inovices/delete/${id}`, { state: { inoviceData } });
+    const inoviceData = await invoiceToDelete(id);
+    navigate(`/invoices/delete/${id}`, { state: { inoviceData } });
   };
 
   const handleDownloadClick = async (id: number, inoviceNumber: string) => {
@@ -37,7 +37,7 @@ const Inovices = () => {
           backgroundColor: "#005f40",
           marginLeft: "30px",
         }}
-        onClick={() => navigate("/inovices/add")}
+        onClick={() => navigate("/invoices/add")}
       >
         Nova faktura
       </Button>
@@ -54,26 +54,26 @@ const Inovices = () => {
             </tr>
           </thead>
           <tbody>
-            {inovices.map((inovice) => (
-              <tr key={inovice.id} className="firstcolumnorrow">
-                <td onClick={() => navigate(`/inovices/edit/${inovice.id}`)}>
-                  {inovice.number}/{inovice.year}
+            {invoices.map((invoice) => (
+              <tr key={invoice.id} className="firstcolumnorrow">
+                <td onClick={() => navigate(`/invoices/edit/${invoice.id}`)}>
+                  {invoice.number}/{invoice.year}
                 </td>
-                <td onClick={() => navigate(`/inovices/edit/${inovice.id}`)}>
-                  {inovice.date}
+                <td onClick={() => navigate(`/invoices/edit/${invoice.id}`)}>
+                  {invoice.date}
                 </td>
-                <td onClick={() => navigate(`/inovices/edit/${inovice.id}`)}>
-                  {inovice.clientName}
+                <td onClick={() => navigate(`/invoices/edit/${invoice.id}`)}>
+                  {invoice.clientName}
                 </td>
-                <td onClick={() => navigate(`/inovices/edit/${inovice.id}`)}>
-                  {inovice.amount}
+                <td onClick={() => navigate(`/invoices/edit/${invoice.id}`)}>
+                  {invoice.amount}
                 </td>
                 <td
                   className="print-cell"
                   onClick={() =>
                     handleDownloadClick(
-                      inovice.id,
-                      `${inovice.number}/${inovice.year}`
+                      invoice.id,
+                      `${invoice.number}/${invoice.year}`
                     )
                   }
                 >
@@ -81,7 +81,7 @@ const Inovices = () => {
                 </td>
                 <td
                   className="delete-cell"
-                  onClick={() => handleDeleteClick(inovice.id)}
+                  onClick={() => handleDeleteClick(invoice.id)}
                 >
                   <AiFillDelete style={{ color: "whitesmoke" }} />
                 </td>
@@ -90,7 +90,7 @@ const Inovices = () => {
           </tbody>
         </table>
       </div>
-      {inovices.length === 0 ? null : (
+      {invoices.length === 0 ? null : (
         <div className="paginationInoivice">
           <button
             className={`page-button ${currentPage === 1 ? "disabled" : ""}`}

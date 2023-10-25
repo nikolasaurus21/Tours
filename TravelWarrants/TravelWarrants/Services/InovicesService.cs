@@ -1,14 +1,9 @@
-﻿
-using PdfSharpCore.Pdf;
-using PdfSharpCore;
-using TheArtOfDev.HtmlRenderer.PdfSharp;
+﻿using PuppeteerSharp;
+using PuppeteerSharp.Media;
+using System.Text;
 using TravelWarrants.DTOs;
 using TravelWarrants.DTOs.Inovices;
 using TravelWarrants.Interfaces;
-using System.Text;
-using TravelWarrants.Models;
-using PuppeteerSharp.Media;
-using PuppeteerSharp;
 
 namespace TravelWarrants.Services
 {
@@ -25,11 +20,11 @@ namespace TravelWarrants.Services
         }
 
 
-        public async Task<ResponseDTO<InoviceGetByIdDeleteDTO>> GetForDelete(int inoviceId)
+        public async Task<ResponseDTO<InvoiceGetByIdDeleteDTO>> GetForDelete(int inoviceId)
         {
-            var inoviceToDelete = await _context.Inovices.Include(c => c.Client)
+            var inoviceToDelete = await _context.Invoices.Include(c => c.Client)
                 .Where(x => x.Id == inoviceId)
-                .Select(x => new InoviceGetByIdDeleteDTO
+                .Select(x => new InvoiceGetByIdDeleteDTO
                 {
                     Number = x.Number + "/" + x.Year,
                     Date = x.DocumentDate.ToShortDateString(),
@@ -39,22 +34,22 @@ namespace TravelWarrants.Services
 
             if (inoviceToDelete == null)
             {
-                return new ResponseDTO<InoviceGetByIdDeleteDTO> { IsSucced = false };
+                return new ResponseDTO<InvoiceGetByIdDeleteDTO> { IsSucced = false };
             }
-            return new ResponseDTO<InoviceGetByIdDeleteDTO> { IsSucced = true, Message = inoviceToDelete };
+            return new ResponseDTO<InvoiceGetByIdDeleteDTO> { IsSucced = true, Message = inoviceToDelete };
 
         }
-        public async Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetInovices(int? page)
+        public async Task<ResponseDTO<IEnumerable<InvoiceGetDTO>>> GetInovices(int? page)
         {
             int pageSize = 10;
             int pageNumber = (page ?? 1);
 
-            var inovices = await _context.Inovices
+            var inovices = await _context.Invoices
                 .Include(c => c.Client)
                 .OrderBy(x => x.DocumentDate)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .Select(x => new InoviceGetDTO
+                .Select(x => new InvoiceGetDTO
                 {
                     Id = x.Id,
                     Number = x.Number,
@@ -66,15 +61,15 @@ namespace TravelWarrants.Services
                 .OrderByDescending(x => x.Id)
                 .ToListAsync();
 
-            int totalRecords = await _context.Inovices.CountAsync();
+            int totalRecords = await _context.Invoices.CountAsync();
             int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
 
-            var response = new ResponseDTO<IEnumerable<InoviceGetDTO>>() { Message = inovices, IsSucced = true, TotalPages = totalPages };
+            var response = new ResponseDTO<IEnumerable<InvoiceGetDTO>>() { Message = inovices, IsSucced = true, TotalPages = totalPages };
             return response;
         }
-        public async Task<ResponseDTO<InoviceGetByIdDTO>> GetById(int inoviceId)
+        public async Task<ResponseDTO<InvoiceGetByIdDTO>> GetById(int inoviceId)
         {
-            var inovice = await _context.Inovices
+            var inovice = await _context.Invoices
                 .Include(i => i.InoviceService)
                 .Include(c => c.Client)
                 .Where(x => x.Id == inoviceId)
@@ -82,10 +77,10 @@ namespace TravelWarrants.Services
 
             if (inovice == null)
             {
-                return new ResponseDTO<InoviceGetByIdDTO> { IsSucced = false };
+                return new ResponseDTO<InvoiceGetByIdDTO> { IsSucced = false };
             }
 
-            var response = new InoviceGetByIdDTO
+            var response = new InvoiceGetByIdDTO
             {
                 ClientId = inovice.ClientId,
                 ClientName = inovice.Client.Name,
@@ -94,9 +89,9 @@ namespace TravelWarrants.Services
                 PriceWithoutVAT = inovice.PriceWithoutVAT ?? default(bool),
                 Note = inovice.Note,
                 Number = inovice.Number + "/" + inovice.Year,
-                ItemsOnInovice = inovice.InoviceService.Where(i => i.InoviceId.HasValue && !i.ProformaInvoiceId.HasValue)
+                ItemsOnInovice = inovice.InoviceService.Where(i => i.InvoiceId.HasValue && !i.ProformaInvoiceId.HasValue)
 
-                .Select(i => new ItemsOnInoviceEdit
+                .Select(i => new ItemsOnInvoiceEdit
                 {
                     Id = i.Id,
                     Description = i.Description,
@@ -107,27 +102,27 @@ namespace TravelWarrants.Services
                 }).ToList()
             };
 
-            return new ResponseDTO<InoviceGetByIdDTO> { IsSucced = true, Message = response };
+            return new ResponseDTO<InvoiceGetByIdDTO> { IsSucced = true, Message = response };
         }
-        public async Task<ResponseDTO<InoviceGetDTO>> NewInovice(InoviceNewDTO inoviceSaveDTO)
+        public async Task<ResponseDTO<InvoiceGetDTO>> NewInovice(InvoiceNewDTO inoviceSaveDTO)
         {
 
-            var companyExists = await _context.Companies.AnyAsync();
+            var companyExists = await _context.Company.AnyAsync();
             if (!companyExists)
             {
-                return new ResponseDTO<InoviceGetDTO>() { IsSucced = false, ErrorMessage = "Add a company first" };
+                return new ResponseDTO<InvoiceGetDTO>() { IsSucced = false, ErrorMessage = "Add a company first" };
             }
 
             if (inoviceSaveDTO == null || inoviceSaveDTO.ItemsOnInovice == null)
             {
-                return new ResponseDTO<InoviceGetDTO>() { IsSucced = false };
+                return new ResponseDTO<InvoiceGetDTO>() { IsSucced = false };
             }
 
             decimal amount = 0, vat = 0;
 
 
 
-            var newInovice = new Inovice
+            var newInovice = new Invoice
             {
                 ClientId = inoviceSaveDTO.ClientId,
                 DocumentDate = inoviceSaveDTO.DocumentDate,
@@ -135,9 +130,9 @@ namespace TravelWarrants.Services
                 PriceWithoutVAT = inoviceSaveDTO.PriceWithoutVAT,
                 Note = inoviceSaveDTO.Note,
                 Year = inoviceSaveDTO.DocumentDate.Year,
-                
-                InoviceService = new List<InoviceService>()
-                
+
+                InoviceService = new List<InvoiceService>()
+
 
 
             };
@@ -146,7 +141,7 @@ namespace TravelWarrants.Services
 
             foreach (var item in inoviceSaveDTO.ItemsOnInovice)
             {
-                var serviceOnInovice = new InoviceService()
+                var serviceOnInovice = new InvoiceService()
                 {
 
                     Description = item.Description,
@@ -155,7 +150,7 @@ namespace TravelWarrants.Services
                     Price = item.Price,
                     Value = item.Quantity * item.Price,
                     NumberOfDays = item.NumberOfDays,
-                    
+
 
 
                 };
@@ -187,7 +182,7 @@ namespace TravelWarrants.Services
             newInovice.Total = inoviceSaveDTO.PriceWithoutVAT ? amount + vat : amount;
             try
             {
-                newInovice.Number = _context.Inovices.OrderByDescending(n => n.Number)
+                newInovice.Number = _context.Invoices.OrderByDescending(n => n.Number)
                     .First(z => z.Year == newInovice.Year).Number + 1;
             }
             catch
@@ -196,7 +191,7 @@ namespace TravelWarrants.Services
                 newInovice.Number = 1;
             }
 
-            _context.Inovices.Add(newInovice);
+            _context.Invoices.Add(newInovice);
 
             _context.Accounts.Add(
 
@@ -206,7 +201,7 @@ namespace TravelWarrants.Services
                     Date = newInovice.DocumentDate,
                     Note = newInovice.Note,
                     ClientId = newInovice.ClientId,
-                    Inovice = newInovice
+                    Invoice = newInovice
                 });
 
             var status = await _context.Statuses.FirstOrDefaultAsync(x => x.ClientId == newInovice.ClientId) ??
@@ -224,7 +219,7 @@ namespace TravelWarrants.Services
 
 
 
-            var addedInovice = new InoviceGetDTO
+            var addedInovice = new InvoiceGetDTO
             {
                 Id = newInovice.Id,
                 Number = newInovice.Number,
@@ -236,28 +231,28 @@ namespace TravelWarrants.Services
                 Date = newInovice.DocumentDate
             };
 
-            return new ResponseDTO<InoviceGetDTO> { IsSucced = true, Message = addedInovice };
+            return new ResponseDTO<InvoiceGetDTO> { IsSucced = true, Message = addedInovice };
         }
-        public async Task<ResponseDTO<InoviceGetDTO>> EditInvoice(int invoiceId, InoviceEditDTO inoviceEditDTO)
+        public async Task<ResponseDTO<InvoiceGetDTO>> EditInvoice(int invoiceId, InvoiceEditDTO inoviceEditDTO)
         {
             if (inoviceEditDTO == null || inoviceEditDTO.ItemsOnInovice == null)
             {
-                return new ResponseDTO<InoviceGetDTO>() { IsSucced = false };
+                return new ResponseDTO<InvoiceGetDTO>() { IsSucced = false };
             }
 
-            var existingInvoice = await _context.Inovices.Include(i => i.InoviceService)
+            var existingInvoice = await _context.Invoices.Include(i => i.InoviceService)
                                                 .FirstOrDefaultAsync(i => i.Id == invoiceId);
 
             if (existingInvoice == null)
             {
-                return new ResponseDTO<InoviceGetDTO>() { IsSucced = false, };
+                return new ResponseDTO<InvoiceGetDTO>() { IsSucced = false, };
             }
 
             decimal vat = 0;
             var oldClient = existingInvoice.ClientId;
             var oldAmount = existingInvoice.Total;
 
-            
+
             existingInvoice.ClientId = inoviceEditDTO.ClientId;
             existingInvoice.DocumentDate = inoviceEditDTO.DocumentDate;
             existingInvoice.CurrencyDate = inoviceEditDTO.DocumentDate.AddDays(inoviceEditDTO.PaymentDeadline);
@@ -269,10 +264,10 @@ namespace TravelWarrants.Services
             {
                 foreach (var Id in inoviceEditDTO.ItemsToDeleteId)
                 {
-                    var toDelete = await _context.InovicesServices.FirstOrDefaultAsync(i => i.Id == Id);
+                    var toDelete = await _context.InvoicesServices.FirstOrDefaultAsync(i => i.Id == Id);
                     if (toDelete != null)
                     {
-                        _context.InovicesServices.Remove(toDelete);
+                        _context.InvoicesServices.Remove(toDelete);
                     }
                 }
             }
@@ -287,7 +282,7 @@ namespace TravelWarrants.Services
                     continue;
                 }
 
-                
+
                 updateItem.Price = item.Price;
                 updateItem.Quantity = item.Quantity;
                 updateItem.Description = item.Description;
@@ -310,7 +305,7 @@ namespace TravelWarrants.Services
 
             foreach (var item in inoviceEditDTO.ItemsOnInovice.Where(x => x.Id == 0))
             {
-                var serviceOnInovice = new InoviceService()
+                var serviceOnInovice = new InvoiceService()
                 {
 
                     Description = item.Description,
@@ -319,7 +314,7 @@ namespace TravelWarrants.Services
                     Price = item.Price,
                     Value = item.Quantity * item.Price,
                     NumberOfDays = item.NumberOfDays,
-                    
+
 
 
                 };
@@ -347,14 +342,14 @@ namespace TravelWarrants.Services
             existingInvoice.Total = inoviceEditDTO.PriceWithoutVAT ? amount + vat : amount;
 
 
-            var acc = await _context.Accounts.FirstOrDefaultAsync(x => x.InoviceId == existingInvoice.Id)
-                ?? new Account { InoviceId = existingInvoice.Id, ProformaInvoiceId = null };
+            var acc = await _context.Accounts.FirstOrDefaultAsync(x => x.InvoiceId == existingInvoice.Id)
+                ?? new Account { InvoiceId = existingInvoice.Id, ProformaInvoiceId = null };
 
 
             acc.Date = existingInvoice.DocumentDate;
             acc.Amount = existingInvoice.Total;
             acc.ClientId = existingInvoice.ClientId;
-            
+
 
             var oldStatus = await _context.Statuses.FirstOrDefaultAsync(x => x.ClientId == oldClient);
             if (oldStatus != null)
@@ -381,7 +376,7 @@ namespace TravelWarrants.Services
 
             _context.SaveChanges();
 
-            var addedInovice = new InoviceGetDTO
+            var addedInovice = new InvoiceGetDTO
             {
                 Id = existingInvoice.Id,
                 Number = existingInvoice.Number,
@@ -393,11 +388,11 @@ namespace TravelWarrants.Services
                 Date = existingInvoice.DocumentDate
             };
 
-            return new ResponseDTO<InoviceGetDTO> { IsSucced = true, Message = addedInovice };
+            return new ResponseDTO<InvoiceGetDTO> { IsSucced = true, Message = addedInovice };
         }
         public async Task<ResponseDTO<bool>> DeleteInovice(int inoviceId)
         {
-            var deleteInovice = await _context.Inovices.Include(i => i.InoviceService)
+            var deleteInovice = await _context.Invoices.Include(i => i.InoviceService)
                 .FirstOrDefaultAsync(x => x.Id == inoviceId);
 
             if (deleteInovice == null)
@@ -407,17 +402,17 @@ namespace TravelWarrants.Services
 
             try
             {
-                var acc = await _context.Accounts.FirstOrDefaultAsync(x => x.InoviceId == deleteInovice.Id);
+                var acc = await _context.Accounts.FirstOrDefaultAsync(x => x.InvoiceId == deleteInovice.Id);
                 if (acc != null)
                 {
                     _context.Accounts.Remove(acc);
                 }
                 foreach (var item in deleteInovice.InoviceService.ToList())
                 {
-                    _context.InovicesServices.Remove(item);
+                    _context.InvoicesServices.Remove(item);
                 }
 
-                _context.Inovices.Remove(deleteInovice);
+                _context.Invoices.Remove(deleteInovice);
 
                 var status = await _context.Statuses.FirstOrDefaultAsync(x => x.ClientId == deleteInovice.ClientId);
                 if (status != null)
@@ -444,15 +439,15 @@ namespace TravelWarrants.Services
                 return new ResponseDTO<bool> { IsSucced = false, Message = false };
             }
         }
-        private async Task<ResponseDTO<InviocePdf>> InoviceForPDf(int id)
+        private async Task<ResponseDTO<InvoicePdf>> InoviceForPDf(int id)
         {
-            var invoice = await _context.Inovices
-                .Include(i => i.InoviceService.Where(i => i.InoviceId.HasValue && !i.ProformaInvoiceId.HasValue))
+            var invoice = await _context.Invoices
+                .Include(i => i.InoviceService.Where(i => i.InvoiceId.HasValue && !i.ProformaInvoiceId.HasValue))
                 .ThenInclude(s => s.Service)
                 .Include(c => c.Client)
 
                 .Where(x => x.Id == id)
-                .Select(x => new InviocePdf
+                .Select(x => new InvoicePdf
                 {
                     Id = x.Id,
                     ClientName = x.Client.Name,
@@ -464,8 +459,8 @@ namespace TravelWarrants.Services
                     PriceWithoutVat = x.NoVAT,
                     Vat = x.VAT,
                     ItemsOnInovice = x.InoviceService
-                    
-                    .Select(i => new ItemsOnInovicePdf
+
+                    .Select(i => new ItemsOnInvoicePdf
                     {
                         ServiceVat = i.Service.VATRate,
                         Description = i.Description,
@@ -478,7 +473,7 @@ namespace TravelWarrants.Services
 
             if (invoice != null)
             {
-                return new ResponseDTO<InviocePdf>
+                return new ResponseDTO<InvoicePdf>
                 {
                     IsSucced = true,
                     Message = invoice
@@ -486,14 +481,14 @@ namespace TravelWarrants.Services
             }
             else
             {
-                return new ResponseDTO<InviocePdf>
+                return new ResponseDTO<InvoicePdf>
                 {
                     IsSucced = false
 
                 };
             }
         }
-        public async Task<(byte[],string)> GeneratePdf(int id)
+        public async Task<(byte[], string)> GeneratePdf(int id)
         {
             var companyData = await _companyService.Get();
 
@@ -533,9 +528,9 @@ namespace TravelWarrants.Services
                                  "<td>" + item.Service + "</td>" +
                                  "<td>" + item.Description + "</td>" +
                                  "<td>" + item.NumberOfDays.ToString() + "</td>" +
-                                 "<td>" + item.ServiceVat.ToString() + "%"  + "</td>" +
+                                 "<td>" + item.ServiceVat.ToString() + "%" + "</td>" +
                                  "<td>" + item.Quantity.ToString() + "</td>" +
-                                 "<td>" + item.Price.ToString()+ "€" + "</td></tr>");
+                                 "<td>" + item.Price.ToString() + "€" + "</td></tr>");
 
                 if (i == rowsPerPage)
                 {
@@ -571,25 +566,25 @@ namespace TravelWarrants.Services
                                      "<td class='no-border'>" + totalForThisVatRate + "€" + "</td></tr>");
             }
 
-                string htmlContent = htmlTemplate
-                .Replace("{{InvoiceNumber}}", inovice.Number)
-                .Replace("{{InvoiceDate}}", DateTime.Now.ToString("dd/MM/yyyy"))
-                .Replace("{{CompanyName}}", company.Name)
-                .Replace("{{CompanyAddress}}", company.Address)
-                .Replace("{{CompanyCity}}", company.Place)
-                .Replace("{{CompanyPostalCode}}", company.PTT)
-                .Replace("{{CompanyPhone}}", company.Telephone)
-                .Replace("{{CompanyFax}}", company.Fax)
-                .Replace("{{CompanyTIN}}", company.TIN)
-                .Replace("{{ClientName}}", inovice.ClientName)
-                .Replace("{{ClientAddress}}", inovice.ClientAddress)
-                .Replace("{{ClientCity}}", inovice.ClientPlace)
-                .Replace("{{ClientEmail}}", inovice.Email)
-                .Replace("{{TableRows}}", tableRows.ToString())
-                .Replace("{{PriceWithoutVat}}", inovice.PriceWithoutVat.ToString() + "€")
-                .Replace("{{Vat}}", inovice.Vat.ToString() + "€")
-                .Replace("{{Total}}", inovice.Total.ToString() + "€")
-                .Replace("{{VatRows}}", vatFooterRows.ToString());
+            string htmlContent = htmlTemplate
+            .Replace("{{InvoiceNumber}}", inovice.Number)
+            .Replace("{{InvoiceDate}}", DateTime.Now.ToString("dd/MM/yyyy"))
+            .Replace("{{CompanyName}}", company.Name)
+            .Replace("{{CompanyAddress}}", company.Address)
+            .Replace("{{CompanyCity}}", company.Place)
+            .Replace("{{CompanyPostalCode}}", company.PTT)
+            .Replace("{{CompanyPhone}}", company.Telephone)
+            .Replace("{{CompanyFax}}", company.Fax)
+            .Replace("{{CompanyTIN}}", company.TIN)
+            .Replace("{{ClientName}}", inovice.ClientName)
+            .Replace("{{ClientAddress}}", inovice.ClientAddress)
+            .Replace("{{ClientCity}}", inovice.ClientPlace)
+            .Replace("{{ClientEmail}}", inovice.Email)
+            .Replace("{{TableRows}}", tableRows.ToString())
+            .Replace("{{PriceWithoutVat}}", inovice.PriceWithoutVat.ToString() + "€")
+            .Replace("{{Vat}}", inovice.Vat.ToString() + "€")
+            .Replace("{{Total}}", inovice.Total.ToString() + "€")
+            .Replace("{{VatRows}}", vatFooterRows.ToString());
 
 
 
@@ -625,5 +620,5 @@ namespace TravelWarrants.Services
         }
     }
 
-    
+
 }

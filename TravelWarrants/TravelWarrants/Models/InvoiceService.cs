@@ -2,10 +2,10 @@
 
 namespace TravelWarrants.Models
 {
-    public class InoviceService
+    public class InvoiceService
     {
         public int Id { get; set; }
-        public int? InoviceId { get; set; }
+        public int? InvoiceId { get; set; }
         public int ServiceId { get; set; }
         public int? ProformaInvoiceId { get; set; }
         public string Description { get; set; }
@@ -16,7 +16,7 @@ namespace TravelWarrants.Models
         public decimal Value { get; set; }
         public decimal VAT { get; set; }
         public string NumberOfDays { get; set; }
-        public virtual Inovice Inovice { get; set; }
+        public virtual Invoice Invoice { get; set; }
         public virtual Service Service { get; set; }
 
         public virtual ProformaInvoice ProformaInvoice { get; set; }

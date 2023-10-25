@@ -69,7 +69,7 @@ const SideMenu = () => {
           </div>
           <div
             className="submenu-item"
-            onClick={() => navigate("/giroaccounts")}
+            onClick={() => navigate("/bankaccounts")}
           >
             Žiro-Račun
           </div>
@@ -103,7 +103,7 @@ const SideMenu = () => {
       </div>
       {isInvoiceMenuOpen && (
         <div className="submenu">
-          <div className="submenu-item" onClick={() => navigate("/inovices")}>
+          <div className="submenu-item" onClick={() => navigate("/invoices")}>
             Fakture
           </div>
           <div

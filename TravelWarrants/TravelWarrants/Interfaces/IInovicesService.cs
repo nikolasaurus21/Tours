@@ -5,12 +5,12 @@ namespace TravelWarrants.Interfaces
 {
     public interface IInovicesService
     {
-        Task<ResponseDTO<bool>> DeleteInovice(int inoviceId);
-        Task<ResponseDTO<InoviceGetDTO>> EditInvoice(int invoiceId, InoviceEditDTO inoviceEditDTO);
-        Task<ResponseDTO<InoviceGetByIdDTO>> GetById(int inoviceId);
-        Task<ResponseDTO<InoviceGetByIdDeleteDTO>> GetForDelete(int inoviceId);
-        Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetInovices(int? page);
-        Task<ResponseDTO<InoviceGetDTO>> NewInovice(InoviceNewDTO inoviceSaveDTO);
-        Task<(byte[],string)> GeneratePdf(int id);
+        Task<ResponseDTO<bool>> DeleteInovice(int invoiceId);
+        Task<ResponseDTO<InvoiceGetDTO>> EditInvoice(int invoiceId, InvoiceEditDTO invoiceEditDTO);
+        Task<ResponseDTO<InvoiceGetByIdDTO>> GetById(int inoviceId);
+        Task<ResponseDTO<InvoiceGetByIdDeleteDTO>> GetForDelete(int inoviceId);
+        Task<ResponseDTO<IEnumerable<InvoiceGetDTO>>> GetInovices(int? page);
+        Task<ResponseDTO<InvoiceGetDTO>> NewInovice(InvoiceNewDTO invoiceSaveDTO);
+        Task<(byte[], string)> GeneratePdf(int id);
     }
 }

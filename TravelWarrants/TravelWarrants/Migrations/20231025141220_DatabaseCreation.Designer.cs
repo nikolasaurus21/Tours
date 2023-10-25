@@ -12,8 +12,8 @@ using TravelWarrants.Models;
 namespace TravelWarrants.Migrations
 {
     [DbContext(typeof(TravelWarrantsContext))]
-    [Migration("20231013115851_DbCreate")]
-    partial class DbCreate
+    [Migration("20231025141220_DatabaseCreation")]
+    partial class DatabaseCreation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,7 +34,7 @@ namespace TravelWarrants.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal?>("Amount")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int?>("ClientId")
                         .IsRequired()
@@ -43,7 +43,7 @@ namespace TravelWarrants.Migrations
                     b.Property<DateTime?>("Date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("InoviceId")
+                    b.Property<int?>("InvoiceId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Note")
@@ -57,7 +57,7 @@ namespace TravelWarrants.Migrations
 
                     b.HasIndex("ClientId");
 
-                    b.HasIndex("InoviceId");
+                    b.HasIndex("InvoiceId");
 
                     b.HasIndex("ProformaInvoiceId");
 
@@ -98,7 +98,7 @@ namespace TravelWarrants.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("RegistrationNUmber")
+                    b.Property<string>("RegistrationNumber")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -164,10 +164,10 @@ namespace TravelWarrants.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Companies", (string)null);
+                    b.ToTable("Company", (string)null);
                 });
 
-            modelBuilder.Entity("TravelWarrants.Models.CompanyGiroAccount", b =>
+            modelBuilder.Entity("TravelWarrants.Models.CompanyBankAccount", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -190,7 +190,7 @@ namespace TravelWarrants.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("CompaniesGiroAccounts", (string)null);
+                    b.ToTable("CompanyBankAccounts", (string)null);
                 });
 
             modelBuilder.Entity("TravelWarrants.Models.Driver", b =>
@@ -201,11 +201,11 @@ namespace TravelWarrants.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("NUmberOfPhone")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("NumberOfPhone")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -214,7 +214,7 @@ namespace TravelWarrants.Migrations
                     b.ToTable("Drivers", (string)null);
                 });
 
-            modelBuilder.Entity("TravelWarrants.Models.Inovice", b =>
+            modelBuilder.Entity("TravelWarrants.Models.Invoice", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -232,7 +232,7 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("NoVAT")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<string>("Note")
                         .IsRequired()
@@ -245,10 +245,10 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<decimal>("Total")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<decimal>("VAT")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int>("Year")
                         .HasColumnType("integer");
@@ -257,10 +257,10 @@ namespace TravelWarrants.Migrations
 
                     b.HasIndex("ClientId");
 
-                    b.ToTable("Inovices", (string)null);
+                    b.ToTable("Invoices", (string)null);
                 });
 
-            modelBuilder.Entity("TravelWarrants.Models.InoviceService", b =>
+            modelBuilder.Entity("TravelWarrants.Models.InvoiceService", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -272,7 +272,7 @@ namespace TravelWarrants.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("InoviceId")
+                    b.Property<int?>("InvoiceId")
                         .HasColumnType("integer");
 
                     b.Property<string>("NumberOfDays")
@@ -280,7 +280,7 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("text");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int?>("ProformaInvoiceId")
                         .HasColumnType("integer");
@@ -295,17 +295,17 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<decimal>("Value")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InoviceId");
+                    b.HasIndex("InvoiceId");
 
                     b.HasIndex("ProformaInvoiceId");
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("InovicesServices", (string)null);
+                    b.ToTable("InvoicesServices", (string)null);
                 });
 
             modelBuilder.Entity("TravelWarrants.Models.Payment", b =>
@@ -317,7 +317,7 @@ namespace TravelWarrants.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int>("ClientId")
                         .HasColumnType("integer");
@@ -334,33 +334,6 @@ namespace TravelWarrants.Migrations
                     b.HasIndex("ClientId");
 
                     b.ToTable("Payments", (string)null);
-                });
-
-            modelBuilder.Entity("TravelWarrants.Models.Place", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Country")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("Latitude")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("Longitude")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Places", (string)null);
                 });
 
             modelBuilder.Entity("TravelWarrants.Models.ProformaInvoice", b =>
@@ -381,7 +354,7 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("NoVAT")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<string>("Note")
                         .IsRequired()
@@ -400,13 +373,13 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<decimal>("Total")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int?>("UploadedFileId")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("VAT")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int>("Year")
                         .HasColumnType("integer");
@@ -450,13 +423,13 @@ namespace TravelWarrants.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("AmountOfAccount")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<decimal>("AmountOfDeposit")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<decimal>("Balance")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int>("ClientId")
                         .HasColumnType("integer");
@@ -524,13 +497,13 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("text");
 
                     b.Property<decimal?>("NumberOfDays")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int>("NumberOfPassengers")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<decimal>("StartMileage")
                         .HasColumnType("numeric");
@@ -539,7 +512,7 @@ namespace TravelWarrants.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("Toll")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<int>("VehicleId")
                         .HasColumnType("integer");
@@ -629,9 +602,9 @@ namespace TravelWarrants.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TravelWarrants.Models.Inovice", "Inovice")
+                    b.HasOne("TravelWarrants.Models.Invoice", "Invoice")
                         .WithMany("Account")
-                        .HasForeignKey("InoviceId");
+                        .HasForeignKey("InvoiceId");
 
                     b.HasOne("TravelWarrants.Models.ProformaInvoice", "ProformaInvoice")
                         .WithMany("Account")
@@ -639,12 +612,12 @@ namespace TravelWarrants.Migrations
 
                     b.Navigation("Client");
 
-                    b.Navigation("Inovice");
+                    b.Navigation("Invoice");
 
                     b.Navigation("ProformaInvoice");
                 });
 
-            modelBuilder.Entity("TravelWarrants.Models.CompanyGiroAccount", b =>
+            modelBuilder.Entity("TravelWarrants.Models.CompanyBankAccount", b =>
                 {
                     b.HasOne("TravelWarrants.Models.Company", "Company")
                         .WithMany("CompanyGiroAccount")
@@ -655,7 +628,7 @@ namespace TravelWarrants.Migrations
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("TravelWarrants.Models.Inovice", b =>
+            modelBuilder.Entity("TravelWarrants.Models.Invoice", b =>
                 {
                     b.HasOne("TravelWarrants.Models.Client", "Client")
                         .WithMany("Inovice")
@@ -666,25 +639,25 @@ namespace TravelWarrants.Migrations
                     b.Navigation("Client");
                 });
 
-            modelBuilder.Entity("TravelWarrants.Models.InoviceService", b =>
+            modelBuilder.Entity("TravelWarrants.Models.InvoiceService", b =>
                 {
-                    b.HasOne("TravelWarrants.Models.Inovice", "Inovice")
+                    b.HasOne("TravelWarrants.Models.Invoice", "Invoice")
                         .WithMany("InoviceService")
-                        .HasForeignKey("InoviceId")
+                        .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("TravelWarrants.Models.ProformaInvoice", "ProformaInvoice")
-                        .WithMany("InoviceService")
+                        .WithMany("InvoiceService")
                         .HasForeignKey("ProformaInvoiceId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("TravelWarrants.Models.Service", "Service")
-                        .WithMany("InoviceService")
+                        .WithMany("InvoiceService")
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Inovice");
+                    b.Navigation("Invoice");
 
                     b.Navigation("ProformaInvoice");
 
@@ -782,7 +755,7 @@ namespace TravelWarrants.Migrations
                     b.Navigation("Tour");
                 });
 
-            modelBuilder.Entity("TravelWarrants.Models.Inovice", b =>
+            modelBuilder.Entity("TravelWarrants.Models.Invoice", b =>
                 {
                     b.Navigation("Account");
 
@@ -793,12 +766,12 @@ namespace TravelWarrants.Migrations
                 {
                     b.Navigation("Account");
 
-                    b.Navigation("InoviceService");
+                    b.Navigation("InvoiceService");
                 });
 
             modelBuilder.Entity("TravelWarrants.Models.Service", b =>
                 {
-                    b.Navigation("InoviceService");
+                    b.Navigation("InvoiceService");
                 });
 
             modelBuilder.Entity("TravelWarrants.Models.UploadedFiles", b =>

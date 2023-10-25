@@ -9,6 +9,6 @@ namespace TravelWarrants.Interfaces
         Task<ResponseDTO<DriverDTO>> GetDriver(int id);
         Task<ResponseDTO<DriverDTO>> NewDriver(DriverDTOSave driverDTO);
         Task<ResponseDTO<bool>> DeleteDriver(int id);
-        Task<ResponseDTO<DriverDTO>> EditDriver(int id,DriverDTOSave driverDTO);
+        Task<ResponseDTO<DriverDTO>> EditDriver(int id, DriverDTOSave driverDTO);
     }
 }

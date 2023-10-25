@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace TravelWarrants.DTOs.Tours
+﻿namespace TravelWarrants.DTOs.Tours
 {
     public class TourDTOSave
     {

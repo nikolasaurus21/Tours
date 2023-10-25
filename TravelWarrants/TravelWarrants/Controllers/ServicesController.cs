@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.DTOs.Services;
 using TravelWarrants.Interfaces;
-using TravelWarrants.Models;
 
 namespace TravelWarrants.Controllers
 {
@@ -11,7 +9,7 @@ namespace TravelWarrants.Controllers
     public class ServicesController : ControllerBase
     {
         private readonly IServicesService _servicesService;
-        public ServicesController(IServicesService servicesService )
+        public ServicesController(IServicesService servicesService)
         {
             _servicesService = servicesService;
         }
@@ -22,14 +20,14 @@ namespace TravelWarrants.Controllers
         {
 
             var result = await _servicesService.GetServices();
-            
+
             if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
 
-            
+
         }
 
 
@@ -44,21 +42,21 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-           
+
         }
 
         [HttpPost]
-        public async Task<ActionResult> NewService (ServiceDTOSave serviceDTO)
+        public async Task<ActionResult> NewService(ServiceDTOSave serviceDTO)
         {
             var result = await _servicesService.NewService(serviceDTO);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
-            
+
             return BadRequest(result.ErrorMessage);
 
-            
+
         }
 
         [HttpDelete("{id}")]
@@ -72,23 +70,23 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            
+
 
         }
 
         [HttpPut("{id}")]
 
-        public async Task<ActionResult> EditService(int id , ServiceDTOSave serviceDTO)
+        public async Task<ActionResult> EditService(int id, ServiceDTOSave serviceDTO)
         {
             var result = await _servicesService.EditService(id, serviceDTO);
-            if(result.IsSucced)
+            if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
 
-            
-            
+
+
         }
     }
 }

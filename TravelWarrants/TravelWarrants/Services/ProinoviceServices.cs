@@ -1,16 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using PdfSharpCore.Pdf;
-using PdfSharpCore;
+﻿using PuppeteerSharp;
+using PuppeteerSharp.Media;
 using System.Text;
-using TheArtOfDev.HtmlRenderer.PdfSharp;
 using TravelWarrants.DTOs;
 using TravelWarrants.DTOs.Inovices;
 using TravelWarrants.DTOs.Proinovce;
 using TravelWarrants.Interfaces;
-
-using Newtonsoft.Json;
-using PuppeteerSharp.Media;
-using PuppeteerSharp;
 
 namespace TravelWarrants.Services
 {
@@ -26,11 +20,11 @@ namespace TravelWarrants.Services
             _companyService = companyService;
             _fileUploadService = fileUploadService;
         }
-        public async Task<ResponseDTO<InoviceGetByIdDeleteDTO>> GetForDeleteProinvoice(int inoviceId)
+        public async Task<ResponseDTO<InvoiceGetByIdDeleteDTO>> GetForDeleteProinvoice(int inoviceId)
         {
             var inoviceToDelete = await _context.ProformaInvoices.Include(c => c.Client)
                 .Where(x => x.Id == inoviceId)
-                .Select(x => new InoviceGetByIdDeleteDTO
+                .Select(x => new InvoiceGetByIdDeleteDTO
                 {
                     Number = x.Number + "/" + x.Year,
                     Date = x.DocumentDate.ToShortDateString(),
@@ -40,15 +34,15 @@ namespace TravelWarrants.Services
 
             if (inoviceToDelete == null)
             {
-                return new ResponseDTO<InoviceGetByIdDeleteDTO> { IsSucced = false };
+                return new ResponseDTO<InvoiceGetByIdDeleteDTO> { IsSucced = false };
             }
-            return new ResponseDTO<InoviceGetByIdDeleteDTO> { IsSucced = true, Message = inoviceToDelete };
+            return new ResponseDTO<InvoiceGetByIdDeleteDTO> { IsSucced = true, Message = inoviceToDelete };
 
         }
         public async Task<bool> DeleteProInovice(int inoviceId)
         {
             var deleteProinovice = await _context.ProformaInvoices
-                .Include(i => i.InoviceService)
+                .Include(i => i.InvoiceService)
                 .FirstOrDefaultAsync(x => x.Id == inoviceId);
 
             if (deleteProinovice == null)
@@ -63,9 +57,9 @@ namespace TravelWarrants.Services
                 {
                     _context.Accounts.Remove(acc);
                 }
-                foreach (var item in deleteProinovice.InoviceService.ToList())
+                foreach (var item in deleteProinovice.InvoiceService.ToList())
                 {
-                    _context.InovicesServices.Remove(item);
+                    _context.InvoicesServices.Remove(item);
                 }
 
                 _context.ProformaInvoices.Remove(deleteProinovice);
@@ -100,13 +94,13 @@ namespace TravelWarrants.Services
             var proinvoice = await _context.ProformaInvoices.FirstOrDefaultAsync(x => x.Id == invoiceId);
             if (proinvoice == null || proinvoice.UploadedFileId == null)
             {
-                return new FileData { FileStream=null };
+                return new FileData { FileStream = null };
             }
 
             var result = await _fileUploadService.DownloadRoutePlan(proinvoice.UploadedFileId.Value);
 
-            return new FileData { FileStream = result.FileStream ,FileName = result.FileName };
-            
+            return new FileData { FileStream = result.FileStream, FileName = result.FileName };
+
         }
         public async Task<bool> DeleteRoutePlan(int invoiceId)
         {
@@ -119,7 +113,7 @@ namespace TravelWarrants.Services
                 return false;
             }
 
-            
+
             await _fileUploadService.DeleteFile((int)proinvoice.UploadedFileId);
 
             proinvoice.UploadedFileId = null;
@@ -132,7 +126,7 @@ namespace TravelWarrants.Services
         public async Task<ResponseDTO<ProinvoiceGetByIdDTO>> GetProformaInvoiceById(int invoiceId)
         {
             var proinvoice = await _context.ProformaInvoices
-                .Include(i => i.InoviceService.Where(i => !i.InoviceId.HasValue && i.ProformaInvoiceId.HasValue))
+                .Include(i => i.InvoiceService.Where(i => !i.InvoiceId.HasValue && i.ProformaInvoiceId.HasValue))
                 .Include(c => c.Client)
                 .Include(u => u.UploadedFiles)
                 .Where(x => x.Id == invoiceId)
@@ -156,8 +150,8 @@ namespace TravelWarrants.Services
                 OfferAccepted = proinvoice.OfferAccepted ?? default,
                 FileName = proinvoice.UploadedFiles?.FileName,
                 FileId = proinvoice.UploadedFileId ?? null,
-                ItemsOnInovice = proinvoice.InoviceService
-                .Select(i => new ItemsOnInoviceEdit
+                ItemsOnInovice = proinvoice.InvoiceService
+                .Select(i => new ItemsOnInvoiceEdit
                 {
                     Id = i.Id,
                     Description = i.Description,
@@ -177,7 +171,7 @@ namespace TravelWarrants.Services
                 return new ResponseDTO<ProinvoiceGetDTO>() { IsSucced = false };
             }
 
-            var existingProformaInvoice = await _context.ProformaInvoices.Include(i => i.InoviceService)
+            var existingProformaInvoice = await _context.ProformaInvoices.Include(i => i.InvoiceService)
                                                 .FirstOrDefaultAsync(i => i.Id == invoiceId);
 
             if (existingProformaInvoice == null)
@@ -185,7 +179,7 @@ namespace TravelWarrants.Services
                 return new ResponseDTO<ProinvoiceGetDTO>() { IsSucced = false, };
             }
 
-           
+
 
 
             decimal vat = 0;
@@ -202,24 +196,24 @@ namespace TravelWarrants.Services
             existingProformaInvoice.ProinoviceWithoutVAT = proinvoiceEditDTO.ProinoviceWithoutVAT;
 
 
-           
-            
+
+
             foreach (var Id in proinvoiceEditDTO.ItemsToDeleteId)
             {
-                var toDelete = await _context.InovicesServices.FirstOrDefaultAsync(i => i.Id == Id);
+                var toDelete = await _context.InvoicesServices.FirstOrDefaultAsync(i => i.Id == Id);
                 if (toDelete != null)
                 {
-                    _context.InovicesServices.Remove(toDelete);
+                    _context.InvoicesServices.Remove(toDelete);
                 }
             }
-            
-            
+
+
 
 
 
             foreach (var item in proinvoiceEditDTO.ItemsOnInovice.Where(x => x.Id != 0))
             {
-                var updateItem = existingProformaInvoice.InoviceService.FirstOrDefault(x => x.Id == item.Id);
+                var updateItem = existingProformaInvoice.InvoiceService.FirstOrDefault(x => x.Id == item.Id);
 
                 if (updateItem == null)
                 {
@@ -248,7 +242,7 @@ namespace TravelWarrants.Services
 
             foreach (var item in proinvoiceEditDTO.ItemsOnInovice.Where(x => x.Id == 0))
             {
-                var serviceOnInovice = new InoviceService()
+                var serviceOnInovice = new InvoiceService()
                 {
 
                     Description = item.Description,
@@ -269,7 +263,7 @@ namespace TravelWarrants.Services
                     ? serviceOnInovice.Value * service.VATRate / 100
                     : serviceOnInovice.Value * service.VATRate * 100 / (service.VATRate + 100) / 100;
 
-                existingProformaInvoice.InoviceService.Add(serviceOnInovice);  
+                existingProformaInvoice.InvoiceService.Add(serviceOnInovice);
                 serviceOnInovice.VAT = Math.Round(serviceOnInovice.VAT, 2);
 
                 vat += serviceOnInovice.VAT;
@@ -287,17 +281,17 @@ namespace TravelWarrants.Services
 
             if (proinvoiceEditDTO.RoutePlan.HasValue)
             {
-                
+
                 existingProformaInvoice.UploadedFileId = proinvoiceEditDTO.RoutePlan.Value;
             }
             else
             {
-                
+
                 existingProformaInvoice.UploadedFileId = null;
             }
 
-            var acc = await _context.Accounts.FirstOrDefaultAsync(x => x.InoviceId == existingProformaInvoice.Id)
-                 ?? new Account { InoviceId = existingProformaInvoice.Id };
+            var acc = await _context.Accounts.FirstOrDefaultAsync(x => x.InvoiceId == existingProformaInvoice.Id)
+                 ?? new Account { InvoiceId = existingProformaInvoice.Id };
 
             acc.Date = existingProformaInvoice.DocumentDate;
             acc.Amount = existingProformaInvoice.Total;
@@ -326,7 +320,7 @@ namespace TravelWarrants.Services
                 _context.Statuses.Add(status);
             }
 
-           
+
             await _context.SaveChangesAsync();
 
             var addedInovice = new ProinvoiceGetDTO
@@ -339,8 +333,8 @@ namespace TravelWarrants.Services
                 .Where(x => x.Id == existingProformaInvoice.ClientId)
                 .Select(x => x.Name).FirstOrDefaultAsync(),
                 Date = existingProformaInvoice.DocumentDate,
-                
-                
+
+
             };
 
             return new ResponseDTO<ProinvoiceGetDTO> { IsSucced = true, Message = addedInovice };
@@ -349,13 +343,13 @@ namespace TravelWarrants.Services
         }
         public async Task<ResponseDTO<ProinvoiceGetDTO>> NewProinvoice(ProinvoiceNewDTO proinvoiceNewDTO)
         {
-            var companyExists = await _context.Companies.AnyAsync();
+            var companyExists = await _context.Company.AnyAsync();
             if (!companyExists)
             {
                 return new ResponseDTO<ProinvoiceGetDTO> { IsSucced = false, ErrorMessage = "Add a company first" };
             }
 
-           
+
 
             if (proinvoiceNewDTO == null || proinvoiceNewDTO.ItemsOnInovice.Count == 0)
             {
@@ -373,13 +367,13 @@ namespace TravelWarrants.Services
                 Note = proinvoiceNewDTO.Note,
                 Year = proinvoiceNewDTO.DocumentDate.Year,
                 ProinoviceWithoutVAT = proinvoiceNewDTO.ProinoviceWithoutVAT,
-                
-                InoviceService = new List<InoviceService>()
+
+                InvoiceService = new List<InvoiceService>()
             };
 
             foreach (var item in proinvoiceNewDTO.ItemsOnInovice)
             {
-                var serviceOnInovice = new InoviceService()
+                var serviceOnInovice = new InvoiceService()
                 {
 
                     Description = item.Description,
@@ -388,7 +382,7 @@ namespace TravelWarrants.Services
                     Price = item.Price,
                     Value = item.Quantity * item.Price,
                     NumberOfDays = item.NumberOfDays
-                    
+
 
 
                 };
@@ -407,7 +401,7 @@ namespace TravelWarrants.Services
                     ? serviceOnInovice.Value * service.VATRate / 100
                     : serviceOnInovice.Value * service.VATRate * 100 / (service.VATRate + 100) / 100;
 
-                newProformaInovice.InoviceService.Add(serviceOnInovice);  // Dodavanje usluge na fakturu
+                newProformaInovice.InvoiceService.Add(serviceOnInovice);  // Dodavanje usluge na fakturu
                 serviceOnInovice.VAT = Math.Round(serviceOnInovice.VAT, 2);
 
                 vat += serviceOnInovice.VAT;
@@ -473,7 +467,7 @@ namespace TravelWarrants.Services
             var addedInovice = new ProinvoiceGetDTO
             {
                 Id = newProformaInovice.Id,
-                Number = newProformaInovice.Number +"/"+ newProformaInovice.Year,
+                Number = newProformaInovice.Number + "/" + newProformaInovice.Year,
                 Amount = newProformaInovice.Total,
                 ClientName = await _context.Clients
                 .Where(x => x.Id == newProformaInovice.ClientId)
@@ -495,14 +489,14 @@ namespace TravelWarrants.Services
                 .OrderByDescending(x => x.DocumentDate)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .Select( x=> new ProinvoiceGetDTO
+                .Select(x => new ProinvoiceGetDTO
                 {
-                    Id=x.Id,
-                    ClientName= x.Client.Name,
+                    Id = x.Id,
+                    ClientName = x.Client.Name,
                     Amount = x.Total,
                     OfferAccepted = x.OfferAccepted ?? false,
                     Date = x.DocumentDate,
-                    Number=x.Number + "/" +x.Year
+                    Number = x.Number + "/" + x.Year
                 }).ToListAsync();
 
             return new ResponseDTO<IEnumerable<ProinvoiceGetDTO>> { IsSucced = true, Message = proinvoice };
@@ -510,10 +504,10 @@ namespace TravelWarrants.Services
         private async Task<ResponseDTO<ProformaInvoicePdf>> ProformaInvoiceForPDF(int id)
         {
             var invoice = await _context.ProformaInvoices
-                .Include(i => i.InoviceService.Where(i => !i.InoviceId.HasValue && i.ProformaInvoiceId.HasValue))
+                .Include(i => i.InvoiceService.Where(i => !i.InvoiceId.HasValue && i.ProformaInvoiceId.HasValue))
                 .ThenInclude(s => s.Service)
                 .Include(c => c.Client)
-                
+
                 .Where(x => x.Id == id)
                 .Select(x => new ProformaInvoicePdf
                 {
@@ -524,12 +518,12 @@ namespace TravelWarrants.Services
                     Email = x.Client.Email,
                     Number = x.Number + "/" + x.Year,
                     Total = x.Total,
-                    
+
                     PriceWithoutVat = x.NoVAT,
                     Vat = x.VAT,
                     ShowVat = x.ProinoviceWithoutVAT ?? false,
-                    ItemsOnInovice = x.InoviceService
-                    .Select(i => new ItemsOnInovicePdf
+                    ItemsOnInovice = x.InvoiceService
+                    .Select(i => new ItemsOnInvoicePdf
                     {
                         ServiceVat = i.Service.VATRate,
                         Description = i.Description,
@@ -599,7 +593,7 @@ namespace TravelWarrants.Services
                                  "<td>" + item.Service + "</td>" +
                                  "<td>" + item.Description + "</td>" +
                                  "<td>" + item.NumberOfDays.ToString() + "</td>" +
-                                 "<td>" + item.ServiceVat.ToString() + "%"+"</td>" +
+                                 "<td>" + item.ServiceVat.ToString() + "%" + "</td>" +
                                  "<td>" + item.Quantity.ToString() + "</td>" +
                                  "<td>" + item.Price.ToString() + "€" + "</td></tr>");
                 if (i == rowsPerPage)
@@ -651,7 +645,7 @@ namespace TravelWarrants.Services
                 .Replace("{{ClientCity}}", proformaInvoice.ClientPlace)
                 .Replace("{{ClientEmail}}", proformaInvoice.Email)
                 .Replace("{{TableRows}}", tableRows.ToString())
-                .Replace("{{ShowVatStyle}}", proformaInvoice.ShowVat ? "style=\"display:none;\"" : "" )
+                .Replace("{{ShowVatStyle}}", proformaInvoice.ShowVat ? "style=\"display:none;\"" : "")
                 .Replace("{{PriceWithoutVat}}", proformaInvoice.PriceWithoutVat.ToString() + "€")
                 .Replace("{{Vat}}", proformaInvoice.Vat.ToString() + "€")
                 .Replace("{{Total}}", proformaInvoice.Total.ToString() + "€")
@@ -665,7 +659,7 @@ namespace TravelWarrants.Services
             var page = await browser.NewPageAsync();
 
             await page.SetContentAsync(htmlContent);
-          
+
             var options = new PdfOptions
             {
                 Format = PaperFormat.A4,

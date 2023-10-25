@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Xml.Linq;
+﻿using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.DTOs.Fleet;
 using TravelWarrants.Interfaces;
-using TravelWarrants.Models;
 
 namespace TravelWarrants.Controllers
 {
@@ -30,7 +27,7 @@ namespace TravelWarrants.Controllers
 
             return NotFound();
 
-            
+
         }
 
         [HttpGet("{id}")]
@@ -46,14 +43,14 @@ namespace TravelWarrants.Controllers
             return NotFound();
 
 
-            
+
         }
 
         [HttpPost]
 
         public async Task<ActionResult> NewVehicle(FleetDTOSave fleetDTO)
         {
-         
+
             var result = await _vehiclesService.NewVehicle(fleetDTO);
             if (result.IsSucced)
             {
@@ -62,7 +59,7 @@ namespace TravelWarrants.Controllers
             }
             return BadRequest(result.ErrorMessage);
 
-            
+
         }
 
         [HttpDelete("{id}")]
@@ -71,29 +68,29 @@ namespace TravelWarrants.Controllers
         {
             var result = await _vehiclesService.DeleteVehicle(id);
 
-            if(result.IsSucced)
+            if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
 
-            
+
         }
 
         [HttpPut("{id}")]
 
-        public async Task<ActionResult> EditVehicle (int id, FleetDTOSave fleetDTO)
+        public async Task<ActionResult> EditVehicle(int id, FleetDTOSave fleetDTO)
         {
             var result = await _vehiclesService.EditVehicle(id, fleetDTO);
-            if (result.IsSucced) 
+            if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
 
-            
-            
+
+
         }
-    
+
     }
 }

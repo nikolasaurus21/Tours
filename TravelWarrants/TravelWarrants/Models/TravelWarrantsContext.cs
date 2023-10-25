@@ -8,36 +8,34 @@ namespace TravelWarrants.Models
 
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Client> Clients { get; set; }
-        public DbSet<Company> Companies { get; set; }
-        public DbSet<CompanyGiroAccount> CompaniesGiroAccounts { get; set; }
+        public DbSet<Company> Company { get; set; }
+        public DbSet<CompanyBankAccount> CompanyBankAccounts { get; set; }
         public DbSet<Driver> Drivers { get; set; }
-        public DbSet<Inovice> Inovices { get; set; }
-        public DbSet<InoviceService> InovicesServices { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
+        public DbSet<InvoiceService> InvoicesServices { get; set; }
         public DbSet<Payment> Payments { get; set; }
-        public DbSet<Place> Places { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Status> Statuses { get; set; }
         public DbSet<Tour> Tours { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<ProformaInvoice> ProformaInvoices { get; set; }
         public DbSet<UploadedFiles> UploadedFiles { get; set; }
-        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Account>().ToTable("Accounts");
             modelBuilder.Entity<Client>().ToTable("Clients");
-            modelBuilder.Entity<Company>().ToTable("Companies");
-            modelBuilder.Entity<CompanyGiroAccount>().ToTable("CompaniesGiroAccounts");
+            modelBuilder.Entity<Company>().ToTable("Company");
+            modelBuilder.Entity<CompanyBankAccount>().ToTable("CompanyBankAccounts");
             modelBuilder.Entity<Driver>().ToTable("Drivers");
-            modelBuilder.Entity<Inovice>().ToTable("Inovices");
+            modelBuilder.Entity<Invoice>().ToTable("Invoices");
             modelBuilder.Entity<Payment>().ToTable("Payments");
-            modelBuilder.Entity<Place>().ToTable("Places");
             modelBuilder.Entity<Service>().ToTable("Services");
             modelBuilder.Entity<Status>().ToTable("Statuses");
             modelBuilder.Entity<Tour>().ToTable("Tours");
             modelBuilder.Entity<Vehicle>().ToTable("Vehicles");
-            modelBuilder.Entity<InoviceService>().ToTable("InovicesServices");
+            modelBuilder.Entity<InvoiceService>().ToTable("InvoicesServices");
             modelBuilder.Entity<ProformaInvoice>().ToTable("ProformaInovices");
             modelBuilder.Entity<UploadedFiles>().ToTable("UploadedFiles");
 
@@ -46,10 +44,10 @@ namespace TravelWarrants.Models
 
 
             // One-to-Many relationship between Inovice and Acount +
-            modelBuilder.Entity<Inovice>()
+            modelBuilder.Entity<Invoice>()
                     .HasMany(f => f.Account)
-                    .WithOne(r => r.Inovice)
-                    .HasForeignKey(r => r.InoviceId);
+                    .WithOne(r => r.Invoice)
+                    .HasForeignKey(r => r.InvoiceId);
 
 
             // One-to-Many relationship between ProformaInovice and Acount +
@@ -108,15 +106,15 @@ namespace TravelWarrants.Models
                    .HasForeignKey(v => v.VehicleId);
 
             // One-to-Many relathionship between Inovice and InoviceService +
-            modelBuilder.Entity<Inovice>()
+            modelBuilder.Entity<Invoice>()
                     .HasMany(f => f.InoviceService)
-                    .WithOne(uf => uf.Inovice)
-                    .HasForeignKey(uf => uf.InoviceId)
+                    .WithOne(uf => uf.Invoice)
+                    .HasForeignKey(uf => uf.InvoiceId)
                     .OnDelete(DeleteBehavior.Restrict);
 
             // One-to-Many relathionship between ProformaInovice and InoviceService +
             modelBuilder.Entity<ProformaInvoice>()
-                    .HasMany(f => f.InoviceService)
+                    .HasMany(f => f.InvoiceService)
                     .WithOne(uf => uf.ProformaInvoice)
                     .HasForeignKey(uf => uf.ProformaInvoiceId)
                     .OnDelete(DeleteBehavior.Restrict);
@@ -124,7 +122,7 @@ namespace TravelWarrants.Models
 
             // One-to-Many relathionship between Service and InoviceService +
             modelBuilder.Entity<Service>()
-                   .HasMany(uf => uf.InoviceService)
+                   .HasMany(uf => uf.InvoiceService)
                    .WithOne(u => u.Service)
                    .HasForeignKey(u => u.ServiceId);
 
@@ -142,20 +140,20 @@ namespace TravelWarrants.Models
                      .IsRequired(false);
 
             modelBuilder.Entity<Account>()
-                .Property(a => a.InoviceId)
-                .IsRequired(false);  
+                .Property(a => a.InvoiceId)
+                .IsRequired(false);
 
             modelBuilder.Entity<Account>()
                 .Property(a => a.ProformaInvoiceId)
-                .IsRequired(false);  
+                .IsRequired(false);
 
-            modelBuilder.Entity<InoviceService>()
-            .Property(a => a.InoviceId)
-            .IsRequired(false);  
+            modelBuilder.Entity<InvoiceService>()
+            .Property(a => a.InvoiceId)
+            .IsRequired(false);
 
-            modelBuilder.Entity<InoviceService>()
+            modelBuilder.Entity<InvoiceService>()
                 .Property(a => a.ProformaInvoiceId)
-                .IsRequired(false);  
+                .IsRequired(false);
 
         }
 

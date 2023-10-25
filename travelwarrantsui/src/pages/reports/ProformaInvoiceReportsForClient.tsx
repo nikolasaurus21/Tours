@@ -8,7 +8,7 @@ import {
 } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import { ClientsContext } from "../../context/ClientsContext";
-import { Inovices, ListItem } from "../../api/interfaces";
+import { Invoices, ListItem } from "../../api/interfaces";
 import {
   downloadPdfProformaInvoice,
   getProformaInvoiceForClients,
@@ -20,7 +20,7 @@ const ProformaInvoiceReportsForClient = () => {
 
   const { clients } = useContext(ClientsContext);
 
-  const [proformaInvoices, setProformaInvoices] = useState<Inovices[]>([]);
+  const [proformaInvoices, setProformaInvoices] = useState<Invoices[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [clientid, setClientid] = useState<number | null>(null);

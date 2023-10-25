@@ -1,15 +1,13 @@
-﻿using System.Text.Json.Serialization;
-
-namespace TravelWarrants.Models
+﻿namespace TravelWarrants.Models
 {
     public class Client
     {
-        
+
         public int Id { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
         public string PlaceName { get; set; }
-        public string RegistrationNUmber { get; set; }
+        public string RegistrationNumber { get; set; }
         public decimal VAT { get; set; }
         public string Telephone { get; set; }
         public string Fax { get; set; }
@@ -17,7 +15,7 @@ namespace TravelWarrants.Models
         public string? Note { get; set; }
         public bool? Excursion { get; set; }
         public virtual ICollection<Account> Account { get; set; }
-        public virtual ICollection<Inovice> Inovice { get; set; }
+        public virtual ICollection<Invoice> Inovice { get; set; }
         public virtual ICollection<ProformaInvoice> ProformaInvoice { get; set; }
         public virtual ICollection<Tour> Tour { get; set; }
         public virtual ICollection<Payment> Payment { get; set; }

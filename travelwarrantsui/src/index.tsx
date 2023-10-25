@@ -9,13 +9,13 @@ import { ClientsProvider } from "./context/ClientsContext";
 import { VehiclesProvider } from "./context/VehiclesContext";
 import { DriversProvider } from "./context/DriversContext";
 import { CompanyProvider } from "./context/CompanyContext";
-import { ZiroRacuniProvider } from "./context/ZiroRacuniContext";
+import { BankAccountsProvider } from "./context/BankAccountsContext";
 import { ServicesProvider } from "./context/ServicesContext";
 import { PaymentsProvider } from "./context/PaymentsContext";
 import { SearchesProvider } from "./context/SearchesContext";
 import { StatusesProvider } from "./context/StatusesContext";
 import { PaginationProvider } from "./context/PaginationContext";
-import { InovicesProvider } from "./context/InovicesContext";
+import { InvoicesProvider } from "./context/InvoicesContext";
 import { ProformaInvoicesProvider } from "./context/ProformaInvoicesContext";
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -26,13 +26,13 @@ root.render(
       <VehiclesProvider>
         <DriversProvider>
           <CompanyProvider>
-            <ZiroRacuniProvider>
+            <BankAccountsProvider>
               <ServicesProvider>
                 <TravelWarrantsProvider>
                   <PaymentsProvider>
                     <SearchesProvider>
                       <StatusesProvider>
-                        <InovicesProvider>
+                        <InvoicesProvider>
                           <ProformaInvoicesProvider>
                             <PaginationProvider>
                               <BrowserRouter>
@@ -40,13 +40,13 @@ root.render(
                               </BrowserRouter>
                             </PaginationProvider>
                           </ProformaInvoicesProvider>
-                        </InovicesProvider>
+                        </InvoicesProvider>
                       </StatusesProvider>
                     </SearchesProvider>
                   </PaymentsProvider>
                 </TravelWarrantsProvider>
               </ServicesProvider>
-            </ZiroRacuniProvider>
+            </BankAccountsProvider>
           </CompanyProvider>
         </DriversProvider>
       </VehiclesProvider>

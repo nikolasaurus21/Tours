@@ -1,10 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TravelWarrants.Models
 {
     public class Payment
-    { 
+    {
 
         public int Id { get; set; }
         public int ClientId { get; set; }

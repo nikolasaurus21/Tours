@@ -10,16 +10,16 @@ import { useNavigate } from "react-router-dom";
 import {
   downloadPdf,
   getInovicesForPeriod,
-  inoviceToDelete,
+  invoiceToDelete,
 } from "../../api/api";
 
-import { Inovices } from "../../api/interfaces";
+import { Invoices } from "../../api/interfaces";
 import { format } from "date-fns";
 
 const InoviceReportsForPeriod = () => {
   const navigate = useNavigate();
 
-  const [inovices, setInovices] = useState<Inovices[]>([]);
+  const [inovices, setInovices] = useState<Invoices[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
 
@@ -57,7 +57,7 @@ const InoviceReportsForPeriod = () => {
   };
 
   const handleDeleteClick = async (id: number) => {
-    const inoviceData = await inoviceToDelete(id);
+    const inoviceData = await invoiceToDelete(id);
     navigate(`/inovices/delete/${id}`, { state: { inoviceData } });
   };
 

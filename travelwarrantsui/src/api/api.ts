@@ -1,4 +1,4 @@
-import {  addClient, addVehicle,allClients, allVehicles,allDrivers,addDriver,ICompany, allGiroAccounts, addGiroAccounts, allServices, addService, allTravelWarrants, addTravelWarrant, allPayments, addPayment, IReports, Statuses, deleteTour, Inovices, IAddInovice, IDeleteInovice, IGetInoviceById, IItemsEdit, IEditInovice, IProformaInvoices, IAddProformaInvoice, IGetProformaInvoiceById, IEditProformaInvoice} from "./interfaces";
+import {  addClient, addVehicle,allClients, allVehicles,allDrivers,addDriver,ICompany, allBankAccounts, addBankAccounts, allServices, addService, allTravelWarrants, addTravelWarrant, allPayments, addPayment, IReports, Statuses, deleteTour, Invoices, IAddInvoice, IDeleteInvoice, IGetInvoiceById, IItemsEdit, IEditInvoice, IProformaInvoices, IAddProformaInvoice, IGetProformaInvoiceById, IEditProformaInvoice} from "./interfaces";
 import axios from "axios";
 import { format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
@@ -293,10 +293,10 @@ export const getClientById = async (id: number): Promise<addClient> => {
   })
 }
 
-//GiroAccount
+//BankAccount
 
-export const getGiroAccounts =async ():Promise<allGiroAccounts[]> => {
-  const response = await axios.get("https://localhost:7206/api/GiroAccounts/Get")
+export const getBankAccounts =async ():Promise<allBankAccounts[]> => {
+  const response = await axios.get("https://localhost:7206/api/BankAccounts/Get")
   const jsonResponse = await response.data.map((x:any) => ({
     id:x.id,
     bank:x.bank,
@@ -305,10 +305,10 @@ export const getGiroAccounts =async ():Promise<allGiroAccounts[]> => {
   return  jsonResponse
 }
 
-export const getGiroAccountById =async (id:number):Promise<addGiroAccounts> => {
-  const response = await axios.get(`https://localhost:7206/api/GiroAccounts/GetAcc/${id}`)
+export const getBankAccountById =async (id:number):Promise<addBankAccounts> => {
+  const response = await axios.get(`https://localhost:7206/api/BankAccounts/GetAcc/${id}`)
   const jsonResponse = await response.data
-  const singleAcc:addGiroAccounts ={
+  const singleAcc:addBankAccounts ={
     bank:jsonResponse.bank,
     account: jsonResponse.accountNumber
   }
@@ -316,11 +316,11 @@ export const getGiroAccountById =async (id:number):Promise<addGiroAccounts> => {
   return  singleAcc
 }
 
-export const addGiroAccount =async (data:addGiroAccounts):Promise<allGiroAccounts> => {
- const response =  await axios.post("https://localhost:7206/api/GiroAccounts/NewGiroAcc",{
+export const addBankAccount =async (data:addBankAccounts):Promise<allBankAccounts> => {
+ const response =  await axios.post("https://localhost:7206/api/BankAccounts/NewBankAcc",{
     bank:data.bank,
     accountNumber:data.account,
-    companyId:14
+    companyId:1
   },{
     headers:{
       "Content-Type":"application/json",
@@ -328,7 +328,7 @@ export const addGiroAccount =async (data:addGiroAccounts):Promise<allGiroAccount
     }
   })
 
-  const newAcc:allGiroAccounts ={
+  const newAcc:allBankAccounts ={
     id:response.data.id,
     bank:response.data.bank,
     account:response.data.accountNumber
@@ -337,8 +337,8 @@ export const addGiroAccount =async (data:addGiroAccounts):Promise<allGiroAccount
   return newAcc
 }
 
-export const editGiroAccount =async (id:number,data:addGiroAccounts):Promise<allGiroAccounts> => {
-  const response= await axios.put(`https://localhost:7206/api/GiroAccounts/EditGiroAcc/${id}`,{
+export const editBankAccount =async (id:number,data:addBankAccounts):Promise<allBankAccounts> => {
+  const response= await axios.put(`https://localhost:7206/api/BankAccounts/EditBankAcc/${id}`,{
     bank:data.bank,
     accountNumber:data.account,
     companyId:14
@@ -348,7 +348,7 @@ export const editGiroAccount =async (id:number,data:addGiroAccounts):Promise<all
       Accept:"application/json",
     }
   })
-  const updatedAcc:allGiroAccounts ={
+  const updatedAcc:allBankAccounts ={
     id:response.data.id,
     bank:response.data.bank,
     account:response.data.accountNumber
@@ -835,7 +835,7 @@ export const  getReportsForDestination = async (dest:string):Promise<IReports[]>
   return jsonResponse;
 }
 
-export const getInoviceForClients =async (id:number,page?: number | null):Promise<Inovices[]> => {
+export const getInoviceForClients =async (id:number,page?: number | null):Promise<Invoices[]> => {
   const response  = await axios.get("https://localhost:7206/api/TravelWarrantsReports/InoviceReportsForClient",
   {
     params:{
@@ -856,7 +856,7 @@ export const getInoviceForClients =async (id:number,page?: number | null):Promis
 
  return jsonResponse
 }
-export const getInovicesForPeriod =async (from:Date,to:Date,page?:number):Promise<Inovices[]> => {
+export const getInovicesForPeriod =async (from:Date,to:Date,page?:number):Promise<Invoices[]> => {
   const response = await axios.get(`https://localhost:7206/api/TravelWarrantsReports/InoviceReportsForPeriod`, {
       params: {
         from: from.toISOString(),
@@ -877,7 +877,7 @@ export const getInovicesForPeriod =async (from:Date,to:Date,page?:number):Promis
    return jsonResponse
 }
 
-export const getInovicesByDescription =async (desc:string,page:number):Promise<Inovices[]> => {
+export const getInovicesByDescription =async (desc:string,page:number):Promise<Invoices[]> => {
   const response = await axios.get("https://localhost:7206/api/TravelWarrantsReports/InoviceReportsForDescription",{
     params:{
       description:desc,
@@ -896,7 +896,7 @@ export const getInovicesByDescription =async (desc:string,page:number):Promise<I
 
  return jsonResponse
 }
-export const getProformaInvoiceForClients =async (id:number,page?: number | null):Promise<Inovices[]> => {
+export const getProformaInvoiceForClients =async (id:number,page?: number | null):Promise<Invoices[]> => {
   const response  = await axios.get("https://localhost:7206/api/TravelWarrantsReports/ProformaInvoiceReportsForClient",
   {
     params:{
@@ -917,7 +917,7 @@ export const getProformaInvoiceForClients =async (id:number,page?: number | null
 
  return jsonResponse
 }
-export const getProformaInvoiceForPeriod =async (from:Date,to:Date,page?:number):Promise<Inovices[]> => {
+export const getProformaInvoiceForPeriod =async (from:Date,to:Date,page?:number):Promise<Invoices[]> => {
   const response = await axios.get(`https://localhost:7206/api/TravelWarrantsReports/ProformaInvoiceReportsForPeriod`, {
       params: {
         from: from.toISOString(),
@@ -937,7 +937,7 @@ export const getProformaInvoiceForPeriod =async (from:Date,to:Date,page?:number)
   
    return jsonResponse
 }
-export const getProformaInvoiceByDescription =async (desc:string,page:number):Promise<Inovices[]> => {
+export const getProformaInvoiceByDescription =async (desc:string,page:number):Promise<Invoices[]> => {
   const response = await axios.get("https://localhost:7206/api/TravelWarrantsReports/ProformaInvoiceReportsForDescription",{
     params:{
       description:desc,
@@ -1013,10 +1013,10 @@ export const getStatuses =async ():Promise<Statuses[]> => {
   return jsonResponse
 }
 
-//Inovice
+//Invoice
 
-export const getInovices =async (page?: number | null):Promise<Inovices[]> => {
-   const response = await axios.get("https://localhost:7206/api/Inovices/Get",{
+export const getInvoices =async (page?: number | null):Promise<Invoices[]> => {
+   const response = await axios.get("https://localhost:7206/api/Invoices/Get",{
     params:{
       pageNumber:page
     }
@@ -1035,9 +1035,9 @@ export const getInovices =async (page?: number | null):Promise<Inovices[]> => {
    return jsonResponse
 }
 
-export const newInovice =async (data:IAddInovice):Promise<Inovices> => {
+export const newInvoice =async (data:IAddInvoice):Promise<Invoices> => {
   const utcDate = utcToZonedTime(data.date, "UTC");
-  const response = await axios.post("https://localhost:7206/api/Inovices/NewInovice",
+  const response = await axios.post("https://localhost:7206/api/Invoices/NewInvoice",
   {
     clientId:data.clientId,
     documentDate:format(utcDate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
@@ -1053,7 +1053,7 @@ export const newInovice =async (data:IAddInovice):Promise<Inovices> => {
     }
   })
 console.log(response.data)
- const inoviceData:Inovices ={
+ const inoviceData:Invoices ={
   id:response.data.id,
   year:response.data.year,
   number:response.data.number,
@@ -1065,11 +1065,11 @@ console.log(response.data)
  return inoviceData
 }
 
-export const inoviceToDelete =async (id:number):Promise<IDeleteInovice> => {
-  const response = await axios.get(`https://localhost:7206/api/Inovices/ToDelete/${id}`)
+export const invoiceToDelete =async (id:number):Promise<IDeleteInvoice> => {
+  const response = await axios.get(`https://localhost:7206/api/Invoices/ToDelete/${id}`)
   const jsonResponse = response.data
 
-  const inoviceToDelete:IDeleteInovice={
+  const inoviceToDelete:IDeleteInvoice={
     number:jsonResponse.number,
     clientName: jsonResponse.clientName,
     date:jsonResponse.date,
@@ -1079,13 +1079,13 @@ export const inoviceToDelete =async (id:number):Promise<IDeleteInovice> => {
   return inoviceToDelete
 }
 
-export const getInoviceById =async (id:number):Promise<IGetInoviceById> => {
-  var response = await axios.get(`https://localhost:7206/api/Inovices/GetById/${id}`)
+export const getInvoiceById =async (id:number):Promise<IGetInvoiceById> => {
+  var response = await axios.get(`https://localhost:7206/api/Invoices/GetById/${id}`)
   const jsonResponse = response.data
   //console.log("Sa servera:" , jsonResponse);
   const date = new Date(jsonResponse.documentDate);
   const formattedDate = format(date, "yyyy-MM-dd'T'HH:mm");
-  const singleInovice:IGetInoviceById={
+  const singleInovice:IGetInvoiceById={
     
     //clientName: jsonResponse.clientName,
     date:formattedDate,
@@ -1110,9 +1110,9 @@ export const getInoviceById =async (id:number):Promise<IGetInoviceById> => {
   return singleInovice
 }
 
-export const editInovice =async (id:number,data:IEditInovice):Promise<Inovices> => {
+export const editInvoice =async (id:number,data:IEditInvoice):Promise<Invoices> => {
   const utcDate = utcToZonedTime(data.date, "UTC");
-  const response = await axios.put(`https://localhost:7206/api/Inovices/EditInovice/${id}`,
+  const response = await axios.put(`https://localhost:7206/api/Invoices/EditInovice/${id}`,
   {
     clientId:data.clientId,
     documentDate:format(utcDate, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
@@ -1129,7 +1129,7 @@ export const editInovice =async (id:number,data:IEditInovice):Promise<Inovices> 
     }
   })
 
-const inoviceData:Inovices ={
+const inoviceData:Invoices ={
   id:response.data.id,
   year:response.data.year,
   number:response.data.number,
@@ -1143,7 +1143,7 @@ const inoviceData:Inovices ={
 }
 export const downloadPdf = async (id: number, invoiceNumber: string) => {
   try {
-    const response = await axios.get(`https://localhost:7206/api/Inovices/GeneratePdf/${id}`, {
+    const response = await axios.get(`https://localhost:7206/api/Invoices/GeneratePdf/${id}`, {
       responseType: 'blob',
     });
 
@@ -1349,11 +1349,11 @@ export const downloadPdfProformaInvoice = async (id: number, invoiceNumber: stri
   }
 };
 
-export const proformaInvoiceToDelete =async (id:number):Promise<IDeleteInovice> => {
+export const proformaInvoiceToDelete =async (id:number):Promise<IDeleteInvoice> => {
   const response = await axios.get(`https://localhost:7206/api/ProformaInvoice/GetProformaInvoiceForDelete/${id}`)
   const jsonResponse = response.data
 
-  const proformaInvoiceToDelete:IDeleteInovice={
+  const proformaInvoiceToDelete:IDeleteInvoice={
     number:jsonResponse.number,
     clientName: jsonResponse.clientName,
     date:jsonResponse.date,

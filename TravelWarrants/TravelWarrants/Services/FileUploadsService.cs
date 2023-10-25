@@ -1,8 +1,5 @@
-﻿using TravelWarrants.Interfaces;
-using System;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Mvc;
-using TravelWarrants.DTOs;
+﻿using TravelWarrants.DTOs;
+using TravelWarrants.Interfaces;
 
 namespace TravelWarrants.Services
 {

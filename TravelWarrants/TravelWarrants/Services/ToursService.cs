@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TravelWarrants.DTOs;
-using TravelWarrants.DTOs.GiroAcc;
+﻿using TravelWarrants.DTOs;
 using TravelWarrants.DTOs.Tours;
 using TravelWarrants.Interfaces;
 
@@ -15,7 +13,7 @@ namespace TravelWarrants.Services
         }
         public async Task<ResponseDTO<TourDTOGet>> CreateTour(TourDTOSave tourDTO)
         {
-            var companyExists = await _context.Companies.AnyAsync();
+            var companyExists = await _context.Company.AnyAsync();
             if (!companyExists)
             {
                 return new ResponseDTO<TourDTOGet>() { IsSucced = false, ErrorMessage = "Add a company first" };
@@ -69,7 +67,7 @@ namespace TravelWarrants.Services
             };
 
 
-            return new ResponseDTO<TourDTOGet>() { IsSucced = false,Message= newTour };
+            return new ResponseDTO<TourDTOGet>() { IsSucced = true, Message = newTour };
         }
 
         public async Task<ResponseDTO<bool>> DeleteTour(int id)
@@ -78,7 +76,7 @@ namespace TravelWarrants.Services
 
             if (tourToDelete == null)
             {
-                return new ResponseDTO<bool>() { IsSucced = false,Message=false };
+                return new ResponseDTO<bool>() { IsSucced = false, Message = false };
             }
 
 
@@ -144,7 +142,7 @@ namespace TravelWarrants.Services
             };
 
 
-            return new ResponseDTO<TourDTOGet>() { IsSucced = true ,Message=updatedTour}; 
+            return new ResponseDTO<TourDTOGet>() { IsSucced = true, Message = updatedTour };
         }
 
         public async Task<ResponseDTO<TourDeleteDTO>> GetForDelete(int id)
@@ -183,7 +181,7 @@ namespace TravelWarrants.Services
                 FuelPrice = x.FuelPrice,
                 StartMileage = x.StartMileage,
                 EndMileage = x.EndMileage,
-               
+
                 Note = x.Note,
                 NumberOfDays = x.NumberOfDays,
                 DriverId = x.DriverId,

@@ -1,6 +1,6 @@
 ﻿namespace TravelWarrants.DTOs.GiroAcc
 {
-    public class GiroAccountDTOSave
+    public class BankAccountDTOSave
     {
 
 

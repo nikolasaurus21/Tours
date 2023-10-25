@@ -7,16 +7,16 @@ import {
 } from "react-icons/ai";
 import Button from "../../ui/Button";
 import { useNavigate } from "react-router-dom";
-import { Inovices } from "../../api/interfaces";
+import { Invoices } from "../../api/interfaces";
 import {
   downloadPdf,
   getInovicesByDescription,
-  inoviceToDelete,
+  invoiceToDelete,
 } from "../../api/api";
 
 const InoviceReportsByDescription = () => {
   const navigate = useNavigate();
-  const [inovices, setInovices] = useState<Inovices[]>([]);
+  const [inovices, setInovices] = useState<Invoices[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [description, setDescription] = useState<string>("");
@@ -40,7 +40,7 @@ const InoviceReportsByDescription = () => {
     }
   };
   const handleDeleteClick = async (id: number) => {
-    const inoviceData = await inoviceToDelete(id);
+    const inoviceData = await invoiceToDelete(id);
     navigate(`/inovices/delete/${id}`, { state: { inoviceData } });
   };
 

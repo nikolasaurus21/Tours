@@ -1,18 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.DTOs.GiroAcc;
 using TravelWarrants.Interfaces;
-using TravelWarrants.Models;
 
 namespace TravelWarrants.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class GiroAccountsController : ControllerBase
+    public class BankAccountsController : ControllerBase
     {
         private readonly IAccountService _accService;
 
-        public GiroAccountsController(IAccountService accService)
+        public BankAccountsController(IAccountService accService)
         {
             _accService = accService;
         }
@@ -22,14 +20,14 @@ namespace TravelWarrants.Controllers
         public async Task<ActionResult> Get()
         {
 
-             var result = await _accService.Get();
+            var result = await _accService.Get();
             if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
 
-           
+
         }
 
         [HttpGet("{id}")]
@@ -37,7 +35,7 @@ namespace TravelWarrants.Controllers
         public async Task<ActionResult> GetAcc(int id)
         {
 
-            var result =  await _accService.GetAcc(id);
+            var result = await _accService.GetAcc(id);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
@@ -49,46 +47,46 @@ namespace TravelWarrants.Controllers
 
         [HttpPost]
 
-        public async Task<ActionResult> NewGiroAcc(GiroAccountDTOSave giroAccountDTO)
+        public async Task<ActionResult> NewBankAcc(BankAccountDTOSave giroAccountDTO)
         {
-            
-            var result = await _accService.NewGiroAcc(giroAccountDTO);
+
+            var result = await _accService.NewBankAcc(giroAccountDTO);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return BadRequest(result.ErrorMessage);
 
-            
+
         }
 
 
         [HttpDelete("{id}")]
 
-        public async Task<ActionResult> DeleteGiroAcc(int id)
+        public async Task<ActionResult> DeleteBankAcc(int id)
         {
-            var result = await _accService.DeleteGiroAcc(id);
+            var result = await _accService.DeleteBankAcc(id);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
 
-            
+
         }
 
         [HttpPut("{id}")]
 
-        public async Task<ActionResult> EditGiroAcc(int id, GiroAccountDTOSave giroAccountDTO)
+        public async Task<ActionResult> EditBankAcc(int id, BankAccountDTOSave giroAccountDTO)
         {
-            var result = await _accService.EditGiroAcc(id, giroAccountDTO);
+            var result = await _accService.EditBankAcc(id, giroAccountDTO);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
 
-            
+
         }
     }
 }

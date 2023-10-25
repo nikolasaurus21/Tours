@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.Interfaces;
-using TravelWarrants.Services;
 
 namespace TravelWarrants.Controllers
 {
@@ -41,6 +39,6 @@ namespace TravelWarrants.Controllers
             return Ok(result);
         }
 
-        
+
     }
 }

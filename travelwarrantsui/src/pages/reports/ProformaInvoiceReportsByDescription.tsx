@@ -7,7 +7,7 @@ import {
 } from "react-icons/ai";
 import Button from "../../ui/Button";
 import { useNavigate } from "react-router-dom";
-import { Inovices } from "../../api/interfaces";
+import { Invoices } from "../../api/interfaces";
 import {
   downloadPdfProformaInvoice,
   getProformaInvoiceByDescription,
@@ -16,7 +16,7 @@ import {
 
 const ProformaInvoiceReportsByDescription = () => {
   const navigate = useNavigate();
-  const [proformaInvoices, setProformaInvoices] = useState<Inovices[]>([]);
+  const [proformaInvoices, setProformaInvoices] = useState<Invoices[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [description, setDescription] = useState<string>("");

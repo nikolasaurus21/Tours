@@ -12,7 +12,7 @@ namespace TravelWarrants.DTOs.Proinovce
         public string ClientPlace { get; set; }
         public string Email { get; set; }
         public string ClientPTT { get; set; }
-        public List<ItemsOnInovicePdf> ItemsOnInovice { get; set; } = new List<ItemsOnInovicePdf>();
+        public List<ItemsOnInvoicePdf> ItemsOnInovice { get; set; } = new List<ItemsOnInvoicePdf>();
         public decimal Total { get; set; }
         public decimal PriceWithoutVat { get; set; }
         public bool ShowVat { get; set; }

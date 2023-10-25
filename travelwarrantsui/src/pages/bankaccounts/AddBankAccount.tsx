@@ -1,50 +1,38 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { addBankAccounts } from "../../api/interfaces";
+
 import Button from "../../ui/Button";
-import { useNavigate, useParams } from "react-router-dom";
-import { addGiroAccounts } from "../../api/interfaces";
-import { getGiroAccountById } from "../../api/api";
-import { GiroAccountsContext } from "../../context/ZiroRacuniContext";
+import { BankAccountsContext } from "../../context/BankAccountsContext";
 
 const initialValues = {
   bank: "",
   account: "",
 };
-const EditGiroAccount = () => {
+const AddGiroAccount = () => {
   const navigate = useNavigate();
-  const { editAcc } = useContext(GiroAccountsContext);
-  const { id } = useParams();
-  const [addGiroAcc, setAddGiroAcc] = useState<addGiroAccounts>(initialValues);
+  const { addAcc } = useContext(BankAccountsContext);
+
+  const [addGiroAcc, setAddGiroAcc] = useState<addBankAccounts>(initialValues);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value, type, checked } = e.target;
     const newValue = type === "checkbox" ? checked : value;
     setAddGiroAcc((prevValues) => ({ ...prevValues, [name]: newValue }));
   };
+
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ): Promise<void> => {
     e.preventDefault();
     try {
-      await editAcc(Number(id), addGiroAcc);
+      await addAcc(addGiroAcc);
 
-      navigate("/giroaccounts");
+      navigate("/bankaccounts");
     } catch (error) {
       console.error("Error adding client:", error);
     }
   };
-
-  useEffect(() => {
-    const getSingleGiroAcc = async () => {
-      try {
-        const giroData = await getGiroAccountById(Number(id));
-        setAddGiroAcc(giroData);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getSingleGiroAcc();
-  }, [id]);
-
   return (
     <div>
       <div>
@@ -55,11 +43,11 @@ const EditGiroAccount = () => {
               marginTop: "10px",
               marginLeft: "10px",
             }}
-            onClick={() => navigate("/giroaccounts")}
+            onClick={() => navigate("/bankaccounts")}
           >
             Nazad
           </Button>
-          <h1>Izmijeni žiro-račun</h1>
+          <h1>Novi žiro-račun</h1>
         </div>
         <form onSubmit={handleSubmit} className="form-container-basic">
           <div>
@@ -81,11 +69,11 @@ const EditGiroAccount = () => {
             />
           </div>
 
-          <button type="submit">Sačuvaj izmjene</button>
+          <button type="submit">Dodaj žiro-račun</button>
         </form>
       </div>
     </div>
   );
 };
 
-export default EditGiroAccount;
+export default AddGiroAccount;

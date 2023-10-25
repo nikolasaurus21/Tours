@@ -1,23 +1,22 @@
 import React, { useContext } from "react";
-import { InovicesContext } from "../../context/InovicesContext";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
 import Button from "../../ui/Button";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { BankAccountsContext } from "../../context/BankAccountsContext";
 
-const DeleteInovice = () => {
+const DeleteGiroAccount = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { removeInovice } = useContext(InovicesContext);
+  const { removeBankAcc: removeGiroAcc } = useContext(BankAccountsContext);
   const location = useLocation();
-  const inoviceData = location.state?.inoviceData;
-
+  const giroData = location.state?.giroData;
   const handleRemoveClick = () => {
-    removeInovice(Number(id));
-    navigate("/inovices");
+    removeGiroAcc(Number(id));
+    navigate("/bankaccounts");
   };
   return (
     <div>
       <Button
-        onClick={() => navigate("/inovices")}
+        onClick={() => navigate("/bankaccounts")}
         buttonStyle={{
           backgroundColor: "rgb(100,100,100)",
           marginLeft: "10px",
@@ -32,24 +31,16 @@ const DeleteInovice = () => {
           marginRight: "280px",
         }}
       >
-        Jeste li sigurni da želite obrisati ovu fakturu?
+        Jeste li sigurni da želite obrisati ovaj žiro-račun?
       </h1>
       <div className="delete-client-container">
         <div className="delete-client-content">
           <div>
             <p>
-              <span className="text-delete">Broj:</span> {inoviceData.number}
+              <span className="text-delete">Banka:</span> {giroData.bank}
             </p>
             <p>
-              <span className="text-delete">Klijent:</span>{" "}
-              {inoviceData.clientName}
-            </p>
-            <p>
-              {" "}
-              <span className="text-delete">Datum:</span> {inoviceData.date}
-            </p>
-            <p>
-              <span className="text-delete">Amount:</span> {inoviceData.amount}
+              <span className="text-delete">Račun:</span> {giroData.account}
             </p>
           </div>
           <div className="button-delete">
@@ -58,13 +49,13 @@ const DeleteInovice = () => {
                 backgroundColor: "rgb(2,123,50)",
                 marginRight: "5px",
               }}
-              onClick={() => navigate(`/inovices/edit/${Number(id)}`)}
+              onClick={() => navigate(`/bankaccounts/edit/${Number(id)}`)}
             >
               Izmijeni
             </Button>
             <Button
               onClick={handleRemoveClick}
-              buttonStyle={{ backgroundColor: "rgb(160,0,0)" }}
+              buttonStyle={{ backgroundColor: "rgb(165,0,0)" }}
             >
               Obriši
             </Button>
@@ -75,4 +66,4 @@ const DeleteInovice = () => {
   );
 };
 
-export default DeleteInovice;
+export default DeleteGiroAccount;

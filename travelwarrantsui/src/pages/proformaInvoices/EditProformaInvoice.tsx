@@ -79,8 +79,7 @@ const EditProformaInvoice = () => {
     const fetchInovice = async () => {
       try {
         const proformaInvoice = await getProformaInvoiceById(Number(id));
-        console.log("POdaci sa servera:", proformaInvoice);
-        // console.log("File id:", proformaInvoice.fileId);
+
         setOldFileId(proformaInvoice.fileId);
         setAddProformaInvoice(proformaInvoice);
         setFileName(proformaInvoice.fileName);

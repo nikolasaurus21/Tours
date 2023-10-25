@@ -1,7 +1,5 @@
 global using Microsoft.EntityFrameworkCore;
 global using TravelWarrants.Models;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using TravelWarrants.Interfaces;
 using TravelWarrants.Services;
 
@@ -16,20 +14,20 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<TravelWarrantsContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("ConnectionDB")));
 
-builder.Services.AddScoped<IClientsService,ClientsService>();
-builder.Services.AddScoped<IVehiclesService,VehiclesService>();
-builder.Services.AddScoped<IDriversService,DriversService>();
-builder.Services.AddScoped<ICompanyService,CompanyService>();
-builder.Services.AddScoped<IAccountService,AccountService>();
-builder.Services.AddScoped<IServicesService,ServicesService>();
-builder.Services.AddScoped<IToursService,ToursService>();
-builder.Services.AddScoped<IPaymentsService,PaymentsService>();
-builder.Services.AddScoped<ISearchesService,SearchesService>();
-builder.Services.AddScoped<IStatusesService,StatusesService>();
-builder.Services.AddScoped<IReportsService,ReportsService>();
-builder.Services.AddScoped<IInovicesService,InovicesService>();
-builder.Services.AddScoped<IProInoviceService,ProinoviceServices>();
-builder.Services.AddScoped<IFileUploadService,FileUploadsService>();
+builder.Services.AddScoped<IClientsService, ClientsService>();
+builder.Services.AddScoped<IVehiclesService, VehiclesService>();
+builder.Services.AddScoped<IDriversService, DriversService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IServicesService, ServicesService>();
+builder.Services.AddScoped<IToursService, ToursService>();
+builder.Services.AddScoped<IPaymentsService, PaymentsService>();
+builder.Services.AddScoped<ISearchesService, SearchesService>();
+builder.Services.AddScoped<IStatusesService, StatusesService>();
+builder.Services.AddScoped<IReportsService, ReportsService>();
+builder.Services.AddScoped<IInovicesService, InovicesService>();
+builder.Services.AddScoped<IProInoviceService, ProinoviceServices>();
+builder.Services.AddScoped<IFileUploadService, FileUploadsService>();
 
 var configuration = builder.Configuration;
 builder.Services.AddCors(options =>

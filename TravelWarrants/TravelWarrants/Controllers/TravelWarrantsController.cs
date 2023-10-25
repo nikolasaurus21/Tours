@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using TravelWarrants.DTOs.Tours;
 using TravelWarrants.Interfaces;
-using TravelWarrants.Models;
 
 namespace TravelWarrants.Controllers
 {
@@ -11,11 +9,11 @@ namespace TravelWarrants.Controllers
     public class TravelWarrantsController : ControllerBase
     {
         private readonly IToursService _toursService;
-        
+
         public TravelWarrantsController(IToursService toursService)
         {
             _toursService = toursService;
-         
+
         }
 
 
@@ -34,13 +32,13 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            
+
         }
         [HttpGet("{id}")]
 
         public async Task<ActionResult> GetTour(int id)
         {
-            
+
             var result = await _toursService.GetTour(id);
             if (result.IsSucced)
             {
@@ -48,7 +46,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            
+
         }
 
         [HttpGet("{id}")]
@@ -61,14 +59,14 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            
+
         }
 
 
         [HttpPost]
         public async Task<ActionResult> CreateTour(TourDTOSave tourDTO)
         {
-            
+
 
             var result = await _toursService.CreateTour(tourDTO);
             if (result.IsSucced)
@@ -76,7 +74,7 @@ namespace TravelWarrants.Controllers
                 return Ok(result.Message);
             }
             return BadRequest(result.ErrorMessage);
-            
+
         }
 
         [HttpDelete("{id}")]
@@ -89,11 +87,11 @@ namespace TravelWarrants.Controllers
                 return Ok(result.Message);
             }
             return NotFound();
-           
+
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> EditTour(int id,TourDTOSave tourDTO)
+        public async Task<ActionResult> EditTour(int id, TourDTOSave tourDTO)
         {
             var result = await _toursService.EditTour(id, tourDTO);
             if (result.IsSucced)
@@ -101,9 +99,9 @@ namespace TravelWarrants.Controllers
                 return Ok(result.Message);
             }
             return NotFound();
-            
 
-            
+
+
         }
     }
 }

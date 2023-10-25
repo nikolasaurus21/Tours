@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TravelWarrants.DTOs;
+﻿using TravelWarrants.DTOs;
 using TravelWarrants.DTOs.Company;
 using TravelWarrants.Interfaces;
 
@@ -14,7 +13,7 @@ namespace TravelWarrants.Services
         }
         public async Task<ResponseDTO<IEnumerable<CompanyDTO>>> Get()
         {
-            var company = await _context.Companies.Select(x => new CompanyDTO
+            var company = await _context.Company.Select(x => new CompanyDTO
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -34,7 +33,7 @@ namespace TravelWarrants.Services
 
         public async Task NewCompany(CompanyDTOSave companyDTO)
         {
-            var companyDb = await _context.Companies.FirstOrDefaultAsync();
+            var companyDb = await _context.Company.FirstOrDefaultAsync();
 
             if (companyDb == null)
             {
@@ -53,7 +52,7 @@ namespace TravelWarrants.Services
                     TIN = companyDTO.TIN,
                     VAT = companyDTO.VAT
                 };
-                _context.Companies.Add(newcompany);
+                _context.Company.Add(newcompany);
             }
             else
             {
@@ -75,7 +74,7 @@ namespace TravelWarrants.Services
             await _context.SaveChangesAsync();
 
 
-            
+
         }
     }
 }

@@ -1,8 +1,6 @@
-﻿using System.Diagnostics;
-
-namespace TravelWarrants.DTOs.Inovices
+﻿namespace TravelWarrants.DTOs.Inovices
 {
-    public class InoviceGetDTO
+    public class InvoiceGetDTO
     {
         public int Id { get; set; }
         public int Number { get; set; }

@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.DTOs.Proinovce;
 using TravelWarrants.Interfaces;
-using TravelWarrants.Models;
-using TravelWarrants.Services;
 
 namespace TravelWarrants.Controllers
 {
@@ -35,12 +32,12 @@ namespace TravelWarrants.Controllers
             }
             return BadRequest();
         }
-        
+
 
         [HttpDelete("{invoiceId}")]
         public async Task<ActionResult> DeleteProformaInvoice(int invoiceId)
         {
-            var result  = await _proInoviceService.DeleteProInovice(invoiceId);
+            var result = await _proInoviceService.DeleteProInovice(invoiceId);
             return Ok(result);
         }
 
@@ -54,7 +51,7 @@ namespace TravelWarrants.Controllers
                 return NotFound("Nema plana puta ili proinvoice nije pronađen.");
             }
 
-            
+
 
             return File(fileData.FileStream, "application/octet-stream", fileData.FileName);
         }
@@ -81,9 +78,9 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
         }
-       
+
         [HttpPost]
-        public async Task<ActionResult> NewProformaInvoice([FromBody]ProinvoiceNewDTO proinvoiceNewDTO)
+        public async Task<ActionResult> NewProformaInvoice([FromBody] ProinvoiceNewDTO proinvoiceNewDTO)
         {
             var result = await _proInoviceService.NewProinvoice(proinvoiceNewDTO);
             if (result.IsSucced)
@@ -95,7 +92,7 @@ namespace TravelWarrants.Controllers
 
 
         [HttpPut("{invoiceId}")]
-        public async Task<ActionResult> EditProformaInvoice(int invoiceId,[FromBody]ProinvoiceEditDTO proinvoiceEditDTO)
+        public async Task<ActionResult> EditProformaInvoice(int invoiceId, [FromBody] ProinvoiceEditDTO proinvoiceEditDTO)
         {
             var result = await _proInoviceService.EditProinvoice(invoiceId, proinvoiceEditDTO);
             if (result.IsSucced)
@@ -104,7 +101,7 @@ namespace TravelWarrants.Controllers
             }
             return BadRequest(result.Message);
         }
-        
+
         [HttpGet]
         public async Task<ActionResult> GetProformaInvoice(int? page)
         {

@@ -1,8 +1,6 @@
 ﻿using TravelWarrants.DTOs;
-using TravelWarrants.DTOs.GiroAcc;
 using TravelWarrants.DTOs.Services;
 using TravelWarrants.Interfaces;
-using TravelWarrants.Models;
 
 namespace TravelWarrants.Services
 {
@@ -35,7 +33,7 @@ namespace TravelWarrants.Services
             var serviceDb = await _context.Services.FirstOrDefaultAsync(x => x.Id == id);
             if (serviceDb == null)
             {
-                return new ResponseDTO<ServiceDTO>() { IsSucced = false};
+                return new ResponseDTO<ServiceDTO>() { IsSucced = false };
             }
 
             serviceDb.VATRate = serviceDTO.VATRate;
@@ -51,7 +49,7 @@ namespace TravelWarrants.Services
                 VATRate = serviceDb.VATRate,
             };
 
-            return new ResponseDTO<ServiceDTO>() { IsSucced = true,Message=updatedService };
+            return new ResponseDTO<ServiceDTO>() { IsSucced = true, Message = updatedService };
         }
 
         public async Task<ResponseDTO<ServiceDTO>> GetService(int id)
@@ -80,7 +78,7 @@ namespace TravelWarrants.Services
 
         public async Task<ResponseDTO<ServiceDTO>> NewService(ServiceDTOSave serviceDTO)
         {
-            var companyExists = await _context.Companies.AnyAsync();
+            var companyExists = await _context.Company.AnyAsync();
             if (!companyExists)
             {
                 return new ResponseDTO<ServiceDTO>() { IsSucced = false, ErrorMessage = "Add a company first" };

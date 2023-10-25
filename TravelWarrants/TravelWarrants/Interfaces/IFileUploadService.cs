@@ -8,6 +8,6 @@ namespace TravelWarrants.Interfaces
         Task<FileData> DownloadRoutePlan(int fileId);
         Task<int> UploadFileBuffering(IFormFile file);
         Task<int> UploadFileStreaming(IFormFile file);
-        
+
     }
 }

@@ -4,20 +4,20 @@ import Button from "../../ui/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import { ClientsContext } from "../../context/ClientsContext";
 import { ServicesContext } from "../../context/ServicesContext";
-import { IItemsEdit, IEditInovice } from "../../api/interfaces";
-import { getInoviceById } from "../../api/api";
-import { InovicesContext } from "../../context/InovicesContext";
+import { IItemsEdit, IEditInvoice } from "../../api/interfaces";
+import { getInvoiceById } from "../../api/api";
+import { InvoicesContext } from "../../context/InvoicesContext";
 
 const EditInovice = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { clients } = useContext(ClientsContext);
   const { services } = useContext(ServicesContext);
-  const { updateInovice } = useContext(InovicesContext);
+  const { updateInvoice: updateInovice } = useContext(InvoicesContext);
 
   const [items, setItems] = useState<IItemsEdit[]>([]);
   const [invoiceNumber, setInvoiceNumber] = useState<string | null>(null);
-  const [addInvoice, setAddInvoice] = useState<IEditInovice>({
+  const [addInvoice, setAddInvoice] = useState<IEditInvoice>({
     clientId: 0,
     date: "",
     paymentDeadline: 0,
@@ -31,7 +31,7 @@ const EditInovice = () => {
   useEffect(() => {
     const fetchInovice = async () => {
       try {
-        const inovice = await getInoviceById(Number(id));
+        const inovice = await getInvoiceById(Number(id));
 
         setAddInvoice(inovice);
         if (inovice.itemsOnInovice) {
@@ -78,7 +78,7 @@ const EditInovice = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newInvoiceData: IEditInovice = {
+    const newInvoiceData: IEditInvoice = {
       clientId: addInvoice.clientId,
       date: addInvoice.date,
       paymentDeadline: addInvoice.paymentDeadline,
@@ -89,7 +89,7 @@ const EditInovice = () => {
     };
 
     await updateInovice(Number(id), newInvoiceData);
-    navigate("/inovices");
+    navigate("/invoices");
   };
 
   return (
@@ -101,7 +101,7 @@ const EditInovice = () => {
             marginTop: "15px",
             backgroundColor: "rgb(100,100,100)",
           }}
-          onClick={() => navigate("/inovices")}
+          onClick={() => navigate("/invoices")}
         >
           Nazad
         </Button>

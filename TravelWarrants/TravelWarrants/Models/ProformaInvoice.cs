@@ -19,13 +19,13 @@ namespace TravelWarrants.Models
         public string Note { get; set; }
         public bool? PriceWithoutVAT { get; set; }
         public bool? ProinoviceWithoutVAT { get; set; }
-        
+
         public bool? OfferAccepted { get; set; }
-        public  Client Client { get; set; }
-        public  ICollection<InoviceService> InoviceService { get; set; }
-        public  ICollection<Account> Account { get; set; }
+        public Client Client { get; set; }
+        public ICollection<InvoiceService> InvoiceService { get; set; }
+        public ICollection<Account> Account { get; set; }
         public int? UploadedFileId { get; set; }
         public UploadedFiles UploadedFiles { get; set; }
-        
+
     }
 }

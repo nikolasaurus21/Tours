@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Net;
-using System.Xml.Linq;
+﻿using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.DTOs.Company;
 using TravelWarrants.Interfaces;
 
@@ -29,19 +25,19 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            
+
         }
 
         [HttpPost]
         public async Task<ActionResult> NewCompany(CompanyDTOSave companyDTO)
         {
 
-             await _companyService.NewCompany(companyDTO);
+            await _companyService.NewCompany(companyDTO);
             return Ok(companyDTO);
 
-           
+
         }
 
-       
+
     }
 }

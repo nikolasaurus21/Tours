@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using TravelWarrants.DTOs;
+﻿using TravelWarrants.DTOs;
 using TravelWarrants.DTOs.Inovices;
 using TravelWarrants.DTOs.Reports;
 
@@ -15,11 +14,11 @@ namespace TravelWarrants.Interfaces
         Task<ResponseDTO<IEnumerable<TravelWarrantsReportsDTO>>> GetForDrivers(int id);
         Task<ResponseDTO<IEnumerable<TravelWarrantReportsPeriod>>> GetForPeriod(DateTime from, DateTime to);
         bool Excursion(bool? excursionOnOff);
-        Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetInovicesForDescription(string description,int? page);
-        Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetInovicesForPeriod(DateTime from, DateTime to, int? page);
-        Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetInovicesForClient(int clientId, int? page);
-        Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetProformaInvoicesForClient(int clientId, int? page);
-        Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetProformaInvoicesForPeriod(DateTime from, DateTime to, int? page);
-        Task<ResponseDTO<IEnumerable<InoviceGetDTO>>> GetProformaInvoicesForDescription(string description, int? page);
+        Task<ResponseDTO<IEnumerable<InvoiceGetDTO>>> GetInovicesForDescription(string description, int? page);
+        Task<ResponseDTO<IEnumerable<InvoiceGetDTO>>> GetInovicesForPeriod(DateTime from, DateTime to, int? page);
+        Task<ResponseDTO<IEnumerable<InvoiceGetDTO>>> GetInovicesForClient(int clientId, int? page);
+        Task<ResponseDTO<IEnumerable<InvoiceGetDTO>>> GetProformaInvoicesForClient(int clientId, int? page);
+        Task<ResponseDTO<IEnumerable<InvoiceGetDTO>>> GetProformaInvoicesForPeriod(DateTime from, DateTime to, int? page);
+        Task<ResponseDTO<IEnumerable<InvoiceGetDTO>>> GetProformaInvoicesForDescription(string description, int? page);
     }
 }

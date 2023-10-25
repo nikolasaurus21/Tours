@@ -9,8 +9,8 @@ namespace TravelWarrants.DTOs.Proinovce
         public string Note { get; set; }
         public DateTime DocumentDate { get; set; }
 
-        public List<ItemsOnInoviceEdit> ItemsOnInovice { get; set; } = new List<ItemsOnInoviceEdit>();
-        
+        public List<ItemsOnInvoiceEdit> ItemsOnInovice { get; set; } = new List<ItemsOnInvoiceEdit>();
+
         public List<int> ItemsToDeleteId { get; set; }
         public bool PriceWithoutVAT { get; set; } = false;
         public bool? ProinoviceWithoutVAT { get; set; }

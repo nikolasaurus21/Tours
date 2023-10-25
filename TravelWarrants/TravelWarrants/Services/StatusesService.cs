@@ -25,7 +25,7 @@ namespace TravelWarrants.Services
 
             }).ToListAsync();
 
-            return new ResponseDTO<IEnumerable<StatusDTO>> { Message=statuses ,IsSucced=true};
+            return new ResponseDTO<IEnumerable<StatusDTO>> { Message = statuses, IsSucced = true };
         }
     }
 }

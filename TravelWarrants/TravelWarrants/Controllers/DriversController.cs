@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.DTOs.Drivers;
 using TravelWarrants.Interfaces;
-using TravelWarrants.Models;
 
 namespace TravelWarrants.Controllers
 {
@@ -28,7 +26,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-           
+
         }
 
 
@@ -43,12 +41,12 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            
+
         }
 
         [HttpPost]
 
-        public  async Task<ActionResult> NewDriver (DriverDTOSave driverDto)
+        public async Task<ActionResult> NewDriver(DriverDTOSave driverDto)
         {
             var result = await _driversService.NewDriver(driverDto);
             if (result.IsSucced)
@@ -57,7 +55,7 @@ namespace TravelWarrants.Controllers
             }
             return BadRequest(result.ErrorMessage);
 
-            
+
         }
 
         [HttpDelete("{id}")]
@@ -65,28 +63,28 @@ namespace TravelWarrants.Controllers
         public async Task<ActionResult> DeleteDriver(int id)
         {
 
-             var result = await _driversService.DeleteDriver(id);
+            var result = await _driversService.DeleteDriver(id);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
 
-            
+
         }
 
         [HttpPut("{id}")]
 
-        public async Task<ActionResult> EditDriver(int id , DriverDTOSave driverDTO)
+        public async Task<ActionResult> EditDriver(int id, DriverDTOSave driverDTO)
         {
-            var result =await _driversService.EditDriver(id, driverDTO);
+            var result = await _driversService.EditDriver(id, driverDTO);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
-            
-            
+
+
         }
     }
 }

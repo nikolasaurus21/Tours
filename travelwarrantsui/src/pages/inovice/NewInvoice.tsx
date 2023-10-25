@@ -5,18 +5,18 @@ import { ClientsContext } from "../../context/ClientsContext";
 import { ServicesContext } from "../../context/ServicesContext";
 import { HiOutlinePlusSm, HiMinus } from "react-icons/hi";
 import "./inoviceform.css";
-import { IAddInovice, IAddItem } from "../../api/interfaces";
-import { InovicesContext } from "../../context/InovicesContext";
+import { IAddInvoice, IAddItem } from "../../api/interfaces";
+import { InvoicesContext } from "../../context/InvoicesContext";
 
 const NewInovice = () => {
   const navigate = useNavigate();
 
   const { clients } = useContext(ClientsContext);
   const { services } = useContext(ServicesContext);
-  const { addInovice } = useContext(InovicesContext);
+  const { addInvoice: addInovice } = useContext(InvoicesContext);
 
   const [items, setItems] = useState<IAddItem[]>([]);
-  const [addInvoice, setAddInvoice] = useState<IAddInovice>({
+  const [addInvoice, setAddInvoice] = useState<IAddInvoice>({
     clientId: 0,
     date: "",
     paymentDeadline: 0,
@@ -43,7 +43,7 @@ const NewInovice = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newInvoiceData: IAddInovice = {
+    const newInvoiceData: IAddInvoice = {
       clientId: addInvoice.clientId,
       date: addInvoice.date,
       paymentDeadline: addInvoice.paymentDeadline,
@@ -55,7 +55,7 @@ const NewInovice = () => {
     //console.log("Podaci iz forme:", newInvoiceData);
 
     await addInovice(newInvoiceData);
-    navigate("/inovices");
+    navigate("/invoices");
   };
   return (
     <div>
@@ -66,7 +66,7 @@ const NewInovice = () => {
             marginTop: "15px",
             backgroundColor: "rgb(100,100,100)",
           }}
-          onClick={() => navigate("/inovices")}
+          onClick={() => navigate("/invoices")}
         >
           Nazad
         </Button>

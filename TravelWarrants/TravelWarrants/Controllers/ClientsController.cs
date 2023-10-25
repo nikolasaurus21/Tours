@@ -1,22 +1,19 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using TravelWarrants.Models;
-using TravelWarrants.Services;
-using TravelWarrants.Interfaces;
+﻿using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.DTOs.Clients;
+using TravelWarrants.Interfaces;
 
 namespace TravelWarrants.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class ClientsController : ControllerBase
-    {   
+    {
         private readonly IClientsService _clientsService;
-        public ClientsController(IClientsService clientsService) 
+        public ClientsController(IClientsService clientsService)
         {
             _clientsService = clientsService;
-        }  
-        
+        }
+
 
         [HttpGet]
         public async Task<ActionResult> GetClients()
@@ -27,10 +24,10 @@ namespace TravelWarrants.Controllers
             {
                 return Ok(result.Message);
             }
-            
+
             return NotFound();
 
-           
+
         }
 
         [HttpGet("{id}")]
@@ -46,7 +43,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-           
+
         }
 
         [HttpPost]
@@ -60,28 +57,28 @@ namespace TravelWarrants.Controllers
             }
             return BadRequest(result.ErrorMessage);
 
-            
+
         }
 
 
         [HttpDelete("{id}")]
-        
+
         public async Task<ActionResult> DeleteClient(int id)
         {
 
             var result = await _clientsService.DeleteClient(id);
-            if(result.IsSucced)
+            if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
 
-            
+
 
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> EditClient (int id,ClientDTOSave clientDTO)
+        public async Task<ActionResult> EditClient(int id, ClientDTOSave clientDTO)
         {
             var result = await _clientsService.EditClient(id, clientDTO);
             if (result.IsSucced)
@@ -89,8 +86,8 @@ namespace TravelWarrants.Controllers
                 return Ok(result.Message);
             }
             return BadRequest();
-            
-            
+
+
         }
     }
 }

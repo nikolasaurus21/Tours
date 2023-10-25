@@ -1,5 +1,4 @@
 ﻿using TravelWarrants.DTOs;
-using TravelWarrants.DTOs.Clients;
 using TravelWarrants.DTOs.Fleet;
 using TravelWarrants.Interfaces;
 
@@ -33,7 +32,7 @@ namespace TravelWarrants.Services
             var vehicleDb = await _context.Vehicles.FirstOrDefaultAsync(x => x.Id == id);
             if (vehicleDb == null)
             {
-                return new ResponseDTO<FleetDTOGet>() { IsSucced = false }; 
+                return new ResponseDTO<FleetDTOGet>() { IsSucced = false };
             }
 
 
@@ -76,7 +75,7 @@ namespace TravelWarrants.Services
 
             }).ToListAsync();
 
-            return new ResponseDTO<IEnumerable<FleetDTOGet>>() { IsSucced = true, Message=fleet };
+            return new ResponseDTO<IEnumerable<FleetDTOGet>>() { IsSucced = true, Message = fleet };
         }
 
         public async Task<ResponseDTO<FleetDTOGet>> GetVehicle(int id)
@@ -99,7 +98,7 @@ namespace TravelWarrants.Services
 
         public async Task<ResponseDTO<FleetDTOGet>> NewVehicle(FleetDTOSave fleetDTO)
         {
-            var companyExists = await _context.Companies.AnyAsync();
+            var companyExists = await _context.Company.AnyAsync();
             if (!companyExists)
             {
                 return new ResponseDTO<FleetDTOGet>() { IsSucced = false, ErrorMessage = "Add a company first" };

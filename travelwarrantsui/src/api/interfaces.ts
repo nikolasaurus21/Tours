@@ -58,13 +58,13 @@ export interface addClient {
   vat: string;
  }
 
- export interface allGiroAccounts{
+ export interface allBankAccounts{
   id:number
   bank:string
   account:string
  }
 
- export interface addGiroAccounts{
+ export interface addBankAccounts{
   
   bank:string
   account:string
@@ -163,7 +163,7 @@ export interface deleteTour{
   mileage:number
 }
 
-export interface Inovices{
+export interface Invoices{
   id:number,
   number:number,
   year:number,
@@ -181,7 +181,7 @@ export interface IAddItem{
   numberOfDays:string
 
 }
-export interface IAddInovice{
+export interface IAddInvoice{
   clientId: number
   paymentDeadline:number
   note:string
@@ -190,7 +190,7 @@ export interface IAddInovice{
   itemsOnInovice:IAddItem[]
 }
 
-export interface IDeleteInovice{
+export interface IDeleteInvoice{
   number:string
   date:string
   clientName:string
@@ -206,7 +206,7 @@ export interface IItemsEdit{
   numberOfDays:string
 }
 
-export interface IEditInovice{
+export interface IEditInvoice{
   clientId: number
   paymentDeadline:number
   note:string
@@ -216,7 +216,7 @@ export interface IEditInovice{
   itemsToDelete?: number[]
 }
 
-export interface IGetInoviceById{
+export interface IGetInvoiceById{
   clientId: number
   //clientName:string
   paymentDeadline:number

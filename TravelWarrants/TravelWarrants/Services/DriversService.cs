@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TravelWarrants.DTOs;
-using TravelWarrants.DTOs.Clients;
+﻿using TravelWarrants.DTOs;
 using TravelWarrants.DTOs.Drivers;
 using TravelWarrants.Interfaces;
 
@@ -19,7 +17,7 @@ namespace TravelWarrants.Services
 
             if (deleteDriver == null)
             {
-                return new ResponseDTO<bool>() { IsSucced = false ,Message=false};
+                return new ResponseDTO<bool>() { IsSucced = false, Message = false };
             }
 
             _context.Drivers.Remove(deleteDriver);
@@ -33,11 +31,11 @@ namespace TravelWarrants.Services
             var driverDb = await _context.Drivers.FirstOrDefaultAsync(x => x.Id == id);
             if (driverDb == null)
             {
-                  return new ResponseDTO<DriverDTO>() { IsSucced = false };
+                return new ResponseDTO<DriverDTO>() { IsSucced = false };
             }
 
             driverDb.Name = driverDTO.Name;
-            driverDb.NUmberOfPhone = driverDTO.NumberOfPhone;
+            driverDb.NumberOfPhone = driverDTO.NumberOfPhone;
 
 
             _context.Drivers.Update(driverDb);
@@ -45,7 +43,7 @@ namespace TravelWarrants.Services
 
             var updatedDriver = new DriverDTO { Id = driverDb.Id, Name = driverDb.Name };
 
-            return new ResponseDTO<DriverDTO>() { IsSucced = true,Message=updatedDriver };
+            return new ResponseDTO<DriverDTO>() { IsSucced = true, Message = updatedDriver };
         }
 
         public async Task<ResponseDTO<DriverDTO>> GetDriver(int id)
@@ -54,7 +52,7 @@ namespace TravelWarrants.Services
             {
                 Id = x.Id,
                 Name = x.Name,
-                NumberOfPhone = x.NUmberOfPhone
+                NumberOfPhone = x.NumberOfPhone
 
 
             }).FirstOrDefaultAsync();
@@ -74,10 +72,10 @@ namespace TravelWarrants.Services
 
             return new ResponseDTO<IEnumerable<DriverDTO>>() { IsSucced = true, Message = drivers };
         }
-    
+
         public async Task<ResponseDTO<DriverDTO>> NewDriver(DriverDTOSave driverDTO)
         {
-            var companyExists = await _context.Companies.AnyAsync();
+            var companyExists = await _context.Company.AnyAsync();
             if (!companyExists)
             {
                 return new ResponseDTO<DriverDTO>() { IsSucced = false, ErrorMessage = "Add a company first" };
@@ -86,7 +84,7 @@ namespace TravelWarrants.Services
             {
 
                 Name = driverDTO.Name,
-                NUmberOfPhone = driverDTO.NumberOfPhone
+                NumberOfPhone = driverDTO.NumberOfPhone
             };
 
             _context.Drivers.Add(driver);

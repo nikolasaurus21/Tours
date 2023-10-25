@@ -1,7 +1,6 @@
 ﻿using TravelWarrants.DTOs;
 using TravelWarrants.DTOs.Clients;
 using TravelWarrants.Interfaces;
-using TravelWarrants.Models;
 
 namespace TravelWarrants.Services
 {
@@ -14,12 +13,12 @@ namespace TravelWarrants.Services
             _context = context;
         }
 
-        public  async Task<ResponseDTO<bool>> DeleteClient(int id)
+        public async Task<ResponseDTO<bool>> DeleteClient(int id)
         {
             var clientToDelete = await _context.Clients.FirstOrDefaultAsync(x => x.Id == id);
             if (clientToDelete == null)
             {
-                return new ResponseDTO<bool>() { IsSucced= false, Message = false };
+                return new ResponseDTO<bool>() { IsSucced = false, Message = false };
             }
 
             _context.Clients.Remove(clientToDelete);
@@ -41,7 +40,7 @@ namespace TravelWarrants.Services
             clientDb.Name = clientDTO.Name;
             clientDb.Address = clientDTO.Address;
             clientDb.PlaceName = clientDTO.PlaceName;
-            clientDb.RegistrationNUmber = clientDTO.RegistrationNumber;
+            clientDb.RegistrationNumber = clientDTO.RegistrationNumber;
             clientDb.VAT = clientDTO.VAT;
             clientDb.Telephone = clientDTO.Telephone;
             clientDb.Fax = clientDTO.Fax;
@@ -61,7 +60,7 @@ namespace TravelWarrants.Services
 
             };
 
-             return new ResponseDTO<ClientDTOGet>() { Message = updatedClient, IsSucced = true };
+            return new ResponseDTO<ClientDTOGet>() { Message = updatedClient, IsSucced = true };
         }
 
         public async Task<ResponseDTO<ClientDTOSave>> GetClient(int id)
@@ -76,7 +75,7 @@ namespace TravelWarrants.Services
                 Fax = x.Fax,
                 Excursion = x.Excursion,
                 VAT = x.VAT,
-                RegistrationNumber = x.RegistrationNUmber,
+                RegistrationNumber = x.RegistrationNumber,
 
 
             }).FirstOrDefaultAsync();
@@ -101,10 +100,10 @@ namespace TravelWarrants.Services
         public async Task<ResponseDTO<ClientDTOGet>> NewClient(ClientDTOSave clientDTO)
         {
 
-            var companyExists = await _context.Companies.AnyAsync(); 
+            var companyExists = await _context.Company.AnyAsync();
             if (!companyExists)
             {
-                return new ResponseDTO<ClientDTOGet>() {IsSucced = false,  ErrorMessage="Add company before add a client"};
+                return new ResponseDTO<ClientDTOGet>() { IsSucced = false, ErrorMessage = "Add company before add a client" };
             }
 
             var client = new Client
@@ -117,7 +116,7 @@ namespace TravelWarrants.Services
                 Fax = clientDTO.Fax,
                 Excursion = clientDTO.Excursion,
                 VAT = clientDTO.VAT,
-                RegistrationNUmber = clientDTO.RegistrationNumber,
+                RegistrationNumber = clientDTO.RegistrationNumber,
             };
             _context.Clients.Add(client);
             await _context.SaveChangesAsync();
@@ -131,7 +130,7 @@ namespace TravelWarrants.Services
 
             };
 
-            return new ResponseDTO<ClientDTOGet>() { Message = newClient ,IsSucced = true};
+            return new ResponseDTO<ClientDTOGet>() { Message = newClient, IsSucced = true };
         }
     }
 }

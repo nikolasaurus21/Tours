@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.DTOs.Payments;
 using TravelWarrants.Interfaces;
-using TravelWarrants.Models;
 
 namespace TravelWarrants.Controllers
 {
@@ -20,12 +18,12 @@ namespace TravelWarrants.Controllers
         public async Task<ActionResult> GetPayments()
         {
             var result = await _paymentsService.GetPayments();
-            if(result.IsSucced)
+            if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
-            
+
         }
 
 
@@ -34,24 +32,24 @@ namespace TravelWarrants.Controllers
         public async Task<ActionResult> GetPayment(int id)
         {
             var result = await _paymentsService.GetPayment(id);
-            if(result.IsSucced)
+            if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
-            
+
         }
         [HttpPost]
         public async Task<ActionResult> NewPayment(PaymentsDTOSave paymentsDTO)
         {
             var result = await _paymentsService.NewPayment(paymentsDTO);
-            if(result.IsSucced)
+            if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return BadRequest(result.ErrorMessage);
-           
-           
+
+
         }
 
         [HttpPut("{id}")]
@@ -64,7 +62,7 @@ namespace TravelWarrants.Controllers
                 return Ok(result.Message);
             }
             return NotFound();
-            
+
         }
 
 

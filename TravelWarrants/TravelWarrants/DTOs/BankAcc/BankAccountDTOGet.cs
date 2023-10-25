@@ -1,6 +1,6 @@
 ﻿namespace TravelWarrants.DTOs.GiroAcc
 {
-    public class GiroAccountDTOGet
+    public class BankAccountDTOGet
     {
         public int Id { get; set; }
         public string Bank { get; set; }

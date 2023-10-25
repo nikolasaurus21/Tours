@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using TravelWarrants.DTOs;
+﻿using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.Interfaces;
 
 namespace TravelWarrants.Controllers
@@ -26,7 +24,7 @@ namespace TravelWarrants.Controllers
             }
             return NotFound();
 
-            
+
         }
     }
 }

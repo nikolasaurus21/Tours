@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TravelWarrants.DTOs;
-using TravelWarrants.DTOs.GiroAcc;
+﻿using TravelWarrants.DTOs;
 using TravelWarrants.DTOs.Searches;
 using TravelWarrants.Interfaces;
 
@@ -11,7 +9,7 @@ namespace TravelWarrants.Services
         private readonly TravelWarrantsContext _context;
         public SearchesService(TravelWarrantsContext context)
         {
-            _context = context;   
+            _context = context;
         }
         public async Task<ResponseDTO<SearchDTOGet>> EditSearch(int id, SearchesDTOSave searchesDTO)
         {
@@ -20,8 +18,8 @@ namespace TravelWarrants.Services
             if (searchDb == null)
             {
                 return new ResponseDTO<SearchDTOGet>() { IsSucced = false };
-                
-                
+
+
             }
 
             var oldClient = searchDb.ClientId;
@@ -82,7 +80,7 @@ namespace TravelWarrants.Services
 
             };
 
-            return new ResponseDTO<SearchDTOGet> { Message=updatedSearch,IsSucced=true };
+            return new ResponseDTO<SearchDTOGet> { Message = updatedSearch, IsSucced = true };
         }
 
         public async Task<ResponseDTO<SearchDTOGet>> GetSearch(int id)
@@ -97,7 +95,7 @@ namespace TravelWarrants.Services
 
             }).FirstOrDefaultAsync();
 
-            return new ResponseDTO<SearchDTOGet> { IsSucced=true ,Message=payment};
+            return new ResponseDTO<SearchDTOGet> { IsSucced = true, Message = payment };
         }
 
         public async Task<ResponseDTO<IEnumerable<SearchDTOGet>>> GetSearches()
@@ -129,7 +127,7 @@ namespace TravelWarrants.Services
                 Amount = searchesDTO.Amount,
                 ClientId = searchesDTO.ClientId,
                 Note = searchesDTO.Note,
-               
+
 
             };
 

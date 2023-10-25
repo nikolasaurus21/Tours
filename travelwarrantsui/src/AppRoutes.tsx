@@ -10,9 +10,9 @@ import Drivers from "./pages/drivers/Drivers";
 import AddDriver from "./pages/drivers/AddDriver";
 import EditDriver from "./pages/drivers/EditDriver";
 import Company from "./pages/company/Company";
-import GiroAccounts from "./pages/ziro-racun/GiroAccounts";
-import AddGiroAccount from "./pages/ziro-racun/AddGiroAccount";
-import EditGiroAccount from "./pages/ziro-racun/EditGiroAccount";
+import GiroAccounts from "./pages/bankaccounts/BankAccounts";
+import AddGiroAccount from "./pages/bankaccounts/AddBankAccount";
+import EditGiroAccount from "./pages/bankaccounts/EditBankAccount";
 import Services from "./pages/services/Services";
 import AddService from "./pages/services/AddService";
 import EditService from "./pages/services/EditService";
@@ -35,13 +35,13 @@ import Status from "./pages/status/Status";
 import DeleteClient from "./pages/clients/DeleteClient";
 import DeleteVehicle from "./pages/vehicles/DeleteVehicle";
 import DeleteDriver from "./pages/drivers/DeleteDriver";
-import DeleteGiroAccount from "./pages/ziro-racun/DeleteGiroAccount";
+import DeleteGiroAccount from "./pages/bankaccounts/DeleteBankAccount";
 import DeleteService from "./pages/services/DeleteService";
 import DeleteTour from "./pages/travelwarrants/DeleteTour";
-import Inovices from "./pages/inovice/Inovices";
-import NewInovice from "./pages/inovice/NewInovice";
+import Inovices from "./pages/inovice/Invoices";
+import NewInovice from "./pages/inovice/NewInvoice";
 import EditInovice from "./pages/inovice/EditInovice";
-import DeleteInovice from "./pages/inovice/DeleteInovice";
+import DeleteInovice from "./pages/inovice/DeleteInvoice";
 import InoviceReportsForClient from "./pages/reports/InoviceReportsForClient";
 import InoviceReportsForPeriod from "./pages/reports/InoviceReportsForPeriod";
 import InoviceReportsByDescription from "./pages/reports/InoviceReportsByDescription";
@@ -84,11 +84,11 @@ const AppRoutes = () => {
 
         <Route path="/company" element={<Company />} />
 
-        <Route path="/giroaccounts" element={<GiroAccounts />} />
-        <Route path="/giroaccounts/add" element={<AddGiroAccount />} />
-        <Route path="/giroaccounts/edit/:id" element={<EditGiroAccount />} />
+        <Route path="/bankaccounts" element={<GiroAccounts />} />
+        <Route path="/bankaccounts/add" element={<AddGiroAccount />} />
+        <Route path="/bankaccounts/edit/:id" element={<EditGiroAccount />} />
         <Route
-          path="/giroaccounts/delete/:id"
+          path="/bankaccounts/delete/:id"
           element={<DeleteGiroAccount />}
         />
 
@@ -131,7 +131,7 @@ const AppRoutes = () => {
           element={<PeriodReports />}
         />
         <Route
-          path="/reports/inovicesforclient"
+          path="/reports/invoicesforclient"
           element={<InoviceReportsForClient />}
         />
         <Route
@@ -139,28 +139,28 @@ const AppRoutes = () => {
           element={<InoviceReportsForPeriod />}
         />
         <Route
-          path="/reports/inovicesbydescription"
+          path="/reports/invoicesbydescription"
           element={<InoviceReportsByDescription />}
         />
         <Route
-          path="/reports/proformainoviceforclient"
+          path="/reports/proformainvoiceforclient"
           element={<ProformaInvoiceReportsForClient />}
         />
         <Route
-          path="/reports/proformainoviceforperiod"
+          path="/reports/proformainvoiceforperiod"
           element={<ProformaInvoiceReportsForPeriod />}
         />
         <Route
-          path="/reports/proformainovicebydescription"
+          path="/reports/proformainvoicebydescription"
           element={<ProformaInvoiceReportsByDescription />}
         />
 
         <Route path="/status" element={<Status />} />
 
-        <Route path="/inovices" element={<Inovices />} />
-        <Route path="/inovices/add" element={<NewInovice />} />
-        <Route path="/inovices/edit/:id" element={<EditInovice />} />
-        <Route path="/inovices/delete/:id" element={<DeleteInovice />} />
+        <Route path="/invoices" element={<Inovices />} />
+        <Route path="/invoices/add" element={<NewInovice />} />
+        <Route path="/invoices/edit/:id" element={<EditInovice />} />
+        <Route path="/invoices/delete/:id" element={<DeleteInovice />} />
 
         <Route path="/proformainvoices" element={<ProformaInvoices />} />
         <Route path="/proformainvoices/add" element={<NewProformaInvoice />} />

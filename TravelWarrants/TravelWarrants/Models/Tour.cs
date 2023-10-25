@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TravelWarrants.Models
 {
@@ -32,7 +30,7 @@ namespace TravelWarrants.Models
         [Column(TypeName = "decimal(10, 2)")]
         public decimal? NumberOfDays { get; set; }
         public string IntermediateDestinations { get; set; }
-        
+
         public virtual Client Client { get; set; }
         public virtual Driver Driver { get; set; }
         public virtual Vehicle Vehicle { get; set; }

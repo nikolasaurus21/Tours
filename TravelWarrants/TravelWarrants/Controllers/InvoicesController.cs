@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using PdfSharpCore.Pdf;
-using PdfSharpCore;
-using TheArtOfDev.HtmlRenderer.PdfSharp;
+﻿using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.DTOs.Inovices;
 using TravelWarrants.Interfaces;
 
@@ -11,20 +7,20 @@ namespace TravelWarrants.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class InovicesController : ControllerBase
+    public class InvoicesController : ControllerBase
     {
-        private readonly IInovicesService _inovicesService;
+        private readonly IInovicesService _invoicesService;
 
-        public InovicesController(IInovicesService inovicesService)
+        public InvoicesController(IInovicesService invoicesService)
         {
-            _inovicesService = inovicesService;
+            _invoicesService = invoicesService;
         }
 
 
-        [HttpGet("{inoviceId}")]
+        [HttpGet("{invoiceId}")]
         public async Task<ActionResult> GetById(int inoviceId)
         {
-            var result = await _inovicesService.GetById(inoviceId);
+            var result = await _invoicesService.GetById(inoviceId);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
@@ -33,10 +29,10 @@ namespace TravelWarrants.Controllers
             return NotFound();
         }
 
-        [HttpGet("{inoviceId}")]
+        [HttpGet("{invoiceId}")]
         public async Task<ActionResult> ToDelete(int inoviceId)
         {
-            var result = await _inovicesService.GetForDelete(inoviceId);
+            var result = await _invoicesService.GetForDelete(inoviceId);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
@@ -47,7 +43,7 @@ namespace TravelWarrants.Controllers
         [HttpGet]
         public async Task<ActionResult> Get(int? pageNumber)
         {
-            var result =await _inovicesService.GetInovices(pageNumber);
+            var result = await _invoicesService.GetInovices(pageNumber);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
@@ -57,9 +53,9 @@ namespace TravelWarrants.Controllers
 
         [HttpPost]
 
-        public async Task<ActionResult> NewInovice(InoviceNewDTO inoviceSaveDTO)
+        public async Task<ActionResult> NewInvoice(InvoiceNewDTO inoviceSaveDTO)
         {
-            var result = await _inovicesService.NewInovice(inoviceSaveDTO);
+            var result = await _invoicesService.NewInovice(inoviceSaveDTO);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
@@ -67,11 +63,11 @@ namespace TravelWarrants.Controllers
             return BadRequest(result.ErrorMessage);
         }
 
-        [HttpPut("{inoviceId}")]
+        [HttpPut("{invoiceId}")]
 
-        public async Task<ActionResult>EditInovice(int inoviceId, InoviceEditDTO inoviceEditDTO)
+        public async Task<ActionResult> EditInvoice(int inoviceId, InvoiceEditDTO inoviceEditDTO)
         {
-            var result = await _inovicesService.EditInvoice(inoviceId, inoviceEditDTO);
+            var result = await _invoicesService.EditInvoice(inoviceId, inoviceEditDTO);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
@@ -79,11 +75,11 @@ namespace TravelWarrants.Controllers
             return NotFound();
         }
 
-        [HttpDelete("{inoviceId}")]
+        [HttpDelete("{invoiceId}")]
 
-        public async Task<ActionResult> DeleteInovice (int inoviceId)
+        public async Task<ActionResult> DeleteInvoice(int inoviceId)
         {
-            var result = await _inovicesService.DeleteInovice(inoviceId);
+            var result = await _invoicesService.DeleteInovice(inoviceId);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
@@ -94,7 +90,7 @@ namespace TravelWarrants.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> GeneratePdf(int id)
         {
-            var (pdfBytes, invoiceNumber) = await _inovicesService.GeneratePdf(id); 
+            var (pdfBytes, invoiceNumber) = await _invoicesService.GeneratePdf(id);
             string fileName = $"Faktura_{invoiceNumber}.pdf";
             return File(pdfBytes, "application/pdf", fileName);
         }

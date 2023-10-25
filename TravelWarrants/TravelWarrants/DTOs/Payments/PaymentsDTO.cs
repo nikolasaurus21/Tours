@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace TravelWarrants.DTOs.Payments
+﻿namespace TravelWarrants.DTOs.Payments
 {
     public class PaymentsDTO
     {

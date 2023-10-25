@@ -1,14 +1,14 @@
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../ui/Button";
-import { getGiroAccountById } from "../../api/api";
+import { getBankAccountById } from "../../api/api";
 import { AiFillDelete } from "react-icons/ai";
-import { GiroAccountsContext } from "../../context/ZiroRacuniContext";
+import { BankAccountsContext } from "../../context/BankAccountsContext";
 import { usePagination } from "../../context/PaginationContext";
 import Pagination from "../../ui/Pagination";
 
 const GiroAccounts = () => {
-  const { giroAccounts } = useContext(GiroAccountsContext);
+  const { bankAccounts: giroAccounts } = useContext(BankAccountsContext);
 
   const { currentPage, rowsPerPage } = usePagination();
   const totalPages = Math.ceil(giroAccounts.length / rowsPerPage);
@@ -21,15 +21,15 @@ const GiroAccounts = () => {
   const navigate = useNavigate();
 
   const handleDeleteClick = async (id: number) => {
-    const giroData = await getGiroAccountById(id);
-    navigate(`/giroaccounts/delete/${id}`, { state: { giroData: giroData } });
+    const giroData = await getBankAccountById(id);
+    navigate(`/bankaccounts/delete/${id}`, { state: { giroData: giroData } });
   };
   return (
     <div>
       <h1>Žiro-računi</h1>
       <Button
         buttonStyle={{ marginLeft: "30px" }}
-        onClick={() => navigate("/giroaccounts/add")}
+        onClick={() => navigate("/bankaccounts/add")}
       >
         Dodaj žiro-račun
       </Button>
@@ -48,7 +48,7 @@ const GiroAccounts = () => {
                 <tr key={ga.id}>
                   <td
                     className="firstcolumnorrow"
-                    onClick={() => navigate(`/giroaccounts/edit/${ga.id}`)}
+                    onClick={() => navigate(`/bankaccounts/edit/${ga.id}`)}
                   >
                     {ga.bank}
                   </td>

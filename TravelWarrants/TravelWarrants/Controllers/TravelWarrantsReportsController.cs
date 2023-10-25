@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TravelWarrants.DTOs.Reports;
 using TravelWarrants.Interfaces;
 
@@ -18,49 +17,49 @@ namespace TravelWarrants.Controllers
 
 
         [HttpPost]
-        public bool Excursion (bool? excursionOnOff)
+        public bool Excursion(bool? excursionOnOff)
         {
             var result = _reportsService.Excursion(excursionOnOff);
             return result;
         }
-        
+
         [HttpGet("{id}")]
 
         public async Task<ActionResult<IEnumerable<TravelWarrantsReportsDTO>>> GetForClients(int id)
         {
             var result = await _reportsService.GetForClients(id);
-            if(result.IsSucced)
+            if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
 
-            
+
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TravelWarrantsReportsDTO>>> GetForDestination( string destination)
+        public async Task<ActionResult<IEnumerable<TravelWarrantsReportsDTO>>> GetForDestination(string destination)
         {
             var result = await _reportsService.GetForDestination(destination);
-            if(result.IsSucced)
+            if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
-            
+
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TravelWarrantsReportsDTO>>> GetForDepAndDes(string departure, string destination)
         {
             var result = await _reportsService.GetForDepAndDes(departure, destination);
-            if(result.IsSucced)
+            if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
 
-            
+
         }
 
         [HttpGet("{id}")]
@@ -72,38 +71,38 @@ namespace TravelWarrants.Controllers
                 return Ok(result.Message);
             }
             return NotFound();
-            
+
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<TravelWarrantsReportsDTO>>> GetForDrivers(int id )
+        public async Task<ActionResult<IEnumerable<TravelWarrantsReportsDTO>>> GetForDrivers(int id)
         {
             var result = await _reportsService.GetForDrivers(id);
-            if(result.IsSucced)
+            if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
-            
+
         }
 
-       
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TravelWarrantReportsPeriod>>> GetForPeriod(DateTime from, DateTime to)
         {
-           
+
             var result = await _reportsService.GetForPeriod(from, to);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
             }
             return NotFound();
-            
+
         }
 
         [HttpGet]
-        public async Task<ActionResult> InoviceReportsForClient(int clientId, int? page) 
+        public async Task<ActionResult> InoviceReportsForClient(int clientId, int? page)
         {
-            var result = await _reportsService.GetInovicesForClient(clientId,page);
+            var result = await _reportsService.GetInovicesForClient(clientId, page);
             if (result.IsSucced)
             {
                 return Ok(result.Message);
@@ -123,9 +122,9 @@ namespace TravelWarrants.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult>InoviceReportsForPeriod(DateTime from, DateTime to, int? page)
+        public async Task<ActionResult> InoviceReportsForPeriod(DateTime from, DateTime to, int? page)
         {
-            var result = await _reportsService.GetInovicesForPeriod(from, to,page);
+            var result = await _reportsService.GetInovicesForPeriod(from, to, page);
             if (result.IsSucced)
             {
                 return Ok(result.Message);

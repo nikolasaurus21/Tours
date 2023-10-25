@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using TravelWarrants.DTOs;
+﻿using TravelWarrants.DTOs;
 using TravelWarrants.DTOs.Payments;
 
 namespace TravelWarrants.Interfaces

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace TravelWarrants.Migrations
 {
     /// <inheritdoc />
-    public partial class DbCreate : Migration
+    public partial class DatabaseCreation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,7 +21,7 @@ namespace TravelWarrants.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     Address = table.Column<string>(type: "text", nullable: false),
                     PlaceName = table.Column<string>(type: "text", nullable: false),
-                    RegistrationNUmber = table.Column<string>(type: "text", nullable: false),
+                    RegistrationNumber = table.Column<string>(type: "text", nullable: false),
                     VAT = table.Column<decimal>(type: "numeric", nullable: false),
                     Telephone = table.Column<string>(type: "text", nullable: false),
                     Fax = table.Column<string>(type: "text", nullable: false),
@@ -35,7 +35,7 @@ namespace TravelWarrants.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Companies",
+                name: "Company",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -53,7 +53,7 @@ namespace TravelWarrants.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Companies", x => x.Id);
+                    table.PrimaryKey("PK_Company", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -63,27 +63,11 @@ namespace TravelWarrants.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    NUmberOfPhone = table.Column<string>(type: "text", nullable: false)
+                    NumberOfPhone = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Drivers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Places",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Country = table.Column<string>(type: "text", nullable: false),
-                    Latitude = table.Column<decimal>(type: "numeric", nullable: false),
-                    Longitude = table.Column<decimal>(type: "numeric", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Places", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -135,7 +119,7 @@ namespace TravelWarrants.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Inovices",
+                name: "Invoices",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -143,9 +127,9 @@ namespace TravelWarrants.Migrations
                     Number = table.Column<int>(type: "integer", nullable: false),
                     Year = table.Column<int>(type: "integer", nullable: false),
                     ClientId = table.Column<int>(type: "integer", nullable: false),
-                    NoVAT = table.Column<decimal>(type: "numeric", nullable: false),
-                    VAT = table.Column<decimal>(type: "numeric", nullable: false),
-                    Total = table.Column<decimal>(type: "numeric", nullable: false),
+                    NoVAT = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
+                    VAT = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
+                    Total = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
                     DocumentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CurrencyDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Note = table.Column<string>(type: "text", nullable: false),
@@ -153,9 +137,9 @@ namespace TravelWarrants.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Inovices", x => x.Id);
+                    table.PrimaryKey("PK_Invoices", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Inovices_Clients_ClientId",
+                        name: "FK_Invoices_Clients_ClientId",
                         column: x => x.ClientId,
                         principalTable: "Clients",
                         principalColumn: "Id",
@@ -170,7 +154,7 @@ namespace TravelWarrants.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ClientId = table.Column<int>(type: "integer", nullable: false),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
                     Note = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -191,9 +175,9 @@ namespace TravelWarrants.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ClientId = table.Column<int>(type: "integer", nullable: false),
-                    AmountOfAccount = table.Column<decimal>(type: "numeric", nullable: false),
-                    AmountOfDeposit = table.Column<decimal>(type: "numeric", nullable: false),
-                    Balance = table.Column<decimal>(type: "numeric", nullable: false)
+                    AmountOfAccount = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
+                    AmountOfDeposit = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
+                    Balance = table.Column<decimal>(type: "numeric(10,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -207,7 +191,7 @@ namespace TravelWarrants.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CompaniesGiroAccounts",
+                name: "CompanyBankAccounts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -218,11 +202,11 @@ namespace TravelWarrants.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CompaniesGiroAccounts", x => x.Id);
+                    table.PrimaryKey("PK_CompanyBankAccounts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CompaniesGiroAccounts_Companies_CompanyId",
+                        name: "FK_CompanyBankAccounts_Company_CompanyId",
                         column: x => x.CompanyId,
-                        principalTable: "Companies",
+                        principalTable: "Company",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -236,9 +220,9 @@ namespace TravelWarrants.Migrations
                     Number = table.Column<int>(type: "integer", nullable: false),
                     Year = table.Column<int>(type: "integer", nullable: false),
                     ClientId = table.Column<int>(type: "integer", nullable: false),
-                    NoVAT = table.Column<decimal>(type: "numeric", nullable: false),
-                    VAT = table.Column<decimal>(type: "numeric", nullable: false),
-                    Total = table.Column<decimal>(type: "numeric", nullable: false),
+                    NoVAT = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
+                    VAT = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
+                    Total = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
                     DocumentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CurrencyDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Note = table.Column<string>(type: "text", nullable: false),
@@ -274,8 +258,8 @@ namespace TravelWarrants.Migrations
                     Destination = table.Column<string>(type: "text", nullable: false),
                     Mileage = table.Column<decimal>(type: "numeric", nullable: false),
                     NumberOfPassengers = table.Column<int>(type: "integer", nullable: false),
-                    Price = table.Column<decimal>(type: "numeric", nullable: false),
-                    Toll = table.Column<decimal>(type: "numeric", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
+                    Toll = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
                     Fuel = table.Column<decimal>(type: "numeric", nullable: false),
                     TimeOfTour = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     VehicleId = table.Column<int>(type: "integer", nullable: false),
@@ -289,7 +273,7 @@ namespace TravelWarrants.Migrations
                     Note = table.Column<string>(type: "text", nullable: false),
                     DriverId = table.Column<int>(type: "integer", nullable: false),
                     FuelPrice = table.Column<decimal>(type: "numeric", nullable: true),
-                    NumberOfDays = table.Column<decimal>(type: "numeric", nullable: true),
+                    NumberOfDays = table.Column<decimal>(type: "numeric(10,2)", nullable: true),
                     IntermediateDestinations = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -321,11 +305,11 @@ namespace TravelWarrants.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    InoviceId = table.Column<int>(type: "integer", nullable: true),
+                    InvoiceId = table.Column<int>(type: "integer", nullable: true),
                     ProformaInvoiceId = table.Column<int>(type: "integer", nullable: true),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     ClientId = table.Column<int>(type: "integer", nullable: false),
-                    Amount = table.Column<decimal>(type: "numeric", nullable: true),
+                    Amount = table.Column<decimal>(type: "numeric(10,2)", nullable: true),
                     Note = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
@@ -338,9 +322,9 @@ namespace TravelWarrants.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Accounts_Inovices_InoviceId",
-                        column: x => x.InoviceId,
-                        principalTable: "Inovices",
+                        name: "FK_Accounts_Invoices_InvoiceId",
+                        column: x => x.InvoiceId,
+                        principalTable: "Invoices",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Accounts_ProformaInovices_ProformaInvoiceId",
@@ -350,38 +334,38 @@ namespace TravelWarrants.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "InovicesServices",
+                name: "InvoicesServices",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    InoviceId = table.Column<int>(type: "integer", nullable: true),
+                    InvoiceId = table.Column<int>(type: "integer", nullable: true),
                     ServiceId = table.Column<int>(type: "integer", nullable: false),
                     ProformaInvoiceId = table.Column<int>(type: "integer", nullable: true),
                     Description = table.Column<string>(type: "text", nullable: false),
                     Quantity = table.Column<decimal>(type: "numeric", nullable: false),
-                    Price = table.Column<decimal>(type: "numeric", nullable: false),
-                    Value = table.Column<decimal>(type: "numeric", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
+                    Value = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
                     VAT = table.Column<decimal>(type: "numeric", nullable: false),
                     NumberOfDays = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_InovicesServices", x => x.Id);
+                    table.PrimaryKey("PK_InvoicesServices", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_InovicesServices_Inovices_InoviceId",
-                        column: x => x.InoviceId,
-                        principalTable: "Inovices",
+                        name: "FK_InvoicesServices_Invoices_InvoiceId",
+                        column: x => x.InvoiceId,
+                        principalTable: "Invoices",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_InovicesServices_ProformaInovices_ProformaInvoiceId",
+                        name: "FK_InvoicesServices_ProformaInovices_ProformaInvoiceId",
                         column: x => x.ProformaInvoiceId,
                         principalTable: "ProformaInovices",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_InovicesServices_Services_ServiceId",
+                        name: "FK_InvoicesServices_Services_ServiceId",
                         column: x => x.ServiceId,
                         principalTable: "Services",
                         principalColumn: "Id",
@@ -394,9 +378,9 @@ namespace TravelWarrants.Migrations
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Accounts_InoviceId",
+                name: "IX_Accounts_InvoiceId",
                 table: "Accounts",
-                column: "InoviceId");
+                column: "InvoiceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Accounts_ProformaInvoiceId",
@@ -404,28 +388,28 @@ namespace TravelWarrants.Migrations
                 column: "ProformaInvoiceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CompaniesGiroAccounts_CompanyId",
-                table: "CompaniesGiroAccounts",
+                name: "IX_CompanyBankAccounts_CompanyId",
+                table: "CompanyBankAccounts",
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Inovices_ClientId",
-                table: "Inovices",
+                name: "IX_Invoices_ClientId",
+                table: "Invoices",
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InovicesServices_InoviceId",
-                table: "InovicesServices",
-                column: "InoviceId");
+                name: "IX_InvoicesServices_InvoiceId",
+                table: "InvoicesServices",
+                column: "InvoiceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InovicesServices_ProformaInvoiceId",
-                table: "InovicesServices",
+                name: "IX_InvoicesServices_ProformaInvoiceId",
+                table: "InvoicesServices",
                 column: "ProformaInvoiceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InovicesServices_ServiceId",
-                table: "InovicesServices",
+                name: "IX_InvoicesServices_ServiceId",
+                table: "InvoicesServices",
                 column: "ServiceId");
 
             migrationBuilder.CreateIndex(
@@ -472,16 +456,13 @@ namespace TravelWarrants.Migrations
                 name: "Accounts");
 
             migrationBuilder.DropTable(
-                name: "CompaniesGiroAccounts");
+                name: "CompanyBankAccounts");
 
             migrationBuilder.DropTable(
-                name: "InovicesServices");
+                name: "InvoicesServices");
 
             migrationBuilder.DropTable(
                 name: "Payments");
-
-            migrationBuilder.DropTable(
-                name: "Places");
 
             migrationBuilder.DropTable(
                 name: "Statuses");
@@ -490,10 +471,10 @@ namespace TravelWarrants.Migrations
                 name: "Tours");
 
             migrationBuilder.DropTable(
-                name: "Companies");
+                name: "Company");
 
             migrationBuilder.DropTable(
-                name: "Inovices");
+                name: "Invoices");
 
             migrationBuilder.DropTable(
                 name: "ProformaInovices");
