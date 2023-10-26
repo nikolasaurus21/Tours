@@ -6,7 +6,8 @@ import { ServicesContext } from "../../context/ServicesContext";
 import { HiMinus, HiOutlinePlusSm } from "react-icons/hi";
 import { IAddItem, IAddProformaInvoice } from "../../api/interfaces";
 import { ProformaInovicesContext } from "../../context/ProformaInvoicesContext";
-import { uploadFileBuffering, uploadfileStreaming } from "../../api/api";
+import { uploadfileStreaming } from "../../api/api";
+import { BsCheck2All } from "react-icons/bs";
 
 const NewProformaInvoice = () => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ const NewProformaInvoice = () => {
   const { clients } = useContext(ClientsContext);
   const { services } = useContext(ServicesContext);
   const { addProformaInvoice } = useContext(ProformaInovicesContext);
-
+  const [uploading, setUploading] = useState<boolean>(false);
   const [items, setItems] = useState<IAddItem[]>([]);
   const [newProformaInvoice, setNewProformaInvoice] =
     useState<IAddProformaInvoice>({
@@ -69,17 +70,17 @@ const NewProformaInvoice = () => {
     if (!file) {
       return;
     }
-
+    setUploading(true);
     try {
       const fileId = await uploadfileStreaming(file);
       setNewProformaInvoice((prevState) => ({
         ...prevState,
         file: fileId,
       }));
-
-      //console.log(fileId);
     } catch (error) {
       console.error("Greska prilikom upload-a: ", error);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -326,8 +327,14 @@ const NewProformaInvoice = () => {
           className="custom-file-input"
           onChange={handleFileChange}
         />
-
-        <button type="submit">Dodaj profakturu</button>
+        {!uploading && newProformaInvoice.file && (
+          <span>
+            <BsCheck2All style={{ color: "#005f40" }} />
+          </span>
+        )}
+        <button type="submit" disabled={uploading}>
+          Dodaj profakturu
+        </button>
       </form>
     </div>
   );

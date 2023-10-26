@@ -1196,32 +1196,44 @@ export const uploadFileBuffering =async (file:File):Promise<number> => {
     }
 }
 
-export const uploadfileStreaming =async (file:File):Promise<number> => {
+export const uploadfileStreaming = async (file: File): Promise<number> => {
   if (!file) {
     throw new Error('Fajl je obavezan.');
-}
+  }
 
-const formData = new FormData();
-formData.append('file', file);
+  // Kreiranje CancelToken-a unutar funkcije
+  const CancelToken = axios.CancelToken;
+  const source = CancelToken.source();
 
-try {
-  
-  const response = await axios.post('https://localhost:7206/api/UploadFiles/streaming-upload', formData, {
-      headers: {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const response = await axios.post(
+      'https://localhost:7206/api/UploadFiles/streaming-upload',
+      formData,
+      {
+        headers: {
           'Content-Type': 'multipart/form-data',
-      },
-  });
+        },
+        cancelToken: source.token,  // Dodajte cancelToken ovde
+      }
+    );
 
-  
-  const data = response.data;
+    const data = response.data;
+    return data;
 
-  return data;  
-  
+  } catch (error) {
+    if (axios.isCancel(error)) {
+      console.log('Zahtev otkazan:', error.message);
+    } else {
+      console.error('Greška prilikom upload-a:', error);
+    }
+    throw error;
+  }
 
-} catch (error) {
-  console.error('Greska prilikom upload-a: ', error);
-  throw error;  
-}
+  // Otkazivanje zahteva može se pozvati ovako
+  // source.cancel('Operacija otkazana od strane korisnika.');
 }
 export const editProformaInvoice = async (id: number, data: IEditProformaInvoice): Promise<IProformaInvoices> => {
   try {

@@ -48,17 +48,15 @@ namespace TravelWarrants.Services
             return uploadedFile.Id;
         }
 
-        public async Task<int> UploadFileStreaming(IFormFile file)
+        public async Task<int> UploadFileStreaming(IFormFile file, CancellationToken cancellationToken = default)
         {
             if (file == null || file.Length == 0)
             {
-
                 throw new ArgumentException("Invalid file.");
             }
 
             if (!Directory.Exists(_folderPath))
             {
-
                 Directory.CreateDirectory(_folderPath);
             }
 
@@ -81,9 +79,9 @@ namespace TravelWarrants.Services
                 var buffer = new byte[1048576]; // 1 MB buffer
                 int bytesRead;
                 var fileReadStream = file.OpenReadStream();
-                while ((bytesRead = await fileReadStream.ReadAsync(buffer)) > 0)
+                while ((bytesRead = await fileReadStream.ReadAsync(buffer, cancellationToken)) > 0)
                 {
-                    await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead));
+                    await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken);
                     _logger.LogInformation($"{bytesRead} bytes read and written to file");
                 }
             }
@@ -96,10 +94,11 @@ namespace TravelWarrants.Services
             };
 
             _context.UploadedFiles.Add(uploadedFile);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             return uploadedFile.Id;
         }
+
 
 
         public async Task DeleteFile(int fileId)

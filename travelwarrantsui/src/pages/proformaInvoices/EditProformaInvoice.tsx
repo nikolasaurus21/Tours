@@ -9,6 +9,7 @@ import { ClientsContext } from "../../context/ClientsContext";
 
 import { ServicesContext } from "../../context/ServicesContext";
 import { ProformaInovicesContext } from "../../context/ProformaInvoicesContext";
+import { BsCheck2All } from "react-icons/bs";
 
 const EditProformaInvoice = () => {
   const { id } = useParams();
@@ -22,7 +23,7 @@ const EditProformaInvoice = () => {
   const [fileName, setFileName] = useState<string | null>(null);
   const [oldFileId, setOldFileId] = useState<number | undefined>(undefined);
   const [newFileId, setNewFileId] = useState<number | undefined>(undefined);
-
+  const [uploading, setUploading] = useState<boolean>(false);
   const [items, setItems] = useState<IItemsEdit[]>([]);
 
   const [proformaInvoiceNumber, setProformaInvoiceNumber] = useState<
@@ -47,6 +48,7 @@ const EditProformaInvoice = () => {
   ) => {
     const fileToUpload = event.target.files ? event.target.files[0] : null;
     if (fileToUpload) {
+      setUploading(true);
       try {
         const fileIdFromApi = await uploadFile(fileToUpload);
         setNewFileId(fileIdFromApi);
@@ -57,6 +59,8 @@ const EditProformaInvoice = () => {
         }));
       } catch (error) {
         console.error("Error uploading file:", error);
+      } finally {
+        setUploading(false);
       }
     }
   };
@@ -472,17 +476,26 @@ const EditProformaInvoice = () => {
               </button>
             </div>
           ) : (
-            <input
-              type="file"
-              name="routeplan"
-              id="routeplan"
-              className="custom-file-input"
-              onChange={handleFileUpload}
-            />
+            <>
+              <input
+                type="file"
+                name="routeplan"
+                id="routeplan"
+                className="custom-file-input"
+                onChange={handleFileUpload}
+              />
+              {!uploading && addProformaInvoice.file && (
+                <span>
+                  <BsCheck2All style={{ color: "#005f40" }} />
+                </span>
+              )}
+            </>
           )}
         </div>
 
-        <button type="submit">Sačuvaj izmjene</button>
+        <button type="submit" disabled={uploading}>
+          Sačuvaj izmjene
+        </button>
       </form>
     </div>
   );

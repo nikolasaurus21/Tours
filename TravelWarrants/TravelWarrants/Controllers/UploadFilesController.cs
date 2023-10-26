@@ -5,7 +5,7 @@ namespace TravelWarrants.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [RequestFormLimits(MultipartBodyLengthLimit = 512L * 1024 * 1024)]
+    [RequestSizeLimit(100_000_000_000)]
     public class UploadFilesController : ControllerBase
     {
         private readonly IFileUploadService _fileService;
